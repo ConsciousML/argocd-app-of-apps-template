@@ -4,6 +4,8 @@ An ArgoCD template repository implementing the [App of Apps pattern](https://arg
 
 ## Prerequisites
 - A functional ArgoCD instance
+- ArgoCD CRDs must be installed in your cluster
+- The `argocd` namespace must exists in your cluster
 - Knowledge of the [App of Apps pattern](https://argo-cd.readthedocs.io/en/latest/operator-manual/cluster-bootstrapping/#app-of-apps-pattern-alternative)
 
 ## Usage
