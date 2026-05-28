@@ -1,0 +1,4 @@
+[tools]
+helm = "4.2.0"
+kubeconform = "0.7.0"
+prek = "0.4.3"
