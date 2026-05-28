@@ -8,3 +8,5 @@ config:
 
 applications:
   - name: guestbook
+    destination:
+      namespace: argocd
