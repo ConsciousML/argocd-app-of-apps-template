@@ -1,0 +1,18 @@
+[[repos]]
+repo = "local"
+
+[[repos.hooks]]
+id = "validate-helm"
+name = "Helm lint and kubeconform"
+language = "system"
+entry = "scripts/validate-helm.sh"
+files = '\.(yaml|yml)$'
+pass_filenames = false
+
+[[repos.hooks]]
+id = "validate-manifests"
+name = "kubeconform plain manifests"
+language = "system"
+entry = "scripts/validate-manifests.sh"
+files = '\.(yaml|yml)$'
+pass_filenames = false
