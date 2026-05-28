@@ -1,0 +1,11 @@
+config:
+  spec:
+    destination:
+      server: https://kubernetes.default.svc
+    source:
+      repoURL: https://github.com/ConsciousML/argocd-app-of-apps-template
+      targetRevision: main
+
+applications:
+  - name: guestbook
+    namespace: guestbook
