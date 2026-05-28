@@ -67,5 +67,12 @@ prek run
 
 ## Continuous Integration (CI)
 
+CI runs on every pull request via GitHub Actions. It installs tools with mise and runs all prek hooks (`validate-helm` and `validate-manifests`):
+
+- `validate-helm`: runs `helm lint` and `helm template | kubeconform` on every chart discovered in the repo.
+- `validate-manifests`: runs `kubeconform` on every plain Kubernetes manifest (YAML files not part of a Helm chart).
+
+To trigger CI manually, use the **Run workflow** button on the [Actions tab](../../actions/workflows/ci.yaml).
+
 ## License
 This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.
