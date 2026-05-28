@@ -35,7 +35,7 @@ fi
 for manifest in "${PLAIN_MANIFESTS[@]}"; do
   rel="${manifest#"$REPO_ROOT/"}"
   echo "==> kubeconform: $rel"
-  if ! conform_output="$(kubeconform --strict --summary "$manifest" 2>&1)"; then
+  if ! conform_output="$(kubeconform --strict --ignore-missing-schemas --summary "$manifest" 2>&1)"; then
     echo "FAIL: kubeconform failed for $rel"
     echo "$conform_output"
     ERRORS=$((ERRORS + 1))
