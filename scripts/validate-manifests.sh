@@ -25,7 +25,7 @@ while IFS= read -r f; do
   if ! is_under_helm_chart "$f"; then
     PLAIN_MANIFESTS+=("$f")
   fi
-done < <(find "$REPO_ROOT" -name '*.yaml' -not -path '*/.git/*')
+done < <(find "$REPO_ROOT" -name '*.yaml' -not -path '*/.git/*' -not -path '*/.github/*')
 
 if [[ ${#PLAIN_MANIFESTS[@]} -eq 0 ]]; then
   echo "No plain manifests found."

@@ -16,8 +16,47 @@ An ArgoCD template repository implementing the [App of Apps pattern](https://arg
 ## Pre-commit Setup (recommended)
 We use a more efficient framework than [pre-commit](https://github.com/pre-commit/pre-commit) called [prek](https://github.com/j178/prek).
 
+### Installation
+
+**Option 1: Use mise (recommended)**
+
+First, `cd` at the root of this repository. 
+
+Next, install mise:
+```bash
+curl https://mise.run | MISE_VERSION=v2026.4.0 sh
+```
+
+Then, install all the tools in the `mise.toml` file:
+```bash
+mise trust
+mise install
+```
+
+Finally, run the following to automatically activate mise when starting a shell:
+- For zsh: 
+```bash
+echo 'eval "$(~/.local/bin/mise activate zsh)"' >> ~/.zshrc && source ~/.zshrc
+```
+- For bash:
+```bash
+echo 'eval "$(~/.local/bin/mise activate bash)"' >> ~/.bashrc && source ~/.bashrc
+```
+
+For more information on how to use mise, read their [getting started guide](https://mise.jdx.dev/getting-started.html).
+
+**Option 2: Install Tools Manually**
+- [Helm](https://helm.sh/docs/intro/install/)
+- [Kubeconform](https://github.com/yannh/kubeconform#Installation)
+- [prek](https://prek.j178.dev/installation/)
+
+See [mise.toml](./mise.toml) for specific versions.
+
+### Enable Pre-commit
+
 Wire hooks automatically into git automatically:
 ```bash
+chmod +x scripts/*.sh
 prek install
 ```
 
