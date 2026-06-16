@@ -13,7 +13,7 @@ spec:
   source:
     path: apps
     repoURL: https://github.com/ConsciousML/argocd-app-of-apps-template
-    targetRevision: move-guestbook-to-argocd
+    targetRevision: main
   syncPolicy:
     syncOptions:
         - CreateNamespace=true
