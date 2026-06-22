@@ -6,7 +6,9 @@ config:
       repoURL: https://github.com/ConsciousML/argocd-app-of-apps-template
       targetRevision: main
 
+appParams: {}
+
 applications:
-  - name: guestbook
+  - name: guestbook-helm
     destination:
       namespace: guestbook

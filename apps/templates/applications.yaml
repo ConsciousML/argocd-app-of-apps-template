@@ -16,6 +16,11 @@ spec:
     path: {{ .path | default .name | quote }}
     repoURL: {{ $config.spec.source.repoURL }}
     targetRevision: {{ $config.spec.source.targetRevision }}
+    {{- with index $.Values.appParams .name }}
+    helm:
+      values: |
+        {{- . | toYaml | nindent 8 }}
+    {{- end }}
     {{- with .tool }}
     {{- . | toYaml | nindent 4 }}
     {{- end }}
