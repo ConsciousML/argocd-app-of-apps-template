@@ -12,8 +12,18 @@ spec:
   project: default
   source:
     path: apps
-    repoURL: https://github.com/ConsciousML/argocd-app-of-apps-template
+    repoURL: https://github.com/<your-org>/<your-repo>
     targetRevision: main
+    helm:
+      values: |
+        appParams:
+          guestbook-helm:
+            host: <your-domain>
+            gateway:
+              name: <gateway-name>
+              namespace: <gateway-namespace>
+            annotations:
+              external-dns.alpha.kubernetes.io/scope: <public|private>
   syncPolicy:
     syncOptions:
         - CreateNamespace=true
