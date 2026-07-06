@@ -5,6 +5,10 @@ kind: Application
 metadata:
   name: {{ .name | quote }}
   namespace: {{ .namespace | default "argocd" }}
+  {{- if hasKey . "syncWave" }}
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ .syncWave | quote }}
+  {{- end }}
   finalizers:
   - resources-finalizer.argocd.argoproj.io
 spec:
