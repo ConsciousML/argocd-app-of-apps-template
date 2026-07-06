@@ -21,6 +21,10 @@ applications:
     destination:
       namespace: kube-system
     syncWave: 0
+    tool:
+      helm:
+        # Must match the catalog's Pod Identity association's expected ServiceAccount name.
+        releaseName: aws-load-balancer-controller
   - name: helm-guestbook
     destination:
       namespace: guestbook
