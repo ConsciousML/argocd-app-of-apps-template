@@ -9,14 +9,14 @@ config:
 appParams: {}
 
 applications:
-  - name: guestbook-helm
+  - name: helm-guestbook
     destination:
       namespace: guestbook
-  - name: gateway-api-crds
+  - name: crds-gateway-api
     destination:
       namespace: argocd
     syncWave: -1
-  - name: aws-lbc-gateway-api-crds
+  - name: crds-aws-lbc-gateway-api
     destination:
       namespace: argocd
     syncWave: -1

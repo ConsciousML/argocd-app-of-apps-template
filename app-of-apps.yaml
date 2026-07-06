@@ -17,7 +17,7 @@ spec:
     helm:
       values: |
         appParams:
-          guestbook-helm:
+          helm-guestbook:
             host: <your-domain>
             gateway:
               name: <gateway-name>

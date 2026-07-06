@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: nested-app-aws-lbc-gateway-api-crds
+  name: nested-app-crds-gateway-api
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
@@ -9,9 +9,9 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    repoURL: https://github.com/kubernetes-sigs/aws-load-balancer-controller
-    path: config/crd/gateway
-    targetRevision: v3.2.1
+    repoURL: https://github.com/kubernetes-sigs/gateway-api
+    path: config/crd/standard
+    targetRevision: v1.5.0
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
