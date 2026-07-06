@@ -17,6 +17,14 @@ fi
 for chart_dir in "${HELM_CHARTS[@]}"; do
   rel="${chart_dir#"$REPO_ROOT/"}"
 
+  echo "==> helm dependency build: $rel"
+  if ! dep_output="$(helm dependency build "$chart_dir" 2>&1)"; then
+    echo "FAIL: helm dependency build failed for $rel"
+    echo "$dep_output"
+    ERRORS=$((ERRORS + 1))
+    continue
+  fi
+
   echo "==> helm lint: $rel"
   if ! lint_output="$(helm lint "$chart_dir" 2>&1)"; then
     echo "FAIL: helm lint failed for $rel"

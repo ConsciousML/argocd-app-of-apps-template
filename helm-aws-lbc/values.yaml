@@ -1,0 +1,6 @@
+aws-load-balancer-controller:
+  # Placeholder for `helm template` to pass in CI
+  clusterName: "cluster"
+  region: ""
+  vpcId: ""
+  enableServiceMutatorWebhook: false

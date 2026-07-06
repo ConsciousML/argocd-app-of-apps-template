@@ -9,9 +9,6 @@ config:
 appParams: {}
 
 applications:
-  - name: helm-guestbook
-    destination:
-      namespace: guestbook
   - name: crds-gateway-api
     destination:
       namespace: argocd
@@ -20,3 +17,11 @@ applications:
     destination:
       namespace: argocd
     syncWave: -1
+  - name: helm-aws-lbc
+    destination:
+      namespace: kube-system
+    syncWave: 0
+  - name: helm-guestbook
+    destination:
+      namespace: guestbook
+    syncWave: 0
