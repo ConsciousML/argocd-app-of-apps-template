@@ -12,3 +12,9 @@ applications:
   - name: guestbook-helm
     destination:
       namespace: guestbook
+  - name: gateway-api-crds
+    destination:
+      namespace: argocd
+  - name: aws-lbc-gateway-api-crds
+    destination:
+      namespace: argocd
