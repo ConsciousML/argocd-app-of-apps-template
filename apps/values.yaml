@@ -41,6 +41,19 @@ applications:
       helm:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
         releaseName: external-dns-public
+  - name: helm-external-secrets-operator
+    destination:
+      namespace: external-secrets
+    syncWave: 0
+    tool:
+      helm:
+        # Must match the catalog's Pod Identity association's expected ServiceAccount name.
+        releaseName: external-secrets
+  - name: argocd-secrets
+    path: helm-eso-secret-sync
+    destination:
+      namespace: argocd
+    syncWave: 1
   - name: helm-guestbook
     destination:
       namespace: guestbook
