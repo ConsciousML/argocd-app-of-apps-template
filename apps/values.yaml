@@ -25,6 +25,22 @@ applications:
       helm:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
         releaseName: aws-load-balancer-controller
+  - name: helm-external-dns-private
+    destination:
+      namespace: external-dns
+    syncWave: 0
+    tool:
+      helm:
+        # Must match the catalog's Pod Identity association's expected ServiceAccount name.
+        releaseName: external-dns-private
+  - name: helm-external-dns-public
+    destination:
+      namespace: external-dns
+    syncWave: 0
+    tool:
+      helm:
+        # Must match the catalog's Pod Identity association's expected ServiceAccount name.
+        releaseName: external-dns-public
   - name: helm-guestbook
     destination:
       namespace: guestbook
