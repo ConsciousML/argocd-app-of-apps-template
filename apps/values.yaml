@@ -28,4 +28,8 @@ applications:
   - name: helm-guestbook
     destination:
       namespace: guestbook
-    syncWave: 0
+    syncWave: 1
+  - name: helm-argocd-ingress
+    destination:
+      namespace: argocd
+    syncWave: 1
