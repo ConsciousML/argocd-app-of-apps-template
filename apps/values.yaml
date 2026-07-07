@@ -21,6 +21,9 @@ applications:
     destination:
       namespace: kube-system
     syncWave: 0
+    # Chart bundles its own CRDs; avoids client-side apply's annotation size limit.
+    syncOptions:
+      - ServerSideApply=true
     tool:
       helm:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
@@ -29,6 +32,8 @@ applications:
     destination:
       namespace: external-dns
     syncWave: 0
+    syncOptions:
+      - ServerSideApply=true
     tool:
       helm:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
@@ -37,6 +42,8 @@ applications:
     destination:
       namespace: external-dns
     syncWave: 0
+    syncOptions:
+      - ServerSideApply=true
     tool:
       helm:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
@@ -45,6 +52,8 @@ applications:
     destination:
       namespace: external-secrets
     syncWave: 0
+    syncOptions:
+      - ServerSideApply=true
     tool:
       helm:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.

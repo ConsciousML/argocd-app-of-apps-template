@@ -15,6 +15,8 @@ spec:
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
+      # CRDs are too large for client-side apply's annotation limit.
+      - ServerSideApply=true
     automated:
       prune: false
       selfHeal: true
