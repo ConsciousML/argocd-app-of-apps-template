@@ -3,3 +3,4 @@ external-dns:
     name: aws
   txtOwnerId: "cluster"
   domainFilters: []
+  triggerLoopOnEvent: true
