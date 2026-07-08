@@ -1,0 +1,15 @@
+certificateArn: ""
+gatewayClassName: aws-alb
+# Overridden at sync time by gateway-values.yaml (see apps/values.yaml's extraValueFiles) —
+# defaults here only so standalone `helm lint`/`helm template` don't nil-pointer.
+gateway:
+  name: ""
+  namespace: ""
+public:
+  targetGroupConfigName: public-defaults
+  loadBalancerConfigName: public
+private:
+  namespace: gateway
+  gatewayName: private-alb
+  targetGroupConfigName: private-defaults
+  loadBalancerConfigName: private
