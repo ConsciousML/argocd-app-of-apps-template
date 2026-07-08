@@ -11,6 +11,9 @@ metadata:
   {{- end }}
   finalizers:
   - resources-finalizer.argocd.argoproj.io
+  {{- range .finalizers }}
+  - {{ . }}
+  {{- end }}
 spec:
   destination:
     namespace: {{ (.destination).namespace | default .name | quote }}
