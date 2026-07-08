@@ -13,11 +13,18 @@ applications:
   - name: crds-gateway-api
     destination:
       namespace: argocd
-    syncWave: -1
+    syncWave: -2
   - name: crds-aws-lbc-gateway-api
     destination:
       namespace: argocd
-    syncWave: -1
+    syncWave: -2
+  # `synWave: 1` because it needs the CRDs from `helm-aws-lbc`
+  - name: helm-gateway-api
+    destination:
+      namespace: gateway
+    syncWave: 1
+    extraValueFiles:
+      - helm-gateway-api/gateway-values.yaml
 
   # --- AWS Load Balancer Controller ---
   - name: helm-aws-lbc
@@ -71,11 +78,11 @@ applications:
     path: helm-eso-secret-sync
     destination:
       namespace: argocd
-    syncWave: 1
+    syncWave: 2
   - name: helm-argocd-ingress
     destination:
       namespace: argocd
-    syncWave: 1
+    syncWave: 2
 
   # --- Tailscale ---
   - name: tailscale-secrets
@@ -93,10 +100,12 @@ applications:
   - name: helm-tailscale-connector
     destination:
       namespace: tailscale
-    syncWave: 1
+    syncWave: 2
 
   # --- Guestbook ---
   - name: helm-guestbook
     destination:
       namespace: guestbook
-    syncWave: 1
+    syncWave: 2
+    extraValueFiles:
+      - helm-gateway-api/gateway-values.yaml

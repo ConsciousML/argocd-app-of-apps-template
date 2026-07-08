@@ -16,12 +16,36 @@ spec:
     namespace: {{ (.destination).namespace | default .name | quote }}
     server: {{ $config.spec.destination.server | quote }}
   project: {{ .project | default "default" }}
+  {{- $appParamsValues := index $.Values.appParams .name }}
+  {{- $toolHelm := (.tool).helm }}
+  {{- if .extraValueFiles }}
+  sources:
+    - path: {{ .path | default .name | quote }}
+      repoURL: {{ $config.spec.source.repoURL }}
+      targetRevision: {{ $config.spec.source.targetRevision }}
+      helm:
+        valueFiles:
+          {{- range .extraValueFiles }}
+          - $values/{{ . }}
+          {{- end }}
+        {{- with $toolHelm }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- with $appParamsValues }}
+        values: |
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+      {{- with omit (.tool | default dict) "helm" }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+    - repoURL: {{ $config.spec.source.repoURL }}
+      targetRevision: {{ $config.spec.source.targetRevision }}
+      ref: values
+  {{- else }}
   source:
     path: {{ .path | default .name | quote }}
     repoURL: {{ $config.spec.source.repoURL }}
     targetRevision: {{ $config.spec.source.targetRevision }}
-    {{- $appParamsValues := index $.Values.appParams .name }}
-    {{- $toolHelm := (.tool).helm }}
     {{- if or $appParamsValues $toolHelm }}
     helm:
       {{- with $toolHelm }}
@@ -35,6 +59,7 @@ spec:
     {{- with omit (.tool | default dict) "helm" }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
+  {{- end }}
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
