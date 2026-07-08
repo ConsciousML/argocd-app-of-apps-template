@@ -9,6 +9,7 @@ config:
 appParams: {}
 
 applications:
+  # --- Gateway API ---
   - name: crds-gateway-api
     destination:
       namespace: argocd
@@ -17,6 +18,8 @@ applications:
     destination:
       namespace: argocd
     syncWave: -1
+
+  # --- AWS Load Balancer Controller ---
   - name: helm-aws-lbc
     destination:
       namespace: kube-system
@@ -28,6 +31,8 @@ applications:
       helm:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
         releaseName: aws-load-balancer-controller
+
+  # --- ExternalDNS ---
   - name: helm-external-dns-private
     destination:
       namespace: external-dns
@@ -48,6 +53,8 @@ applications:
       helm:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
         releaseName: external-dns-public
+
+  # --- External Secrets Operator ---
   - name: helm-external-secrets-operator
     destination:
       namespace: external-secrets
@@ -58,16 +65,38 @@ applications:
       helm:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
         releaseName: external-secrets
+
+  # --- ArgoCD ---
   - name: argocd-secrets
     path: helm-eso-secret-sync
     destination:
       namespace: argocd
     syncWave: 1
-  - name: helm-guestbook
-    destination:
-      namespace: guestbook
-    syncWave: 1
   - name: helm-argocd-ingress
     destination:
       namespace: argocd
+    syncWave: 1
+
+  # --- Tailscale ---
+  - name: tailscale-secrets
+    path: helm-eso-secret-sync
+    destination:
+      namespace: tailscale
+    syncWave: -1
+  - name: helm-tailscale-operator
+    destination:
+      namespace: tailscale
+    syncWave: 0
+    # Chart bundles its own CRDs; avoids client-side apply's annotation size limit.
+    syncOptions:
+      - ServerSideApply=true
+  - name: helm-tailscale-connector
+    destination:
+      namespace: tailscale
+    syncWave: 1
+
+  # --- Guestbook ---
+  - name: helm-guestbook
+    destination:
+      namespace: guestbook
     syncWave: 1
