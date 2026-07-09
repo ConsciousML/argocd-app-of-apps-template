@@ -75,10 +75,6 @@ applications:
       helm:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
         releaseName: external-dns-private
-    # ArgoCD auto-adds these for the PreDelete hook in predelete-hook.yaml; declared here so sync doesn't flap.
-    finalizers:
-      - pre-delete-finalizer.argocd.argoproj.io
-      - pre-delete-finalizer.argocd.argoproj.io/cleanup
   - name: helm-external-dns-public
     destination:
       namespace: external-dns
@@ -89,9 +85,6 @@ applications:
       helm:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
         releaseName: external-dns-public
-    finalizers:
-      - pre-delete-finalizer.argocd.argoproj.io
-      - pre-delete-finalizer.argocd.argoproj.io/cleanup
 
   # --- External Secrets Operator ---
   - name: helm-external-secrets-operator
