@@ -19,5 +19,8 @@ jobs:
       - name: Make scripts executable
         run: chmod +x scripts/*.sh
 
+      - name: Add Helm chart repos
+        run: scripts/helm-repo-add.sh
+
       - name: Run pre-commit hooks (prek)
         uses: j178/prek-action@v2.0.4
