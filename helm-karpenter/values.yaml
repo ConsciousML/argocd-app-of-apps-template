@@ -1,0 +1,14 @@
+karpenter:
+  # Placeholder for `helm template` to pass in CI
+  settings:
+    clusterName: "cluster"
+    interruptionQueue: "queue"
+    enableZonalShift: false
+  controller:
+    resources:
+      requests:
+        cpu: "1"
+        memory: "1Gi"
+      limits:
+        cpu: "1"
+        memory: "1Gi"

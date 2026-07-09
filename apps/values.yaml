@@ -46,6 +46,24 @@ applications:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
         releaseName: aws-load-balancer-controller
 
+  # --- Karpenter ---
+  - name: helm-karpenter
+    destination:
+      namespace: kube-system
+    syncWave: 0
+    # Chart bundles its own CRDs; avoids client-side apply's annotation size limit.
+    syncOptions:
+      - ServerSideApply=true
+    tool:
+      helm:
+        # Must match the catalog's Pod Identity association's expected ServiceAccount name.
+        releaseName: karpenter
+  - name: helm-karpenter-config
+    destination:
+      namespace: kube-system
+    # After the controller (and its CRDs) are up.
+    syncWave: 1
+
   # --- ExternalDNS ---
   - name: helm-external-dns-private
     destination:
@@ -57,10 +75,6 @@ applications:
       helm:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
         releaseName: external-dns-private
-    # ArgoCD auto-adds these for the PreDelete hook in predelete-hook.yaml; declared here so sync doesn't flap.
-    finalizers:
-      - pre-delete-finalizer.argocd.argoproj.io
-      - pre-delete-finalizer.argocd.argoproj.io/cleanup
   - name: helm-external-dns-public
     destination:
       namespace: external-dns
@@ -71,9 +85,6 @@ applications:
       helm:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
         releaseName: external-dns-public
-    finalizers:
-      - pre-delete-finalizer.argocd.argoproj.io
-      - pre-delete-finalizer.argocd.argoproj.io/cleanup
 
   # --- External Secrets Operator ---
   - name: helm-external-secrets-operator
