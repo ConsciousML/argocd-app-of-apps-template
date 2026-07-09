@@ -46,6 +46,24 @@ applications:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
         releaseName: aws-load-balancer-controller
 
+  # --- Karpenter ---
+  - name: helm-karpenter
+    destination:
+      namespace: kube-system
+    syncWave: 0
+    # Chart bundles its own CRDs; avoids client-side apply's annotation size limit.
+    syncOptions:
+      - ServerSideApply=true
+    tool:
+      helm:
+        # Must match the catalog's Pod Identity association's expected ServiceAccount name.
+        releaseName: karpenter
+  - name: helm-karpenter-config
+    destination:
+      namespace: kube-system
+    # After the controller (and its CRDs) are up.
+    syncWave: 1
+
   # --- ExternalDNS ---
   - name: helm-external-dns-private
     destination:
