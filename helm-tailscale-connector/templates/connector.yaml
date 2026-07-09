@@ -1,0 +1,10 @@
+apiVersion: tailscale.com/v1alpha1
+kind: Connector
+metadata:
+  name: {{ .Values.name | quote }}
+spec:
+  hostnamePrefix: {{ .Values.hostnamePrefix | quote }}
+  replicas: {{ .Values.replicas }}
+  subnetRouter:
+    advertiseRoutes:
+      {{- toYaml .Values.advertiseRoutes | nindent 6 }}

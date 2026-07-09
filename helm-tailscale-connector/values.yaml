@@ -1,0 +1,4 @@
+name: ""
+hostnamePrefix: ""
+advertiseRoutes: []
+replicas: 1

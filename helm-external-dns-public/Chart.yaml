@@ -1,0 +1,9 @@
+apiVersion: v2
+name: helm-external-dns-public
+description: ExternalDNS instance scoped to the public hosted zone
+type: application
+version: 0.1.0
+dependencies:
+  - name: external-dns
+    version: 1.20.0
+    repository: https://kubernetes-sigs.github.io/external-dns/

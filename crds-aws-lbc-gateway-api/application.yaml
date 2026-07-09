@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nested-app-crds-aws-lbc-gateway-api
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    repoURL: https://github.com/kubernetes-sigs/aws-load-balancer-controller
+    path: config/crd/gateway
+    targetRevision: v3.2.1
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      # CRDs are too large for client-side apply's annotation limit.
+      - ServerSideApply=true
+    automated:
+      prune: false
+      selfHeal: true

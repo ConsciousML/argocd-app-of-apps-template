@@ -1,0 +1,6 @@
+external-dns:
+  provider:
+    name: aws
+  txtOwnerId: "cluster"
+  domainFilters: []
+  triggerLoopOnEvent: true

@@ -1,0 +1,10 @@
+apiVersion: gateway.k8s.aws/v1beta1
+kind: TargetGroupConfiguration
+metadata:
+  name: {{ .Values.private.targetGroupConfigName | quote }}
+  namespace: {{ .Values.private.namespace | quote }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  defaultConfiguration:
+    targetType: ip

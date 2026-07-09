@@ -4,6 +4,10 @@ set -euo pipefail
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 ERRORS=0
 
+# Kinds with no reliable kubeconform schema source yet — tracked in
+# https://github.com/ConsciousML/argocd-app-of-apps-template/issues/6
+SKIP_KINDS="Application,SecretStore,ExternalSecret,GatewayClass,TargetGroupConfiguration,LoadBalancerConfiguration,Connector"
+
 # Collect Helm chart root dirs to exclude their files
 HELM_ROOTS=()
 while IFS= read -r dir; do
@@ -35,7 +39,7 @@ fi
 for manifest in "${PLAIN_MANIFESTS[@]}"; do
   rel="${manifest#"$REPO_ROOT/"}"
   echo "==> kubeconform: $rel"
-  if ! conform_output="$(kubeconform --strict --ignore-missing-schemas --summary "$manifest" 2>&1)"; then
+  if ! conform_output="$(kubeconform --strict --ignore-missing-schemas --skip "$SKIP_KINDS" --summary "$manifest" 2>&1)"; then
     echo "FAIL: kubeconform failed for $rel"
     echo "$conform_output"
     ERRORS=$((ERRORS + 1))

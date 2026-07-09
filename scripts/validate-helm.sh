@@ -4,6 +4,10 @@ set -euo pipefail
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 ERRORS=0
 
+# Kinds with no reliable kubeconform schema source yet — tracked in
+# https://github.com/ConsciousML/argocd-app-of-apps-template/issues/6
+SKIP_KINDS="Application,SecretStore,ExternalSecret,GatewayClass,TargetGroupConfiguration,LoadBalancerConfiguration,Connector"
+
 HELM_CHARTS=()
 while IFS= read -r dir; do
   HELM_CHARTS+=("$dir")
@@ -16,6 +20,14 @@ fi
 
 for chart_dir in "${HELM_CHARTS[@]}"; do
   rel="${chart_dir#"$REPO_ROOT/"}"
+
+  echo "==> helm dependency build: $rel"
+  if ! dep_output="$(helm dependency build "$chart_dir" 2>&1)"; then
+    echo "FAIL: helm dependency build failed for $rel"
+    echo "$dep_output"
+    ERRORS=$((ERRORS + 1))
+    continue
+  fi
 
   echo "==> helm lint: $rel"
   if ! lint_output="$(helm lint "$chart_dir" 2>&1)"; then
@@ -31,7 +43,7 @@ for chart_dir in "${HELM_CHARTS[@]}"; do
     ERRORS=$((ERRORS + 1))
     continue
   }
-  if ! conform_output="$(echo "$template_output" | kubeconform --strict --ignore-missing-schemas --summary 2>&1)"; then
+  if ! conform_output="$(echo "$template_output" | kubeconform --strict --ignore-missing-schemas --skip "$SKIP_KINDS" --summary 2>&1)"; then
     echo "FAIL: kubeconform failed for $rel"
     echo "$conform_output"
     ERRORS=$((ERRORS + 1))

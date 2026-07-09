@@ -1,5 +1,5 @@
 apiVersion: v2
-name: guestbook-helm
+name: helm-guestbook
 description: Guestbook app with Gateway API HTTPRoute
 type: application
 version: 0.1.0

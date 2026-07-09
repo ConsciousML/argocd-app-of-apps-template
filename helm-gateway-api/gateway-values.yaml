@@ -1,0 +1,3 @@
+gateway:
+  name: public-alb
+  namespace: gateway
