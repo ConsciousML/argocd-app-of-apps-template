@@ -33,6 +33,10 @@ kube-prometheus-stack:
             resources:
               requests:
                 storage: 50Gi
+        # Reclaim volumes on dev for cost savings, do not enable this on prod
+        persistentVolumeClaimRetentionPolicy:
+          whenDeleted: Delete
+          whenScaled: Retain
 
   alertmanager:
     alertmanagerSpec:
@@ -44,6 +48,10 @@ kube-prometheus-stack:
             resources:
               requests:
                 storage: 10Gi
+      # Reclaim volumes on dev for cost savings, do not enable this on prod
+      persistentVolumeClaimRetentionPolicy:
+        whenDeleted: Delete
+        whenScaled: Retain
 
   grafana:
     # Dashboards/datasources are sidecar-provisioned from ConfigMaps, nothing to persist
