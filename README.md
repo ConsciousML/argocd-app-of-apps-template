@@ -7,7 +7,7 @@ An ArgoCD template repository implementing the [App of Apps pattern](https://arg
 - ArgoCD CRDs must be installed in your cluster
 - The `argocd` namespace must exist in your cluster
 - Knowledge of the [App of Apps pattern](https://argo-cd.readthedocs.io/en/latest/operator-manual/cluster-bootstrapping/#app-of-apps-pattern-alternative)
-- [Gateway API CRDs v1.5](https://github.com/kubernetes-sigs/gateway-api/releases/tag/v1.5.0) and a shared [`Gateway`](https://gateway-api.sigs.k8s.io/reference/api-types/gateway/) resource provisioned in the cluster (for `helm-guestbook`)
+- [Gateway API CRDs v1.5](https://github.com/kubernetes-sigs/gateway-api/releases/tag/v1.5.0) and a shared [`Gateway`](https://gateway-api.sigs.k8s.io/reference/api-types/gateway/) resource provisioned in the cluster (for `guestbook-httproute`)
 
 ## Getting Started
 
@@ -19,11 +19,11 @@ The catalog provisions the Application CR with the correct `helm.values` (hostna
 
 See [`app-of-apps.yaml`](app-of-apps.yaml) for the shape of the resource Terraform produces.
 
-Access the ArgoCD UI and verify the `helm-guestbook` app has been deployed.
+Access the ArgoCD UI and verify the `guestbook` app has been deployed.
 
 ### Adding an App
 
-1. Create a directory for your application at the root of the repository. Plain manifest directories and Helm charts are both supported. See [`helm-guestbook`](helm-guestbook) as a reference.
+1. Create a directory for your application at the root of the repository. Plain manifest directories and Helm charts are both supported. See [`guestbook`](guestbook) as a reference.
 2. In [`apps/values.yaml`](apps/values.yaml), under `applications`, add one entry with the directory name and target namespace.
 3. For Helm chart apps that require runtime values, pass them via `spec.source.helm.values` on the app-of-apps Application CR. The `appParams.<app-name>` map is injected as a Helm values file into the child Application at sync time.
 
