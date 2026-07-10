@@ -1,0 +1,6 @@
+gateway:
+  name: public-alb
+  namespace: gateway
+scheme: internet-facing
+targetGroupConfigName: public-defaults
+loadBalancerConfigName: public

@@ -1,0 +1,6 @@
+gateway:
+  name: private-alb
+  namespace: gateway
+scheme: internal
+targetGroupConfigName: private-defaults
+loadBalancerConfigName: private

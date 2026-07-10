@@ -1,0 +1,12 @@
+gateway:
+  # Overridden at sync time by public-gateway-values.yaml or private-gateway-values.yaml
+  # (see apps/values.yaml's extraValueFiles) — defaults here only so standalone
+  # `helm lint`/`helm template` don't nil-pointer.
+  name: ""
+  namespace: ""
+gatewayClassName: ""
+# internet-facing (public) or internal (private)
+scheme: ""
+targetGroupConfigName: ""
+loadBalancerConfigName: ""
+certificateArn: ""

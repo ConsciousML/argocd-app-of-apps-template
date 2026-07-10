@@ -1,5 +1,0 @@
-apiVersion: v2
-name: helm-gateway-api
-description: Shared internet-facing and internal ALBs via the AWS Load Balancer Controller Gateway API integration
-type: application
-version: 0.1.0
