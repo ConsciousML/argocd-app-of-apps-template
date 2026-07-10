@@ -1,6 +1,0 @@
-host: ""
-gateway:
-  name: ""
-  namespace: ""
-annotations:
-  external-dns.alpha.kubernetes.io/scope: public

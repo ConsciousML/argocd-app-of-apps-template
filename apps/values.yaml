@@ -225,10 +225,18 @@ applications:
       - helm-httproute/alertmanager-httproute-values.yaml
 
   # --- Guestbook ---
-  # Depends on gateway-public.
-  - name: helm-guestbook
+  - name: guestbook
+    destination:
+      namespace: guestbook
+    syncWave: 0
+  # Depends on:
+  # - gateway-public
+  # - guestbook (the backend Service)
+  - name: guestbook-httproute
+    path: helm-httproute
     destination:
       namespace: guestbook
     syncWave: 3
     extraValueFiles:
       - helm-gateway-api-gateway/public-gateway-values.yaml
+      - helm-httproute/guestbook-httproute-values.yaml

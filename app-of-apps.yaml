@@ -17,13 +17,8 @@ spec:
     helm:
       values: |
         appParams:
-          helm-guestbook:
+          guestbook-httproute:
             host: <your-domain>
-            gateway:
-              name: <gateway-name>
-              namespace: <gateway-namespace>
-            annotations:
-              external-dns.alpha.kubernetes.io/scope: <public|private>
   syncPolicy:
     syncOptions:
         - CreateNamespace=true
