@@ -171,6 +171,12 @@ applications:
     # Chart bundles the Prometheus Operator CRDs; avoids client-side apply's annotation size limit.
     syncOptions:
       - ServerSideApply=true
+    tool:
+      helm:
+        # fullnameOverride only pins this chart's own resources (prometheus/alertmanager/
+        # operator); bundled subcharts (grafana, kube-state-metrics, node-exporter) derive
+        # their own names from the release name instead, which backendRefs rely on.
+        releaseName: kube-prometheus-stack
   # Depends on:
   # - gateway-private
   # - helm-kube-prometheus-stack (the backend Service)
