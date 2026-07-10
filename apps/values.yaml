@@ -25,12 +25,13 @@ applications:
     destination:
       namespace: argocd
     syncWave: -2
-  # `syncWave: -1` because it needs the Gateway API CRDs (`crds-gateway-api`) at wave -2.
+  # `syncWave: 0`: GatewayClass only goes Healthy once helm-aws-lbc's controller sets its
+  # Accepted condition, so it can't sync in an earlier wave than the controller.
   - name: gateway-class
     path: helm-gateway-api-gateway-class
     destination:
       namespace: gateway
-    syncWave: -1
+    syncWave: 0
   # `syncWave: 1` because it needs the AWS LBC controller (from `helm-aws-lbc`) running to
   # reconcile the LoadBalancerConfiguration/TargetGroupConfiguration into an ALB.
   - name: gateway-public
