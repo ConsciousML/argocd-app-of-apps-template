@@ -1,0 +1,19 @@
+# Gives this instance time to notice a just-deleted Ingress/HTTPRoute and clean up its
+# Route53 records before its own Deployment is torn down (catalog repo issue #25).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: external-dns-public-predelete
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    argocd.argoproj.io/hook: PreDelete
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: sleep
+          image: busybox
+          command: ["sleep", "60"]
