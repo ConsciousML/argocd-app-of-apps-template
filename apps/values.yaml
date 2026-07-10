@@ -25,13 +25,30 @@ applications:
     destination:
       namespace: argocd
     syncWave: -2
-  # `synWave: 1` because it needs the CRDs from `helm-aws-lbc`
-  - name: helm-gateway-api
+  # `syncWave: -1` because it needs the Gateway API CRDs (`crds-gateway-api`) at wave -2.
+  - name: gateway-class
+    path: helm-gateway-api-gateway-class
+    destination:
+      namespace: gateway
+    syncWave: -1
+  # `syncWave: 1` because it needs the AWS LBC controller (from `helm-aws-lbc`) running to
+  # reconcile the LoadBalancerConfiguration/TargetGroupConfiguration into an ALB.
+  - name: gateway-public
+    path: helm-gateway-api-gateway
     destination:
       namespace: gateway
     syncWave: 1
     extraValueFiles:
-      - helm-gateway-api/gateway-values.yaml
+      - helm-gateway-api-gateway-class/values.yaml
+      - helm-gateway-api-gateway/public-gateway-values.yaml
+  - name: gateway-private
+    path: helm-gateway-api-gateway
+    destination:
+      namespace: gateway
+    syncWave: 1
+    extraValueFiles:
+      - helm-gateway-api-gateway-class/values.yaml
+      - helm-gateway-api-gateway/private-gateway-values.yaml
 
   # --- AWS Load Balancer Controller ---
   - name: helm-aws-lbc
@@ -127,10 +144,45 @@ applications:
       namespace: tailscale
     syncWave: 2
 
+  # --- Prometheus stack ---
+  - name: grafana-secrets
+    path: helm-eso-secret-sync
+    destination:
+      namespace: monitoring
+    syncWave: 0
+  - name: helm-kube-prometheus-stack
+    destination:
+      namespace: monitoring
+    syncWave: 1
+    # Chart bundles the Prometheus Operator CRDs; avoids client-side apply's annotation size limit.
+    syncOptions:
+      - ServerSideApply=true
+  - name: grafana-httproute
+    path: helm-httproute
+    destination:
+      namespace: monitoring
+    syncWave: 2
+    extraValueFiles:
+      - helm-gateway-api-gateway/private-gateway-values.yaml
+  - name: prometheus-httproute
+    path: helm-httproute
+    destination:
+      namespace: monitoring
+    syncWave: 2
+    extraValueFiles:
+      - helm-gateway-api-gateway/private-gateway-values.yaml
+  - name: alertmanager-httproute
+    path: helm-httproute
+    destination:
+      namespace: monitoring
+    syncWave: 2
+    extraValueFiles:
+      - helm-gateway-api-gateway/private-gateway-values.yaml
+
   # --- Guestbook ---
   - name: helm-guestbook
     destination:
       namespace: guestbook
     syncWave: 2
     extraValueFiles:
-      - helm-gateway-api/gateway-values.yaml
+      - helm-gateway-api-gateway/public-gateway-values.yaml
