@@ -1,7 +1,9 @@
 kube-prometheus-stack:
-  # Pins the generated Service names (e.g. kube-prometheus-stack-prometheus) so the
-  # helm-httproute app can target them deterministically.
-  fullnameOverride: kube-prometheus-stack
+  # Set via catalog appParams (local.kube_prometheus_stack_release in
+  # units/eks/addons/argocd/app_of_apps/terragrunt.hcl), which also composes the
+  # helm-httproute backendRef names from the same literal — Helm/YAML can't do that string
+  # interpolation itself, so this one value is coordinated from the catalog instead.
+  fullnameOverride: ""
 
   # These control plane components are AWS-managed on EKS and not exposed for scraping
   kubeEtcd: { enabled: false }

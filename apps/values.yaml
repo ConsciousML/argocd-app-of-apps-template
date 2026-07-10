@@ -136,6 +136,8 @@ applications:
     destination:
       namespace: argocd
     syncWave: 1
+    extraValueFiles:
+      - helm-eso-secret-sync/argocd-secrets-values.yaml
   # Depends on helm-aws-lbc.
   - name: helm-argocd-ingress
     destination:
@@ -149,6 +151,8 @@ applications:
     destination:
       namespace: tailscale
     syncWave: 1
+    extraValueFiles:
+      - helm-eso-secret-sync/tailscale-secrets-values.yaml
   # Depends on tailscale-secrets (needs the oauth secret before it can register with Tailscale).
   - name: helm-tailscale-operator
     destination:
@@ -170,6 +174,8 @@ applications:
     destination:
       namespace: monitoring
     syncWave: 1
+    extraValueFiles:
+      - helm-eso-secret-sync/grafana-secrets-values.yaml
   # Depends on grafana-secrets (needs the admin secret before Grafana's first boot).
   - name: helm-kube-prometheus-stack
     destination:
@@ -182,8 +188,12 @@ applications:
       helm:
         # fullnameOverride only pins this chart's own resources (prometheus/alertmanager/
         # operator); bundled subcharts (grafana, kube-state-metrics, node-exporter) derive
-        # their own names from the release name instead, which backendRefs rely on.
+        # their own names from the release name instead, which backendRefs rely on. Must
+        # match the catalog's local.kube_prometheus_stack_release (units/eks/addons/argocd/
+        # app_of_apps/terragrunt.hcl in terragrunt-template-catalog-eks).
         releaseName: kube-prometheus-stack
+    extraValueFiles:
+      - helm-eso-secret-sync/grafana-secrets-values.yaml
   # Depends on:
   # - gateway-private
   # - helm-kube-prometheus-stack (the backend Service)
@@ -194,6 +204,7 @@ applications:
     syncWave: 3
     extraValueFiles:
       - helm-gateway-api-gateway/private-gateway-values.yaml
+      - helm-httproute/grafana-httproute-values.yaml
   # Same dependencies as grafana-httproute.
   - name: prometheus-httproute
     path: helm-httproute
@@ -202,6 +213,7 @@ applications:
     syncWave: 3
     extraValueFiles:
       - helm-gateway-api-gateway/private-gateway-values.yaml
+      - helm-httproute/prometheus-httproute-values.yaml
   # Same dependencies as grafana-httproute.
   - name: alertmanager-httproute
     path: helm-httproute
@@ -210,6 +222,7 @@ applications:
     syncWave: 3
     extraValueFiles:
       - helm-gateway-api-gateway/private-gateway-values.yaml
+      - helm-httproute/alertmanager-httproute-values.yaml
 
   # --- Guestbook ---
   # Depends on gateway-public.
