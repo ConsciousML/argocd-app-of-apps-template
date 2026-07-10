@@ -1,0 +1,9 @@
+gateway:
+  name: ""
+  namespace: ""
+name: ""
+host: ""
+backendRef:
+  name: ""
+  port: 80
+annotations: {}

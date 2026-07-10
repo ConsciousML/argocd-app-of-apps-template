@@ -13,25 +13,47 @@ applications:
   - name: storage-class-gp3
     destination:
       namespace: kube-system
-    # Zero dependencies, nothing waits on it: grouped with the CRDs, not the ESO controller.
-    syncWave: -2
+    syncWave: -1
 
   # --- Gateway API ---
   - name: crds-gateway-api
     destination:
       namespace: argocd
-    syncWave: -2
+    syncWave: -1
   - name: crds-aws-lbc-gateway-api
     destination:
       namespace: argocd
-    syncWave: -2
-  # `synWave: 1` because it needs the CRDs from `helm-aws-lbc`
-  - name: helm-gateway-api
+    syncWave: -1
+  # Depends on:
+  # - crds-gateway-api (GatewayClass CRD)
+  # - helm-aws-lbc (the controller sets GatewayClass's Accepted condition, which its health
+  #   check waits on)
+  - name: gateway-class
+    path: helm-gateway-api-gateway-class
     destination:
       namespace: gateway
     syncWave: 1
+  # Depends on:
+  # - gateway-class
+  # - crds-aws-lbc-gateway-api (LoadBalancerConfiguration/TargetGroupConfiguration CRDs)
+  # - helm-aws-lbc (controller reconciles into an ALB)
+  - name: gateway-public
+    path: helm-gateway-api-gateway
+    destination:
+      namespace: gateway
+    syncWave: 2
     extraValueFiles:
-      - helm-gateway-api/gateway-values.yaml
+      - helm-gateway-api-gateway-class/values.yaml
+      - helm-gateway-api-gateway/public-gateway-values.yaml
+  # Same dependencies as gateway-public.
+  - name: gateway-private
+    path: helm-gateway-api-gateway
+    destination:
+      namespace: gateway
+    syncWave: 2
+    extraValueFiles:
+      - helm-gateway-api-gateway-class/values.yaml
+      - helm-gateway-api-gateway/private-gateway-values.yaml
 
   # --- AWS Load Balancer Controller ---
   - name: helm-aws-lbc
@@ -58,13 +80,14 @@ applications:
       helm:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
         releaseName: karpenter
+  # Depends on helm-karpenter (controller and its CRDs).
   - name: helm-karpenter-config
     destination:
       namespace: kube-system
-    # After the controller (and its CRDs) are up.
     syncWave: 1
 
   # --- ExternalDNS ---
+  # Depends on crds-gateway-api (watches gateway-httproute sources).
   - name: helm-external-dns-private
     destination:
       namespace: external-dns
@@ -75,6 +98,7 @@ applications:
       helm:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
         releaseName: external-dns-private
+  # Same dependencies as helm-external-dns-private.
   - name: helm-external-dns-public
     destination:
       namespace: external-dns
@@ -90,7 +114,7 @@ applications:
   - name: helm-external-secrets-operator
     destination:
       namespace: external-secrets
-    syncWave: -1
+    syncWave: 0
     syncOptions:
       - ServerSideApply=true
     tool:
@@ -99,38 +123,92 @@ applications:
         releaseName: external-secrets
 
   # --- ArgoCD ---
+  # Depends on helm-external-secrets-operator.
   - name: argocd-secrets
     path: helm-eso-secret-sync
     destination:
       namespace: argocd
-    syncWave: 2
+    syncWave: 1
+  # Depends on helm-aws-lbc.
   - name: helm-argocd-ingress
     destination:
       namespace: argocd
-    syncWave: 2
+    syncWave: 1
 
   # --- Tailscale ---
+  # Depends on helm-external-secrets-operator.
   - name: tailscale-secrets
     path: helm-eso-secret-sync
     destination:
       namespace: tailscale
-    syncWave: 0
+    syncWave: 1
+  # Depends on tailscale-secrets (needs the oauth secret before it can register with Tailscale).
   - name: helm-tailscale-operator
     destination:
       namespace: tailscale
-    syncWave: 1
+    syncWave: 2
     # Chart bundles its own CRDs; avoids client-side apply's annotation size limit.
     syncOptions:
       - ServerSideApply=true
+  # Depends on helm-tailscale-operator (controller and its CRDs).
   - name: helm-tailscale-connector
     destination:
       namespace: tailscale
+    syncWave: 3
+
+  # --- Prometheus stack ---
+  # Depends on helm-external-secrets-operator.
+  - name: grafana-secrets
+    path: helm-eso-secret-sync
+    destination:
+      namespace: monitoring
+    syncWave: 1
+  # Depends on grafana-secrets (needs the admin secret before Grafana's first boot).
+  - name: helm-kube-prometheus-stack
+    destination:
+      namespace: monitoring
     syncWave: 2
+    # Chart bundles the Prometheus Operator CRDs; avoids client-side apply's annotation size limit.
+    syncOptions:
+      - ServerSideApply=true
+    tool:
+      helm:
+        # fullnameOverride only pins this chart's own resources (prometheus/alertmanager/
+        # operator); bundled subcharts (grafana, kube-state-metrics, node-exporter) derive
+        # their own names from the release name instead, which backendRefs rely on.
+        releaseName: kube-prometheus-stack
+  # Depends on:
+  # - gateway-private
+  # - helm-kube-prometheus-stack (the backend Service)
+  - name: grafana-httproute
+    path: helm-httproute
+    destination:
+      namespace: monitoring
+    syncWave: 3
+    extraValueFiles:
+      - helm-gateway-api-gateway/private-gateway-values.yaml
+  # Same dependencies as grafana-httproute.
+  - name: prometheus-httproute
+    path: helm-httproute
+    destination:
+      namespace: monitoring
+    syncWave: 3
+    extraValueFiles:
+      - helm-gateway-api-gateway/private-gateway-values.yaml
+  # Same dependencies as grafana-httproute.
+  - name: alertmanager-httproute
+    path: helm-httproute
+    destination:
+      namespace: monitoring
+    syncWave: 3
+    extraValueFiles:
+      - helm-gateway-api-gateway/private-gateway-values.yaml
 
   # --- Guestbook ---
+  # Depends on gateway-public.
   - name: helm-guestbook
     destination:
       namespace: guestbook
-    syncWave: 2
+    syncWave: 3
     extraValueFiles:
-      - helm-gateway-api/gateway-values.yaml
+      - helm-gateway-api-gateway/public-gateway-values.yaml

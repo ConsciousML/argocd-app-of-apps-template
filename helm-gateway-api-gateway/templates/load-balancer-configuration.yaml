@@ -1,14 +1,14 @@
 apiVersion: gateway.k8s.aws/v1beta1
 kind: LoadBalancerConfiguration
 metadata:
-  name: {{ .Values.private.loadBalancerConfigName | quote }}
-  namespace: {{ .Values.private.namespace | quote }}
+  name: {{ .Values.loadBalancerConfigName | quote }}
+  namespace: {{ .Values.gateway.namespace | quote }}
   annotations:
     argocd.argoproj.io/sync-wave: "1"
 spec:
-  scheme: internal
+  scheme: {{ .Values.scheme | quote }}
   defaultTargetGroupConfiguration:
-    name: {{ .Values.private.targetGroupConfigName | quote }}
+    name: {{ .Values.targetGroupConfigName | quote }}
   listenerConfigurations:
     - protocolPort: HTTPS:443
       defaultCertificate: {{ .Values.certificateArn | quote }}

@@ -1,0 +1,57 @@
+kube-prometheus-stack:
+  # Pins the generated Service names (e.g. kube-prometheus-stack-prometheus) so the
+  # helm-httproute app can target them deterministically.
+  fullnameOverride: kube-prometheus-stack
+
+  # These control plane components are AWS-managed on EKS and not exposed for scraping
+  kubeEtcd: { enabled: false }
+  kubeScheduler: { enabled: false }
+  kubeControllerManager: { enabled: false }
+
+  defaultRules:
+    disabled:
+      # This node group intentionally runs 2 nodes; the rule can't tell EKS has no
+      # control-plane node label and treats <3 nodes as always failing N+1 tolerance.
+      # Dev-only: do not carry this disable over to staging/prod environments, where
+      # N+1 node failure tolerance is a real concern the alert should keep catching.
+      KubeCPUOvercommit: true
+
+  prometheus:
+    prometheusSpec:
+      # Scrape any ServiceMonitor/PodMonitor in the cluster regardless of labels, so
+      # other addons can opt into scraping just by enabling their chart's serviceMonitor
+      serviceMonitorSelectorNilUsesHelmValues: false
+      podMonitorSelectorNilUsesHelmValues: false
+
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            storageClassName: gp3
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 50Gi
+
+  alertmanager:
+    alertmanagerSpec:
+      storage:
+        volumeClaimTemplate:
+          spec:
+            storageClassName: gp3
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 10Gi
+
+  grafana:
+    # Dashboards/datasources are sidecar-provisioned from ConfigMaps, nothing to persist
+    persistence:
+      enabled: false
+    # Placeholders for `helm template` to pass in CI. Overridden at sync time by appParams
+    # (see the catalog's app_of_apps unit), which is also the single source of truth shared
+    # with grafana-secrets' targetSecretName/secretKey.
+    admin:
+      existingSecret: ""
+      passwordKey: ""
+    env:
+      GF_SECURITY_ADMIN_USER: admin
