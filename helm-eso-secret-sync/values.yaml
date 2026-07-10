@@ -1,3 +1,8 @@
 secretStoreName: ""
 awsRegion: ""
-externalSecrets: []
+name: ""
+targetSecretName: ""
+targetCreationPolicy: ""
+refreshPolicy: ""
+remoteKey: ""
+data: []
