@@ -15,7 +15,7 @@ An ArgoCD template repository implementing the [App of Apps pattern](https://arg
 2. In [`apps/values.yaml`](apps/values.yaml) set `repoURL` to your forked repository url.
 3. Deploy the app-of-apps Application using the [terragrunt-template-catalog-eks](https://github.com/ConsciousML/terragrunt-template-catalog-eks) catalog. 
 
-The catalog provisions the Application CR with the correct `helm.values` (hostname, gateway, annotations) via the [`argocd_app_of_apps` module](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/modules/argocd_app_of_apps), [unit](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/eks/addons/argocd/app_of_apps), and [stack](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/pipelines/dev/eks/terragrunt.stack.hcl).
+The catalog provisions the Application CR with the correct `helm.values` (hostname, gateway, annotations) via the [`argocd_app_of_apps` module](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/modules/argocd_app_of_apps), [unit](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/eks/addons/argocd/app_of_apps), and [stack](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/pipelines/dev/eks/stack/terragrunt.stack.hcl).
 
 See [`app-of-apps.yaml`](app-of-apps.yaml) for the shape of the resource Terraform produces.
 
