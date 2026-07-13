@@ -4,7 +4,7 @@ Installs the AWS Load Balancer Controller's Gateway API CRDs (`LoadBalancerConfi
 
 ## What's Inside
 
-- **[application.yaml](application.yaml)**: a nested ArgoCD `Application` sourcing manifests directly from the upstream repo instead of a local chart. `targetRevision` must track `helm-aws-lbc`'s chart version. `ServerSideApply=true` because the CRDs exceed client-side apply's size limit. `prune: false` so a sync never deletes them. `helm-aws-lbc`'s chart already bundles these same CRDs. They're installed again here as a wave `-1` prerequisite so `gateway-class` can depend on them directly instead of on the controller being healthy
+- **[application.yaml](application.yaml)**: a nested ArgoCD `Application` sourcing manifests directly from the upstream repo instead of a local chart. `targetRevision` must track `helm-aws-lbc`'s chart version. `prune: false` so a sync never deletes them. `helm-aws-lbc`'s chart already bundles these same CRDs. They're installed again here as a wave `-1` prerequisite so `gateway-class` can depend on them directly instead of on the controller being healthy
 
 ## Integration
 

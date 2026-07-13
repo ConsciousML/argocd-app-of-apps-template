@@ -4,7 +4,7 @@ Installs the upstream [Gateway API](https://gateway-api.sigs.k8s.io/) CRDs (`Gat
 
 ## What's Inside
 
-- **[application.yaml](application.yaml)**: sources manifests directly from the upstream repo instead of a local chart. `ServerSideApply=true` because the CRDs exceed client-side apply's size limit. `prune: false` so a sync never deletes them and cascades into every `Gateway` and `HTTPRoute`
+- **[application.yaml](application.yaml)**: sources manifests directly from the upstream repo instead of a local chart. `prune: false` so a sync never deletes them and cascades into every `Gateway` and `HTTPRoute`
 
 ## Integration
 
