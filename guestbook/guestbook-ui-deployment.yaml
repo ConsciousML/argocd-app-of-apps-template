@@ -18,18 +18,12 @@ spec:
         - key: "karpenter.sh/provisioned"
           operator: "Exists"
           effect: "NoSchedule"
-      # Prefers the static managed node group over Karpenter, falling back to Karpenter only
-      # when no managed-group capacity is available.
-      affinity:
-        nodeAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              preference:
-                matchExpressions:
-                  - key: karpenter.sh/nodepool
-                    operator: DoesNotExist
       containers:
         - image: gcr.io/google-samples/gb-frontend:v5
           name: guestbook-ui
           ports:
             - containerPort: 80
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
