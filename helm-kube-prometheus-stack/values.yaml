@@ -57,6 +57,26 @@ kube-prometheus-stack:
     # Dashboards/datasources are sidecar-provisioned from ConfigMaps, nothing to persist
     persistence:
       enabled: false
+
+    # Karpenter's dashboards (https://karpenter.sh/docs/getting-started/getting-started-with-karpenter/#monitoring-with-grafana-optional),
+    # provisioned via the Grafana chart's url-based dashboard import
+    # (https://github.com/grafana-community/helm-charts/blob/main/charts/grafana/README.md#import-dashboards).
+    dashboardProviders:
+      dashboardproviders.yaml:
+        apiVersion: 1
+        providers:
+          - name: karpenter
+            orgId: 1
+            folder: Karpenter
+            type: file
+            options:
+              path: /var/lib/grafana/dashboards/karpenter
+    dashboards:
+      karpenter:
+        capacity-dashboard:
+          url: https://karpenter.sh/preview/getting-started/getting-started-with-karpenter/karpenter-capacity-dashboard.json
+        performance-dashboard:
+          url: https://karpenter.sh/preview/getting-started/getting-started-with-karpenter/karpenter-performance-dashboard.json
     # Placeholders for `helm template` to pass in CI. Overridden at sync time by appParams
     # (see the catalog's app_of_apps unit), which is also the single source of truth shared
     # with grafana-secrets' targetSecretName/secretKey.
