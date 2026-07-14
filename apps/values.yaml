@@ -69,10 +69,12 @@ applications:
         releaseName: aws-load-balancer-controller
 
   # --- Karpenter ---
+  # Depends on helm-kube-prometheus-stack (its serviceMonitor needs the ServiceMonitor CRD
+  # that chart installs).
   - name: helm-karpenter
     destination:
       namespace: kube-system
-    syncWave: 0
+    syncWave: 3
     # Chart bundles its own CRDs; avoids client-side apply's annotation size limit.
     syncOptions:
       - ServerSideApply=true
@@ -84,7 +86,7 @@ applications:
   - name: helm-karpenter-config
     destination:
       namespace: kube-system
-    syncWave: 1
+    syncWave: 4
 
   # --- ExternalDNS ---
   # Depends on crds-gateway-api (watches gateway-httproute sources).
@@ -229,7 +231,7 @@ applications:
   - name: guestbook
     destination:
       namespace: guestbook
-    syncWave: 3
+    syncWave: 5
   # Depends on:
   # - gateway-public
   # - guestbook (the backend Service)
@@ -237,7 +239,7 @@ applications:
     path: helm-httproute
     destination:
       namespace: guestbook
-    syncWave: 4
+    syncWave: 6
     extraValueFiles:
       - helm-gateway-api-gateway/public-gateway-values.yaml
       - helm-httproute/guestbook-httproute-values.yaml
