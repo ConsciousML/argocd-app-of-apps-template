@@ -3,21 +3,14 @@
 An ArgoCD template repository implementing the [App of Apps pattern](https://argo-cd.readthedocs.io/en/latest/operator-manual/cluster-bootstrapping/#app-of-apps-pattern-alternative) with CI checks.
 
 ## Prerequisites
-- A functional ArgoCD instance
-- ArgoCD CRDs must be installed in your cluster
-- The `argocd` namespace must exist in your cluster
+- A functional [terragrunt-template-catalog-eks](https://github.com/ConsciousML/terragrunt-template-catalog-eks) deployment. Its [EKS Cluster Stack](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/README.md) provisions ArgoCD and the `argocd` namespace
 - Knowledge of the [App of Apps pattern](https://argo-cd.readthedocs.io/en/latest/operator-manual/cluster-bootstrapping/#app-of-apps-pattern-alternative)
-- [Gateway API CRDs v1.5](https://github.com/kubernetes-sigs/gateway-api/releases/tag/v1.5.0) and a shared [`Gateway`](https://gateway-api.sigs.k8s.io/reference/api-types/gateway/) resource provisioned in the cluster (for `guestbook-httproute`)
 
 ## Getting Started
 
 1. Click on the `Use this template` > `Create a new repository` button and choose a name for your forked repository.
 2. In [`apps/values.yaml`](apps/values.yaml) set `repoURL` to your forked repository url.
-3. Deploy the app-of-apps Application using the [terragrunt-template-catalog-eks](https://github.com/ConsciousML/terragrunt-template-catalog-eks) catalog. 
-
-The catalog provisions the Application CR with the correct `helm.values` (hostname, gateway, annotations) via the [`argocd_app_of_apps` module](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/modules/argocd_app_of_apps), [unit](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/eks/addons/argocd/app_of_apps), and [stack](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/pipelines/dev/eks/terragrunt.stack.hcl).
-
-See [`app-of-apps.yaml`](app-of-apps.yaml) for the shape of the resource Terraform produces.
+3. Deploy the app-of-apps Application using the [terragrunt-template-catalog-eks](https://github.com/ConsciousML/terragrunt-template-catalog-eks) catalog. See its [App of Apps integration guide](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/docs/app-of-apps-integration.md) for how the catalog threads Terraform-sourced values into this chart's `appParams`.
 
 Access the ArgoCD UI and verify the `guestbook` app has been deployed.
 
@@ -25,7 +18,7 @@ Access the ArgoCD UI and verify the `guestbook` app has been deployed.
 
 1. Create a directory for your application at the root of the repository. Plain manifest directories and Helm charts are both supported. See [`guestbook`](guestbook) as a reference.
 2. In [`apps/values.yaml`](apps/values.yaml), under `applications`, add one entry with the directory name and target namespace.
-3. For Helm chart apps that require runtime values, pass them via `spec.source.helm.values` on the app-of-apps Application CR. The `appParams.<app-name>` map is injected as a Helm values file into the child Application at sync time.
+3. For Helm chart apps that require runtime values, pass them via `spec.source.helm.values` on the app-of-apps Application CR. The `appParams.<app-name>` map is injected as a Helm values file into the child Application at sync time. See the catalog's [App of Apps integration guide](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/docs/app-of-apps-integration.md) for the catalog-side steps to wire a new app's values.
 
 ## Pre-commit Setup (recommended)
 We use a more efficient framework than [pre-commit](https://github.com/pre-commit/pre-commit) called [prek](https://github.com/j178/prek).
