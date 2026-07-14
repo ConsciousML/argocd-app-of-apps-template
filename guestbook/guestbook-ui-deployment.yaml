@@ -13,8 +13,17 @@ spec:
       labels:
         app: guestbook-ui
     spec:
+      # Allows scheduling onto Karpenter-provisioned nodes, which are tainted by default.
+      tolerations:
+        - key: "karpenter.sh/provisioned"
+          operator: "Exists"
+          effect: "NoSchedule"
       containers:
         - image: gcr.io/google-samples/gb-frontend:v5
           name: guestbook-ui
           ports:
             - containerPort: 80
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"

@@ -33,6 +33,8 @@ spec:
         - key: karpenter.k8s.aws/instance-size
           operator: NotIn
           values: ["nano", "micro", "metal"]
+      taints:
+        {{- toYaml .Values.taints | nindent 8 }}
       expireAfter: 720h
   # Safety net to prevent runaway scaling costs. Increase this value if your
   # workloads require more compute capacity.
