@@ -1,3 +1,7 @@
 name: default
 nodeRole: ""
 clusterName: ""
+taints:
+  - key: karpenter.sh/provisioned
+    value: "true"
+    effect: NoSchedule
