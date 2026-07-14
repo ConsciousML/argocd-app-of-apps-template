@@ -225,10 +225,11 @@ applications:
       - helm-httproute/alertmanager-httproute-values.yaml
 
   # --- Guestbook ---
+  # Depends on helm-karpenter-config (NodePool must exist before the Deployment schedules).
   - name: guestbook
     destination:
       namespace: guestbook
-    syncWave: 0
+    syncWave: 3
   # Depends on:
   # - gateway-public
   # - guestbook (the backend Service)
@@ -236,7 +237,7 @@ applications:
     path: helm-httproute
     destination:
       namespace: guestbook
-    syncWave: 3
+    syncWave: 4
     extraValueFiles:
       - helm-gateway-api-gateway/public-gateway-values.yaml
       - helm-httproute/guestbook-httproute-values.yaml
