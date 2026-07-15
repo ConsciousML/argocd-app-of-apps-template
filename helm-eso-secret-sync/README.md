@@ -10,6 +10,6 @@ Each `*-secrets-values.yaml` file is loaded via `extraValueFiles` in [`apps/valu
 - **[grafana-secrets-values.yaml](grafana-secrets-values.yaml)**: also sets `kube-prometheus-stack.grafana.admin.existingSecret` and `passwordKey`, consumed by `helm-kube-prometheus-stack` through the same `extraValueFiles` entry so both charts agree on the target secret name
 - **[tailscale-secrets-values.yaml](tailscale-secrets-values.yaml)**: syncs the Tailscale operator's OAuth client credentials
 
-## Integration
+## Upstream Dependencies
 
 - **[`app_of_apps`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl)** (catalog): injects `secretStoreName`, `awsRegion`, and each instance's `remoteKey` via `appParams`

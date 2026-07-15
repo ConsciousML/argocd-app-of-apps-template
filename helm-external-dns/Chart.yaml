@@ -1,6 +1,6 @@
 apiVersion: v2
-name: helm-external-dns-private
-description: ExternalDNS instance scoped to the private hosted zone
+name: helm-external-dns
+description: Generic ExternalDNS instance, reused for both the private and public hosted zones
 type: application
 version: 0.1.0
 dependencies:

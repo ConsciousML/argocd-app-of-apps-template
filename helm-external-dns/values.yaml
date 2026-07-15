@@ -1,0 +1,23 @@
+external-dns:
+  provider:
+    name: aws
+  # txtOwnerId, txtPrefix, and domainFilters are overridden per instance at sync time by the
+  # catalog's app_of_apps unit via appParams.
+  txtOwnerId: ""
+  txtPrefix: ""
+  domainFilters: []
+  triggerLoopOnEvent: true
+  sources:
+    - service
+    - ingress
+    - gateway-httproute
+  registry: txt
+  policy: sync
+  logLevel: info
+  # annotationFilter, extraArgs.aws-zone-type, and serviceAccount.name are overridden per
+  # instance (private/public) via extraValueFiles in apps/values.yaml.
+  annotationFilter: ""
+  extraArgs:
+    aws-zone-type: ""
+  serviceAccount:
+    name: ""

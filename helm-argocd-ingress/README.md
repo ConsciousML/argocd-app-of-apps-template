@@ -7,10 +7,10 @@ Deploys ArgoCD server's `Ingress` (ALB) and the extra `Service` its gRPC traffic
 - **[templates/service-grpc.yaml](templates/service-grpc.yaml)**: a second `Service` fronting the same `argocd-server` pods, with `backend-protocol-version: GRPC`. ArgoCD serves both the web UI and gRPC (CLI, API) traffic on the same port, but the ALB needs a separate target group per protocol version to route gRPC correctly
 - **[templates/ingress.yaml](templates/ingress.yaml)**: routes requests with a `Content-Type: application/grpc` header to `argocd-server-grpc`, everything else to `argocd-server`
 
-## Integration
+## Upstream Dependencies
 
 - **[`app_of_apps`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl)** (catalog): injects `host` and `certificateArn` via `appParams`, the ARN comes from the catalog's `acm_certificate` unit under `route53`
-- **[`helm-external-dns-private`](../helm-external-dns-private)**: this `Ingress` is annotated `external-dns.alpha.kubernetes.io/scope: private`, so only the private ExternalDNS instance creates its DNS record
+- **[`helm-external-dns`](../helm-external-dns)**: this `Ingress` is annotated `external-dns.alpha.kubernetes.io/scope: private`, so only the private ExternalDNS instance creates its DNS record
 
 ## Why Service GRPC Is Defined Here
 

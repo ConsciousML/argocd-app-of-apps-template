@@ -10,8 +10,7 @@ Grafana's admin credentials come from `grafana-secrets`, an instance of [`helm-e
 
 > **Note**: several settings here are dev-only. `defaultRules.disabled.KubeCPUOvercommit` is turned off because this node group intentionally runs 2 nodes and the rule can't tell EKS has no control-plane node label. `persistentVolumeClaimRetentionPolicy.whenDeleted: Delete` reclaims volumes for cost savings. Neither should carry over to staging or prod.
 
-## Integration
+## Upstream Dependencies
 
 - **[`prometheus_stack`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/eks/addons/prometheus_stack)** (catalog): `grafana/aws_secret_password` generates the admin password that `grafana-secrets` syncs in
 - **[`storage-class-gp3`](../storage-class-gp3)**: provisions the `gp3` `StorageClass` both `prometheus` and `alertmanager` request for their persistent volumes
-- **[`helm-karpenter`](../helm-karpenter)**: Grafana here provisions Karpenter's two upstream dashboards via `grafana.dashboards`
