@@ -89,12 +89,14 @@ applications:
     syncWave: 4
 
   # --- ExternalDNS ---
-  # Depends on crds-gateway-api (watches gateway-httproute sources).
+  # Depends on:
+  # - crds-gateway-api (watches gateway-httproute sources)
+  # - helm-kube-prometheus-stack (its serviceMonitor needs the ServiceMonitor CRD that chart installs)
   - name: helm-external-dns-private
     path: helm-external-dns
     destination:
       namespace: external-dns
-    syncWave: 0
+    syncWave: 3
     syncOptions:
       - ServerSideApply=true
     tool:
@@ -112,7 +114,7 @@ applications:
     path: helm-external-dns
     destination:
       namespace: external-dns
-    syncWave: 0
+    syncWave: 3
     syncOptions:
       - ServerSideApply=true
     tool:

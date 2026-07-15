@@ -58,8 +58,7 @@ kube-prometheus-stack:
     persistence:
       enabled: false
 
-    # Karpenter's dashboards (https://karpenter.sh/docs/getting-started/getting-started-with-karpenter/#monitoring-with-grafana-optional),
-    # provisioned via the Grafana chart's url-based dashboard import
+    # Addon dashboards, provisioned via the Grafana chart's dashboard import
     # (https://github.com/grafana-community/helm-charts/blob/main/charts/grafana/README.md#import-dashboards).
     dashboardProviders:
       dashboardproviders.yaml:
@@ -78,14 +77,15 @@ kube-prometheus-stack:
             options:
               path: /var/lib/grafana/dashboards/external-dns
     dashboards:
+      # https://karpenter.sh/docs/getting-started/getting-started-with-karpenter/#monitoring-with-grafana-optional
       karpenter:
         capacity-dashboard:
           url: https://karpenter.sh/preview/getting-started/getting-started-with-karpenter/karpenter-capacity-dashboard.json
         performance-dashboard:
           url: https://karpenter.sh/preview/getting-started/getting-started-with-karpenter/karpenter-performance-dashboard.json
+      # https://grafana.com/grafana/dashboards/23969-external-dns/
       external-dns:
         external-dns-dashboard:
-          # https://grafana.com/grafana/dashboards/23969-external-dns/
           gnetId: 23969
           revision: 1
     # Placeholders for `helm template` to pass in CI. Overridden at sync time by appParams
