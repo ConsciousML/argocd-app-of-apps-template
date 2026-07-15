@@ -82,6 +82,12 @@ kube-prometheus-stack:
             type: file
             options:
               path: /var/lib/grafana/dashboards/aws-lbc
+          - name: eso
+            orgId: 1
+            folder: External Secrets Operator
+            type: file
+            options:
+              path: /var/lib/grafana/dashboards/eso
     dashboards:
       # https://karpenter.sh/docs/getting-started/getting-started-with-karpenter/#monitoring-with-grafana-optional
       karpenter:
@@ -101,6 +107,13 @@ kube-prometheus-stack:
           revision: 2
           datasource:
             - { name: DS_PROMETHEUS, value: Prometheus }
+      # https://grafana.com/grafana/dashboards/21640-external-secrets/
+      eso:
+        eso-dashboard:
+          gnetId: 21640
+          revision: 4
+          datasource:
+            - { name: DS_METRICS, value: Prometheus }
     # Placeholders for `helm template` to pass in CI. Overridden at sync time by appParams
     # (see the catalog's app_of_apps unit), which is also the single source of truth shared
     # with grafana-secrets' targetSecretName/secretKey.
