@@ -10,7 +10,7 @@ Deploys ArgoCD server's `Ingress` (ALB) and the extra `Service` its gRPC traffic
 ## Integration
 
 - **[`app_of_apps`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl)** (catalog): injects `host` and `certificateArn` via `appParams`, the ARN comes from the catalog's `acm_certificate` unit under `route53`
-- **[`helm-external-dns-private`](../helm-external-dns-private)**: this `Ingress` is annotated `external-dns.alpha.kubernetes.io/scope: private`, so only the private ExternalDNS instance creates its DNS record
+- **[`helm-external-dns`](../helm-external-dns)**: this `Ingress` is annotated `external-dns.alpha.kubernetes.io/scope: private`, so only the private ExternalDNS instance creates its DNS record
 
 ## Why Service GRPC Is Defined Here
 

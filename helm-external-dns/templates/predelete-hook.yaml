@@ -3,7 +3,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: external-dns-public-predelete
+  name: {{ .Release.Name }}-predelete
   namespace: {{ .Release.Namespace }}
   annotations:
     argocd.argoproj.io/hook: PreDelete

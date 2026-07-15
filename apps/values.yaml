@@ -91,6 +91,7 @@ applications:
   # --- ExternalDNS ---
   # Depends on crds-gateway-api (watches gateway-httproute sources).
   - name: helm-external-dns-private
+    path: helm-external-dns
     destination:
       namespace: external-dns
     syncWave: 0
@@ -100,12 +101,15 @@ applications:
       helm:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
         releaseName: external-dns-private
+    extraValueFiles:
+      - helm-external-dns/external-dns-private-values.yaml
     # ArgoCD auto-adds these for the PreDelete hook in predelete-hook.yaml; declared here so sync doesn't flap.
     finalizers:
       - pre-delete-finalizer.argocd.argoproj.io
       - pre-delete-finalizer.argocd.argoproj.io/cleanup
   # Same dependencies as helm-external-dns-private.
   - name: helm-external-dns-public
+    path: helm-external-dns
     destination:
       namespace: external-dns
     syncWave: 0
@@ -115,6 +119,8 @@ applications:
       helm:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
         releaseName: external-dns-public
+    extraValueFiles:
+      - helm-external-dns/external-dns-public-values.yaml
     finalizers:
       - pre-delete-finalizer.argocd.argoproj.io
       - pre-delete-finalizer.argocd.argoproj.io/cleanup

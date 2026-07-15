@@ -1,0 +1,6 @@
+external-dns:
+  annotationFilter: external-dns.alpha.kubernetes.io/scope=private
+  extraArgs:
+    aws-zone-type: private
+  serviceAccount:
+    name: external-dns-private
