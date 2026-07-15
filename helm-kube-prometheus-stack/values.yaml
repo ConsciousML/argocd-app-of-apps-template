@@ -88,6 +88,12 @@ kube-prometheus-stack:
             type: file
             options:
               path: /var/lib/grafana/dashboards/eso
+          - name: argocd
+            orgId: 1
+            folder: ArgoCD
+            type: file
+            options:
+              path: /var/lib/grafana/dashboards/argocd
     dashboards:
       # https://karpenter.sh/docs/getting-started/getting-started-with-karpenter/#monitoring-with-grafana-optional
       karpenter:
@@ -114,6 +120,17 @@ kube-prometheus-stack:
           revision: 4
           datasource:
             - { name: DS_METRICS, value: Prometheus }
+      # https://github.com/adinhodovic/argo-cd-mixin
+      argocd:
+        operational-overview:
+          gnetId: 19993
+          revision: 7
+        application-overview:
+          gnetId: 19974
+          revision: 6
+        notifications-overview:
+          gnetId: 19975
+          revision: 8
     # Placeholders for `helm template` to pass in CI. Overridden at sync time by appParams
     # (see the catalog's app_of_apps unit), which is also the single source of truth shared
     # with grafana-secrets' targetSecretName/secretKey.
