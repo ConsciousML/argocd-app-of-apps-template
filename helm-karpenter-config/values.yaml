@@ -1,5 +1,6 @@
 name: default
 nodeRole: ""
+# Injected by the catalog's app_of_apps unit via appParams, from the EKS cluster name.
 clusterName: ""
 taints:
   - key: karpenter.sh/provisioned

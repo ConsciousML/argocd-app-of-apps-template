@@ -9,6 +9,6 @@ Deploys the [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws
 
 The chart bundles its own copy of the Gateway API CRDs. [`crds-aws-lbc-gateway-api`](../crds-aws-lbc-gateway-api) installs them again separately so dependents can target the CRDs without depending on this controller.
 
-## Integration
+## Upstream Dependencies
 
 - **[`aws_load_balancer_controller`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/eks/addons/aws_load_balancer_controller)** (catalog): provisions the IAM role this controller's service account assumes via Pod Identity. See this app's entry in [`apps/values.yaml`](../apps/values.yaml) for the `tool.helm.releaseName` pin that keeps the Helm release name matching that service account

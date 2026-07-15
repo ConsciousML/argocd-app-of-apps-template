@@ -10,7 +10,7 @@ Deploys a Gateway API `Gateway` backed by an ALB, in two instances: `gateway-pub
 
 Each template carries its own `argocd.argoproj.io/sync-wave` annotation, ordering the three resources within this single Application. That's separate from the top-level `syncWave` these two app entries carry in `apps/values.yaml`, which orders this Application against every other one.
 
-## Integration
+## Upstream Dependencies
 
 - **[`route53`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/eks/route53)** (catalog): its `acm_certificate` unit issues the wildcard certificate. The catalog's [`app_of_apps` unit](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl) injects its ARN into both instances' `certificateArn`
 - **[`helm-gateway-api-gateway-class`](../helm-gateway-api-gateway-class)**: both instances load its `values.yaml` via `extraValueFiles` to reference the same `gatewayClassName`

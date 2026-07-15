@@ -1,5 +1,7 @@
 karpenter:
-  # Placeholder for `helm template` to pass in CI
+  # Placeholders for `helm template` to pass in CI. At sync time the catalog's app_of_apps
+  # unit injects the real clusterName (from the EKS cluster) and interruptionQueue (from
+  # units/eks/addons/karpenter/iam) via appParams.
   settings:
     clusterName: "cluster"
     interruptionQueue: "queue"

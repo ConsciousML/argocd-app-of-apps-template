@@ -2,8 +2,13 @@ gateway:
   name: ""
   namespace: ""
 name: ""
+# Injected per instance by the catalog (terragrunt-template-catalog-eks) via appParams,
+# from domains.hcl. See units/eks/addons/argocd/app_of_apps in that repo. No instance
+# sets this itself.
 host: ""
 backendRef:
+  # Some instances also leave this empty. Plain YAML can't compose "<release>-grafana"
+  # from the Helm release name, so app_of_apps injects it via appParams too.
   name: ""
   port: 80
 annotations: {}

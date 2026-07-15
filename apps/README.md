@@ -20,6 +20,6 @@ Each entry under `applications` accepts:
 
 `appParams.<name>` (top-level, sibling of `applications`) is injected as `spec.source.helm.values` on the matching `Application`. This is how the app-of-apps caller passes runtime values, like hostnames or secret keys, without editing this file. See [`../README.md`](../README.md) for how to add a new application entry.
 
-## Integration
+## Upstream Dependencies
 
 - **[`argocd_app_of_apps` module](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/modules/argocd_app_of_apps)** (catalog): provisions the root `Application` that points at this chart and sets `appParams`
