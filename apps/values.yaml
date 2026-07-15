@@ -146,11 +146,13 @@ applications:
     syncWave: 1
     extraValueFiles:
       - helm-eso-secret-sync/argocd-secrets-values.yaml
-  # Depends on helm-aws-lbc.
+  # Depends on:
+  # - helm-aws-lbc
+  # - gateway-private (ingress routes through the private gateway)
   - name: helm-argocd-ingress
     destination:
       namespace: argocd
-    syncWave: 1
+    syncWave: 3
 
   # --- Tailscale ---
   # Depends on helm-external-secrets-operator.

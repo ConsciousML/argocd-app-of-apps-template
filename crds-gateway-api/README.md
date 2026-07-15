@@ -5,7 +5,3 @@ Installs the upstream [Gateway API](https://gateway-api.sigs.k8s.io/) CRDs (`Gat
 ## What's Inside
 
 - **[application.yaml](application.yaml)**: sources manifests directly from the upstream repo instead of a local chart. `prune: false` so a sync never deletes them and cascades into every `Gateway` and `HTTPRoute`
-
-## Integration
-
-- **[`helm-aws-lbc`](../helm-aws-lbc)**: reconciles the resources these CRDs define

@@ -14,4 +14,3 @@ Some instances don't set `backendRef.name` in their values file, because plain Y
 ## Integration
 
 - **[`helm-gateway-api-gateway`](../helm-gateway-api-gateway)**: `gateway.name` and `gateway.namespace` in each instance's values file must reference `gateway-public` or `gateway-private` to match the intended `scope`
-- **[`helm-external-dns`](../helm-external-dns)**: each instance consumes the `scope` annotation to decide which zone gets the DNS record
