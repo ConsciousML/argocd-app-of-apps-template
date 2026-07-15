@@ -71,12 +71,23 @@ kube-prometheus-stack:
             type: file
             options:
               path: /var/lib/grafana/dashboards/karpenter
+          - name: external-dns
+            orgId: 1
+            folder: External DNS
+            type: file
+            options:
+              path: /var/lib/grafana/dashboards/external-dns
     dashboards:
       karpenter:
         capacity-dashboard:
           url: https://karpenter.sh/preview/getting-started/getting-started-with-karpenter/karpenter-capacity-dashboard.json
         performance-dashboard:
           url: https://karpenter.sh/preview/getting-started/getting-started-with-karpenter/karpenter-performance-dashboard.json
+      external-dns:
+        external-dns-dashboard:
+          # https://grafana.com/grafana/dashboards/23969-external-dns/
+          gnetId: 23969
+          revision: 1
     # Placeholders for `helm template` to pass in CI. Overridden at sync time by appParams
     # (see the catalog's app_of_apps unit), which is also the single source of truth shared
     # with grafana-secrets' targetSecretName/secretKey.

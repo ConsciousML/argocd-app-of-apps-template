@@ -14,6 +14,8 @@ external-dns:
   registry: txt
   policy: sync
   logLevel: info
+  serviceMonitor:
+    enabled: true
   # annotationFilter, extraArgs.aws-zone-type, and serviceAccount.name are overridden per
   # instance (private/public) via extraValueFiles in apps/values.yaml.
   annotationFilter: ""
