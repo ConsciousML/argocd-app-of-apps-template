@@ -5,6 +5,11 @@ kube-prometheus-stack:
   # interpolation itself, so this one value is coordinated from the catalog instead.
   fullnameOverride: ""
 
+  # Installed by the catalog's prometheus_operator_crds unit ahead of ArgoCD, not this chart,
+  # so the ServiceMonitor CRD already exists by first sync instead of only after this app.
+  crds:
+    enabled: false
+
   # These control plane components are AWS-managed on EKS and not exposed for scraping
   kubeEtcd: { enabled: false }
   kubeScheduler: { enabled: false }
@@ -58,8 +63,7 @@ kube-prometheus-stack:
     persistence:
       enabled: false
 
-    # Karpenter's dashboards (https://karpenter.sh/docs/getting-started/getting-started-with-karpenter/#monitoring-with-grafana-optional),
-    # provisioned via the Grafana chart's url-based dashboard import
+    # Addon dashboards, provisioned via the Grafana chart's dashboard import
     # (https://github.com/grafana-community/helm-charts/blob/main/charts/grafana/README.md#import-dashboards).
     dashboardProviders:
       dashboardproviders.yaml:
@@ -71,12 +75,67 @@ kube-prometheus-stack:
             type: file
             options:
               path: /var/lib/grafana/dashboards/karpenter
+          - name: external-dns
+            orgId: 1
+            folder: External DNS
+            type: file
+            options:
+              path: /var/lib/grafana/dashboards/external-dns
+          - name: aws-lbc
+            orgId: 1
+            folder: AWS Load Balancer Controller
+            type: file
+            options:
+              path: /var/lib/grafana/dashboards/aws-lbc
+          - name: eso
+            orgId: 1
+            folder: External Secrets Operator
+            type: file
+            options:
+              path: /var/lib/grafana/dashboards/eso
+          - name: argocd
+            orgId: 1
+            folder: ArgoCD
+            type: file
+            options:
+              path: /var/lib/grafana/dashboards/argocd
     dashboards:
+      # https://karpenter.sh/docs/getting-started/getting-started-with-karpenter/#monitoring-with-grafana-optional
       karpenter:
         capacity-dashboard:
           url: https://karpenter.sh/preview/getting-started/getting-started-with-karpenter/karpenter-capacity-dashboard.json
         performance-dashboard:
           url: https://karpenter.sh/preview/getting-started/getting-started-with-karpenter/karpenter-performance-dashboard.json
+      # https://grafana.com/grafana/dashboards/23969-external-dns/
+      external-dns:
+        external-dns-dashboard:
+          gnetId: 23969
+          revision: 1
+      # https://grafana.com/grafana/dashboards/18319-aws-load-balancer-controller/
+      aws-lbc:
+        aws-lbc-dashboard:
+          gnetId: 18319
+          revision: 2
+          datasource:
+            - { name: DS_PROMETHEUS, value: Prometheus }
+      # https://grafana.com/grafana/dashboards/21640-external-secrets/
+      eso:
+        eso-dashboard:
+          gnetId: 21640
+          revision: 4
+          datasource:
+            - { name: DS_METRICS, value: Prometheus }
+      # https://github.com/adinhodovic/argo-cd-mixin
+      argocd:
+        operational-overview:
+          gnetId: 19993
+          revision: 7
+        application-overview:
+          gnetId: 19974
+          revision: 6
+        notifications-overview:
+          gnetId: 19975
+          revision: 8
     # Placeholders for `helm template` to pass in CI. Overridden at sync time by appParams
     # (see the catalog's app_of_apps unit), which is also the single source of truth shared
     # with grafana-secrets' targetSecretName/secretKey.

@@ -4,3 +4,5 @@ aws-load-balancer-controller:
   region: ""
   vpcId: ""
   enableServiceMutatorWebhook: false
+  serviceMonitor:
+    enabled: true
