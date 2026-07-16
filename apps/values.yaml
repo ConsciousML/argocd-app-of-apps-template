@@ -195,7 +195,8 @@ applications:
     destination:
       namespace: monitoring
     syncWave: 2
-    # Chart bundles the Prometheus Operator CRDs; avoids client-side apply's annotation size limit.
+    # Avoids client-side apply's annotation size limit on this release's larger resources
+    # (e.g. the bundled default PrometheusRules).
     syncOptions:
       - ServerSideApply=true
     tool:
