@@ -1,0 +1,10 @@
+misconfigurations:
+  - id: AVD-KSV-0056
+    paths:
+      - "helm-tailscale-operator/charts/tailscale-operator/templates/operator-rbac.yaml"
+    statement: >
+      Required for the Tailscale Kubernetes operator to reconcile Services,
+      Endpoints, EndpointSlices, NetworkPolicies, and Ingresses for
+      tailnet-exposed workloads. Vendored upstream chart; the permissions
+      are inherent to the operator's function and cannot be scoped down
+      without breaking it.
