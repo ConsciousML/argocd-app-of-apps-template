@@ -24,3 +24,14 @@ jobs:
 
       - name: Run pre-commit hooks (prek)
         uses: j178/prek-action@v2.0.4
+        with:
+          extra-args: --all-files --skip trivy
+
+      # Trivy scans Helm charts' built dependencies (charts/), which the
+      # validate-helm hook above populates via `helm dependency build`.
+      # Running it as its own invocation guarantees it starts after that
+      # step, since prek parallelizes hooks within a single run.
+      - name: Trivy
+        uses: j178/prek-action@v2.0.4
+        with:
+          extra-args: --all-files trivy

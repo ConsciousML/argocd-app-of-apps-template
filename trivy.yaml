@@ -1,0 +1,10 @@
+misconfiguration:
+  scanners:
+    - kubernetes
+    - helm
+
+severity:
+  - HIGH
+  - CRITICAL
+
+exit-code: 1
