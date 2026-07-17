@@ -8,6 +8,19 @@ ERRORS=0
 # https://github.com/ConsciousML/argocd-app-of-apps-template/issues/6
 SKIP_KINDS="Application,SecretStore,ExternalSecret,GatewayClass,TargetGroupConfiguration,LoadBalancerConfiguration,Connector"
 
+# Tool config files, not Kubernetes manifests
+NON_MANIFEST_FILES=("$REPO_ROOT/trivy.yaml" "$REPO_ROOT/.trivyignore.yaml")
+
+is_non_manifest_file() {
+  local path="$1"
+  for f in "${NON_MANIFEST_FILES[@]}"; do
+    if [[ "$path" == "$f" ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
 # Collect Helm chart root dirs to exclude their files
 HELM_ROOTS=()
 while IFS= read -r dir; do
@@ -26,7 +39,7 @@ is_under_helm_chart() {
 
 PLAIN_MANIFESTS=()
 while IFS= read -r f; do
-  if ! is_under_helm_chart "$f"; then
+  if ! is_under_helm_chart "$f" && ! is_non_manifest_file "$f"; then
     PLAIN_MANIFESTS+=("$f")
   fi
 done < <(find "$REPO_ROOT" -name '*.yaml' -not -path '*/.git/*' -not -path '*/.github/*')
