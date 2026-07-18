@@ -1,3 +1,10 @@
+scan:
+  skip-dirs:
+    - "**/.terragrunt-stack"
+    - "**/.terragrunt-cache"
+  skip-files:
+    - "**/.env"
+
 misconfiguration:
   scanners:
     - kubernetes

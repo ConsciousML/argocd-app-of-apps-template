@@ -24,3 +24,10 @@ language = "system"
 entry = "trivy config --config trivy.yaml --ignorefile .trivyignore.yaml ."
 files = '\.(yaml|yml)$'
 pass_filenames = false
+
+[[repos.hooks]]
+id = "trivy-secrets"
+name = "Trivy secret scan"
+language = "system"
+entry = "trivy fs ."
+pass_filenames = false
