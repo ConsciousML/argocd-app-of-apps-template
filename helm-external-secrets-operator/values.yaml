@@ -1,3 +1,18 @@
 external-secrets:
   serviceMonitor:
     enabled: true
+
+  # The chart only renders spec.securityContext (pod-level) when podSecurityContext has
+  # more than just 'enabled', otherwise it's omitted even though container-level hardening
+  # (readOnlyRootFilesystem, runAsNonRoot, runAsUser 1000, ...) is already applied by default.
+  # runAsNonRoot here just makes that existing container-level guarantee explicit at the pod level.
+  podSecurityContext:
+    runAsNonRoot: true
+
+  webhook:
+    podSecurityContext:
+      runAsNonRoot: true
+
+  certController:
+    podSecurityContext:
+      runAsNonRoot: true

@@ -81,6 +81,35 @@ misconfigurations:
       dashboards and alerts. Read-only (list/watch), never exposes
       secret values, and disabling it would remove that capability
       rather than just narrowing scope.
+  - id: AVD-KSV-0041
+    paths:
+      - "helm-external-secrets-operator/charts/external-secrets/templates/rbac.yaml"
+    statement: >
+      Required for the ESO controller to create and update the target
+      Secrets ExternalSecret resources define. No ClusterSecretStore is
+      used, but SecretStore/ExternalSecret pairs are already spread
+      across multiple namespaces (argocd, tailscale, monitoring) via
+      helm-eso-secret-sync, with more addons expected to follow the
+      same pattern, so a single cluster-wide controller identity is
+      needed rather than per-namespace RBAC. Vendored upstream chart;
+      inherent to the controller's function.
+  - id: AVD-KSV-0041
+    paths:
+      - "helm-external-secrets-operator/charts/external-secrets/templates/cert-controller-rbac.yaml"
+    statement: >
+      Required for the cert-controller to read and rotate its own
+      webhook TLS Secret. Vendored upstream chart with no namespace
+      scoping option exposed via values; inherent to the
+      controller's function.
+  - id: AVD-KSV-0114
+    paths:
+      - "helm-external-secrets-operator/charts/external-secrets/templates/cert-controller-rbac.yaml"
+    statement: >
+      Required for the cert-controller to push the rotated CA bundle
+      into the secretstore-validate and externalsecret-validate
+      ValidatingWebhookConfigurations by name (scoped via
+      resourceNames, not a wildcard). Vendored upstream chart;
+      inherent to the controller's function.
   - id: AVD-KSV-0009
     paths:
       - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/charts/prometheus-node-exporter/templates/daemonset.yaml"
