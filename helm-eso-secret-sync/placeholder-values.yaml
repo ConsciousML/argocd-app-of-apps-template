@@ -1,0 +1,11 @@
+# Used only by scripts/validate-helm.sh so standalone `helm template` and
+# kubeconform pass. Real values come from each instance's *-secrets-values.yaml
+# via apps/values.yaml's extraValueFiles.
+secretStoreName: "placeholder"
+awsRegion: "placeholder"
+name: "placeholder"
+targetSecretName: "placeholder"
+remoteKey: "placeholder"
+data:
+  - secretKey: "placeholder"
+    remoteProperty: "placeholder"

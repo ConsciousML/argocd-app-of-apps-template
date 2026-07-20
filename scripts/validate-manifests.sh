@@ -3,9 +3,7 @@ set -euo pipefail
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 
-# CRDs have no schema in kubeconform's default source. Look them up in the
-# community CRD catalog; anything not found there falls back to
-# --ignore-missing-schemas below instead of failing the build.
+# CRD schemas, not covered by kubeconform's default source
 CRD_CATALOG='https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json'
 
 IGNORE_PATTERNS=(
