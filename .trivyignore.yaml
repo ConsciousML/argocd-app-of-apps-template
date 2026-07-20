@@ -41,3 +41,29 @@ misconfigurations:
       prometheus-operator maintainers; the permissions are inherent to
       the operator's function and cannot be scoped down without
       breaking it.
+  - id: AVD-KSV-0009
+    paths:
+      - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/charts/prometheus-node-exporter/templates/daemonset.yaml"
+    statement: >
+      Required for node-exporter to bind directly to the host network
+      namespace and expose node-level metrics on the node's own IP.
+      Vendored upstream chart; the permission is inherent to the
+      exporter's function and cannot be disabled without breaking node
+      metric scraping.
+  - id: AVD-KSV-0010
+    paths:
+      - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/charts/prometheus-node-exporter/templates/daemonset.yaml"
+    statement: >
+      Required for node-exporter to read host process information for
+      process and scheduler metrics. Vendored upstream chart; the
+      permission is inherent to the exporter's function and cannot be
+      disabled without breaking node metric scraping.
+  - id: AVD-KSV-0121
+    paths:
+      - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/charts/prometheus-node-exporter/templates/daemonset.yaml"
+    statement: >
+      Required for node-exporter to read the host's filesystem, proc,
+      and sysfs trees, the source of the filesystem, memory, and kernel
+      metrics it exports. Vendored upstream chart; the mounts are
+      inherent to the exporter's function and cannot be removed without
+      breaking node metric scraping.
