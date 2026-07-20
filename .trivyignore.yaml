@@ -41,6 +41,15 @@ misconfigurations:
       prometheus-operator maintainers; the permissions are inherent to
       the operator's function and cannot be scoped down without
       breaking it.
+  - id: AVD-KSV-0014
+    paths:
+      - "helm-tailscale-operator/charts/tailscale-operator/templates/deployment.yaml"
+    statement: >
+      The operator's tsnet client writes its Tailscale state to
+      /root/.config at startup. Vendored upstream chart with no volume
+      mount exposed via values to relocate that write path, so the root
+      filesystem cannot be made read-only without breaking the
+      container on startup.
   - id: AVD-KSV-0009
     paths:
       - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/charts/prometheus-node-exporter/templates/daemonset.yaml"

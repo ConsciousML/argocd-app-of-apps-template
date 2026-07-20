@@ -1,7 +1,6 @@
 tailscale-operator:
   operatorConfig:
     securityContext:
-      readOnlyRootFilesystem: true
       allowPrivilegeEscalation: false
       capabilities:
         drop: ["ALL"] # strip default Linux capabilities, none are needed
