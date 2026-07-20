@@ -3,9 +3,10 @@ set -euo pipefail
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 
-# Kinds with no reliable kubeconform schema source yet — tracked in
-# https://github.com/ConsciousML/argocd-app-of-apps-template/issues/6
-SKIP_KINDS="Application,SecretStore,ExternalSecret,GatewayClass,TargetGroupConfiguration,LoadBalancerConfiguration,Connector"
+# CRDs have no schema in kubeconform's default source. Look them up in the
+# community CRD catalog; anything not found there falls back to
+# --ignore-missing-schemas below instead of failing the build.
+CRD_CATALOG='https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json'
 
 IGNORE_PATTERNS=(
   '(^|/)trivy\.yaml$'         # Trivy config, not a manifest
@@ -26,7 +27,8 @@ done
 kubeconform \
   --strict \
   --ignore-missing-schemas \
-  --skip "$SKIP_KINDS" \
+  --schema-location default \
+  --schema-location "$CRD_CATALOG" \
   --summary \
   "${IGNORE_ARGS[@]}" \
   "$REPO_ROOT"
