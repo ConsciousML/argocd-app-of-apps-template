@@ -8,3 +8,36 @@ misconfigurations:
       tailnet-exposed workloads. Vendored upstream chart; the permissions
       are inherent to the operator's function and cannot be scoped down
       without breaking it.
+  - id: AVD-KSV-0041
+    paths:
+      - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/templates/prometheus-operator/clusterrole.yaml"
+    statement: >
+      Required for the Prometheus operator to generate and own Secrets
+      holding rendered Prometheus and Alertmanager config, webhook TLS
+      certs, and to read user-referenced secrets (basic auth, TLS,
+      remote-write credentials) from ServiceMonitor, Probe, and
+      PrometheusRule resources across namespaces. Vendored upstream chart,
+      matches the RBAC documented by the prometheus-operator maintainers;
+      the permissions are inherent to the operator's function and cannot
+      be scoped down without breaking it.
+  - id: AVD-KSV-0045
+    paths:
+      - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/templates/prometheus-operator/clusterrole.yaml"
+    statement: >
+      Required for the Prometheus operator to fully create and reconcile
+      the StatefulSets, ConfigMaps, and Secrets it owns for the Prometheus
+      and Alertmanager instances it manages. Vendored upstream chart,
+      matches the RBAC documented by the prometheus-operator maintainers;
+      the permissions are inherent to the operator's function and cannot
+      be scoped down without breaking it.
+  - id: AVD-KSV-0056
+    paths:
+      - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/templates/prometheus-operator/clusterrole.yaml"
+    statement: >
+      Required for the Prometheus operator to manage the governing
+      Service and Endpoints objects for the Prometheus and Alertmanager
+      instances it operates, and to read Ingresses for TLS discovery.
+      Vendored upstream chart, matches the RBAC documented by the
+      prometheus-operator maintainers; the permissions are inherent to
+      the operator's function and cannot be scoped down without
+      breaking it.
