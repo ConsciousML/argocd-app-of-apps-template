@@ -50,6 +50,37 @@ misconfigurations:
       mount exposed via values to relocate that write path, so the root
       filesystem cannot be made read-only without breaking the
       container on startup.
+  - id: AVD-KSV-0041
+    paths:
+      - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/charts/grafana/templates/clusterrole.yaml"
+    statement: >
+      Backs the sidecar.datasources watch (needed for the default
+      Prometheus and Alertmanager datasources) and is kept cluster-wide
+      rather than scoped to Grafana's own namespace, so future addons
+      can self-register dashboards via a grafana_dashboard-labeled
+      ConfigMap in their own namespace without further RBAC changes.
+      Read-only (get/watch/list), not write access.
+  - id: AVD-KSV-0014
+    paths:
+      - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/charts/grafana/templates/deployment.yaml"
+    statement: >
+      The grafana container defaults GF_PATHS_TEMP to /tmp, which isn't
+      backed by a volume in this chart; plugin installs and image
+      rendering write there. The download-dashboards and sidecar
+      containers already run with a read-only root filesystem via
+      downloadDashboards.securityContext and sidecar.securityContext,
+      this exception covers only the main grafana container until its
+      temp path is verified safe to redirect into an existing mounted
+      emptyDir.
+  - id: AVD-KSV-0041
+    paths:
+      - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/charts/kube-state-metrics/templates/role.yaml"
+    statement: >
+      The 'secrets' collector is kept enabled (upstream default) so
+      Secret metadata (count, age, type, labels) stays available for
+      dashboards and alerts. Read-only (list/watch), never exposes
+      secret values, and disabling it would remove that capability
+      rather than just narrowing scope.
   - id: AVD-KSV-0009
     paths:
       - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/charts/prometheus-node-exporter/templates/daemonset.yaml"
