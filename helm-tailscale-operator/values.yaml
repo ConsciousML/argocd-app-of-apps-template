@@ -2,11 +2,9 @@ tailscale-operator:
   operatorConfig:
     securityContext:
       readOnlyRootFilesystem: true
-      runAsNonRoot: true
       allowPrivilegeEscalation: false
       capabilities:
         drop: ["ALL"] # strip default Linux capabilities, none are needed
     podSecurityContext:
-      runAsNonRoot: true
       seccompProfile:
         type: RuntimeDefault # apply the runtime's default seccomp profile to block risky syscalls
