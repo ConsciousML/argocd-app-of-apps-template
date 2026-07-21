@@ -1,0 +1,11 @@
+# Used only by scripts/validate-helm.sh so standalone `helm template` and
+# kubeconform pass. Real values come from each instance's *-httproute-values.yaml
+# and appParams via apps/values.yaml's extraValueFiles.
+gateway:
+  name: "placeholder"
+  namespace: "placeholder"
+name: "placeholder"
+host: "placeholder"
+backendRef:
+  name: "placeholder"
+  port: 80

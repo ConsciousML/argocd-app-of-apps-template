@@ -79,6 +79,8 @@ CI runs on every pull request via GitHub Actions. It installs tools with mise an
 - `validate-helm`: runs `helm lint` and `helm template | kubeconform` on every chart discovered in the repo.
 - `validate-manifests`: runs `kubeconform` on every plain Kubernetes manifest (YAML files not part of a Helm chart).
 
+Some charts leave required fields blank in `values.yaml` because they're filled in later, either through `apps/values.yaml`'s `extraValueFiles` or through the catalog's `appParams` injection. If `validate-helm` fails on one of these with a schema validation error, add a `placeholder-values.yaml` next to that chart's `values.yaml` with dummy values that satisfy the schema. `validate-helm.sh` picks it up automatically when present.
+
 To trigger CI manually, use the **Run workflow** button on the [Actions tab](../../actions/workflows/ci.yaml).
 
 ## License

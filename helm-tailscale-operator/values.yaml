@@ -1,1 +1,9 @@
-tailscale-operator: {}
+tailscale-operator:
+  operatorConfig:
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"] # strip default Linux capabilities, none are needed
+    podSecurityContext:
+      seccompProfile:
+        type: RuntimeDefault # apply the runtime's default seccomp profile to block risky syscalls

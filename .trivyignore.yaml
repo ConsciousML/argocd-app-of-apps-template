@@ -1,0 +1,148 @@
+misconfigurations:
+  - id: AVD-KSV-0056
+    paths:
+      - "helm-tailscale-operator/charts/tailscale-operator/templates/operator-rbac.yaml"
+    statement: >
+      Required for the Tailscale Kubernetes operator to reconcile Services,
+      Endpoints, EndpointSlices, NetworkPolicies, and Ingresses for
+      tailnet-exposed workloads. Vendored upstream chart; the permissions
+      are inherent to the operator's function and cannot be scoped down
+      without breaking it.
+  - id: AVD-KSV-0041
+    paths:
+      - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/templates/prometheus-operator/clusterrole.yaml"
+    statement: >
+      Required for the Prometheus operator to generate and own Secrets
+      holding rendered Prometheus and Alertmanager config, webhook TLS
+      certs, and to read user-referenced secrets (basic auth, TLS,
+      remote-write credentials) from ServiceMonitor, Probe, and
+      PrometheusRule resources across namespaces. Vendored upstream chart,
+      matches the RBAC documented by the prometheus-operator maintainers;
+      the permissions are inherent to the operator's function and cannot
+      be scoped down without breaking it.
+  - id: AVD-KSV-0045
+    paths:
+      - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/templates/prometheus-operator/clusterrole.yaml"
+    statement: >
+      Required for the Prometheus operator to fully create and reconcile
+      the StatefulSets, ConfigMaps, and Secrets it owns for the Prometheus
+      and Alertmanager instances it manages. Vendored upstream chart,
+      matches the RBAC documented by the prometheus-operator maintainers;
+      the permissions are inherent to the operator's function and cannot
+      be scoped down without breaking it.
+  - id: AVD-KSV-0056
+    paths:
+      - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/templates/prometheus-operator/clusterrole.yaml"
+    statement: >
+      Required for the Prometheus operator to manage the governing
+      Service and Endpoints objects for the Prometheus and Alertmanager
+      instances it operates, and to read Ingresses for TLS discovery.
+      Vendored upstream chart, matches the RBAC documented by the
+      prometheus-operator maintainers; the permissions are inherent to
+      the operator's function and cannot be scoped down without
+      breaking it.
+  - id: AVD-KSV-0014
+    paths:
+      - "helm-tailscale-operator/charts/tailscale-operator/templates/deployment.yaml"
+    statement: >
+      The operator's tsnet client writes its Tailscale state to
+      /root/.config at startup. Vendored upstream chart with no volume
+      mount exposed via values to relocate that write path, so the root
+      filesystem cannot be made read-only without breaking the
+      container on startup.
+  - id: AVD-KSV-0041
+    paths:
+      - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/charts/grafana/templates/clusterrole.yaml"
+    statement: >
+      Backs the sidecar.datasources watch (needed for the default
+      Prometheus and Alertmanager datasources) and is kept cluster-wide
+      rather than scoped to Grafana's own namespace, so future addons
+      can self-register dashboards via a grafana_dashboard-labeled
+      ConfigMap in their own namespace without further RBAC changes.
+      Read-only (get/watch/list), not write access.
+  - id: AVD-KSV-0014
+    paths:
+      - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/charts/grafana/templates/deployment.yaml"
+    statement: >
+      The grafana container defaults GF_PATHS_TEMP to /tmp, which isn't
+      backed by a volume in this chart; plugin installs and image
+      rendering write there. The download-dashboards and sidecar
+      containers already run with a read-only root filesystem via
+      downloadDashboards.securityContext and sidecar.securityContext,
+      this exception covers only the main grafana container until its
+      temp path is verified safe to redirect into an existing mounted
+      emptyDir.
+  - id: AVD-KSV-0041
+    paths:
+      - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/charts/kube-state-metrics/templates/role.yaml"
+    statement: >
+      The 'secrets' collector is kept enabled (upstream default) so
+      Secret metadata (count, age, type, labels) stays available for
+      dashboards and alerts. Read-only (list/watch), never exposes
+      secret values, and disabling it would remove that capability
+      rather than just narrowing scope.
+  - id: AVD-KSV-0041
+    paths:
+      - "helm-external-secrets-operator/charts/external-secrets/templates/rbac.yaml"
+    statement: >
+      Required for the ESO controller to create and update the target
+      Secrets ExternalSecret resources define. No ClusterSecretStore is
+      used, but SecretStore/ExternalSecret pairs are already spread
+      across multiple namespaces (argocd, tailscale, monitoring) via
+      helm-eso-secret-sync, with more addons expected to follow the
+      same pattern, so a single cluster-wide controller identity is
+      needed rather than per-namespace RBAC. Vendored upstream chart;
+      inherent to the controller's function.
+  - id: AVD-KSV-0041
+    paths:
+      - "helm-external-secrets-operator/charts/external-secrets/templates/cert-controller-rbac.yaml"
+    statement: >
+      Required for the cert-controller to read and rotate its own
+      webhook TLS Secret. Vendored upstream chart with no namespace
+      scoping option exposed via values; inherent to the
+      controller's function.
+  - id: AVD-KSV-0114
+    paths:
+      - "helm-external-secrets-operator/charts/external-secrets/templates/cert-controller-rbac.yaml"
+    statement: >
+      Required for the cert-controller to push the rotated CA bundle
+      into the secretstore-validate and externalsecret-validate
+      ValidatingWebhookConfigurations by name (scoped via
+      resourceNames, not a wildcard). Vendored upstream chart;
+      inherent to the controller's function.
+  - id: AVD-KSV-0056
+    paths:
+      - "helm-aws-lbc/charts/aws-load-balancer-controller/templates/rbac.yaml"
+    statement: >
+      Required for the AWS Load Balancer Controller to reconcile
+      Services and Ingresses cluster-wide and update their status
+      (LB hostname/IP) as it provisions ALBs and NLBs. Vendored
+      upstream chart; the permissions are inherent to the
+      controller's function and cannot be scoped down without
+      breaking it.
+  - id: AVD-KSV-0009
+    paths:
+      - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/charts/prometheus-node-exporter/templates/daemonset.yaml"
+    statement: >
+      Required for node-exporter to bind directly to the host network
+      namespace and expose node-level metrics on the node's own IP.
+      Vendored upstream chart; the permission is inherent to the
+      exporter's function and cannot be disabled without breaking node
+      metric scraping.
+  - id: AVD-KSV-0010
+    paths:
+      - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/charts/prometheus-node-exporter/templates/daemonset.yaml"
+    statement: >
+      Required for node-exporter to read host process information for
+      process and scheduler metrics. Vendored upstream chart; the
+      permission is inherent to the exporter's function and cannot be
+      disabled without breaking node metric scraping.
+  - id: AVD-KSV-0121
+    paths:
+      - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/charts/prometheus-node-exporter/templates/daemonset.yaml"
+    statement: >
+      Required for node-exporter to read the host's filesystem, proc,
+      and sysfs trees, the source of the filesystem, memory, and kernel
+      metrics it exports. Vendored upstream chart; the mounts are
+      inherent to the exporter's function and cannot be removed without
+      breaking node metric scraping.
