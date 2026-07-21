@@ -1,3 +1,6 @@
+# Implemented monolithic deployment mode + HA + S3
+# See https://grafana.com/docs/loki/latest/setup/install/helm/install-monolithic/
+
 loki:
   deploymentMode: Monolithic
 
@@ -77,3 +80,9 @@ loki:
 
   minio:
     enabled: false
+
+  # Chart default (8192, ~9.6Gi pod memory) is sized for a large production cluster and
+  # doesn't fit this dev cluster's nodes. Revisit this value based on real usage before
+  # running Loki at production log volume.
+  chunksCache:
+    allocatedMemory: 1024
