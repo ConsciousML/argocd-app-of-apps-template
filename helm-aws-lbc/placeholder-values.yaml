@@ -1,0 +1,8 @@
+# Used only by scripts/validate-helm.sh so standalone `helm template` and
+# kubeconform pass. Real values are injected by the catalog
+# (terragrunt-template-catalog-eks) via appParams, from the EKS cluster name, region, and
+# VPC ID. See units/eks/addons/argocd/app_of_apps in that repo.
+aws-load-balancer-controller:
+  clusterName: "placeholder-cluster"
+  region: "us-east-1"
+  vpcId: "vpc-placeholder"

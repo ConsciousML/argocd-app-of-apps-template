@@ -1,6 +1,7 @@
 aws-load-balancer-controller:
-  # Placeholder for `helm template` to pass in CI
-  clusterName: "cluster"
+  # Injected by the catalog (terragrunt-template-catalog-eks) via appParams, from the EKS
+  # cluster name, region, and VPC ID. See units/eks/addons/argocd/app_of_apps in that repo.
+  clusterName: ""
   region: ""
   vpcId: ""
   enableServiceMutatorWebhook: false
