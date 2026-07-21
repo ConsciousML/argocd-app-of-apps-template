@@ -25,6 +25,10 @@ kube-prometheus-stack:
 
   prometheus:
     prometheusSpec:
+      # 2 independent replicas, each with their own PVC below. No shared storage needed,
+      # Prometheus HA doesn't require it (dedup happens on the query/Grafana side).
+      replicas: 2
+
       # Scrape any ServiceMonitor/PodMonitor in the cluster regardless of labels, so
       # other addons can opt into scraping just by enabling their chart's serviceMonitor
       serviceMonitorSelectorNilUsesHelmValues: false
