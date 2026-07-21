@@ -38,3 +38,20 @@ spec:
             allowPrivilegeEscalation: false
             capabilities:
               drop: ["ALL"]
+          volumeMounts:
+            - name: apache-run
+              mountPath: /var/run/apache2
+            - name: apache-lock
+              mountPath: /var/lock/apache2
+            - name: apache-log
+              mountPath: /var/log/apache2
+      volumes:
+        - name: apache-run
+          emptyDir:
+            sizeLimit: 16Mi
+        - name: apache-lock
+          emptyDir:
+            sizeLimit: 16Mi
+        - name: apache-log
+          emptyDir:
+            sizeLimit: 64Mi
