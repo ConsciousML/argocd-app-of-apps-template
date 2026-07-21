@@ -47,6 +47,17 @@ loki:
     replicas: 3
     persistence:
       size: 30Gi
+      # Reclaim volumes on dev for cost savings, do not enable this on prod
+      enableStatefulSetAutoDeletePVC: true
+
+  # Chart default (8192, ~9.6Gi pod memory) is sized for a large production cluster and
+  # doesn't fit this dev cluster's nodes. 
+  # If queries are slow, check actual usage in Grafana's
+  # "Kubernetes / Compute Resources / Pod" dashboard before bumping it.
+  # Otherwise read the following to speed up queries:
+  # https://grafana.com/docs/loki/latest/operations/caching/
+  chunksCache:
+    allocatedMemory: 1024
 
   # Other deployment modes, unused in Monolithic mode. Some (write/read/backend) default to
   # replicas: 3 regardless of deploymentMode, and the chart refuses to render if both
@@ -80,9 +91,3 @@ loki:
 
   minio:
     enabled: false
-
-  # Chart default (8192, ~9.6Gi pod memory) is sized for a large production cluster and
-  # doesn't fit this dev cluster's nodes. Revisit this value based on real usage before
-  # running Loki at production log volume.
-  chunksCache:
-    allocatedMemory: 1024
