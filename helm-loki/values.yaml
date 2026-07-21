@@ -1,0 +1,43 @@
+loki:
+  deploymentMode: Monolithic
+
+  loki:
+    # Injected by the catalog (terragrunt-template-catalog-eks) via appParams, from the
+    # units/eks/addons/loki/s3 buckets and the EKS cluster's region. See
+    # units/eks/addons/argocd/app_of_apps in that repo. No instance sets this itself.
+    storage:
+      bucketNames:
+        chunks: ""
+        ruler: ""
+      s3:
+        region: ""
+    schemaConfig:
+      configs:
+        - from: "2024-04-01"
+          store: tsdb
+          object_store: s3
+          schema: v13
+          index:
+            prefix: loki_index_
+            period: 24h
+    compactor:
+      retention_enabled: true
+      delete_request_store: s3
+    limits_config:
+      retention_period: 336h # 14 days, revisit for a real production workload
+
+  singleBinary:
+    replicas: 3
+
+  # SimpleScalable-mode components, unused in Monolithic mode. The chart defaults their
+  # replicas to 3 regardless of deploymentMode and refuses to render if both singleBinary
+  # and these are non-zero at once.
+  write:
+    replicas: 0
+  read:
+    replicas: 0
+  backend:
+    replicas: 0
+
+  minio:
+    enabled: false

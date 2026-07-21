@@ -135,6 +135,16 @@ applications:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
         releaseName: external-secrets
 
+  # --- Loki ---
+  - name: helm-loki
+    destination:
+      namespace: loki
+    syncWave: 0
+    tool:
+      helm:
+        # Must match the catalog's Pod Identity association's expected ServiceAccount name.
+        releaseName: loki
+
   # --- ArgoCD ---
   # Depends on helm-external-secrets-operator.
   - name: argocd-secrets
