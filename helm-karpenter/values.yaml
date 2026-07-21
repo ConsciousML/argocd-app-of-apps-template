@@ -1,10 +1,10 @@
 karpenter:
-  # Placeholders for `helm template` to pass in CI. At sync time the catalog's app_of_apps
-  # unit injects the real clusterName (from the EKS cluster) and interruptionQueue (from
-  # units/eks/addons/karpenter/iam) via appParams.
+  # Injected by the catalog (terragrunt-template-catalog-eks) via appParams, from the EKS
+  # cluster name and units/eks/addons/karpenter/iam's interruption queue. See
+  # units/eks/addons/argocd/app_of_apps in that repo.
   settings:
-    clusterName: "cluster"
-    interruptionQueue: "queue"
+    clusterName: ""
+    interruptionQueue: ""
     enableZonalShift: false
   controller:
     resources:
