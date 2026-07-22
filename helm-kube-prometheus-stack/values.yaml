@@ -74,6 +74,18 @@ kube-prometheus-stack:
     sidecar:
       securityContext:
         readOnlyRootFilesystem: true # writes only into the already-mounted provisioning emptyDirs
+      # Setting env.GF_SECURITY_ADMIN_USER below stops the chart from auto-injecting
+      # REQ_USERNAME into the sidecars (see the grafana chart's _pod.tpl), so their
+      # provisioning-reload API calls go out with no username and always get 401'd. Without a
+      # successful reload, any dashboard/datasource ConfigMap picked up after Grafana's own
+      # boot-time provisioning scan is silently never loaded until the pod restarts and wins
+      # the sidecar-vs-grafana startup race by luck.
+      dashboards:
+        env:
+          REQ_USERNAME: admin
+      datasources:
+        env:
+          REQ_USERNAME: admin
 
     # Appends to the chart's auto-provisioned Prometheus/Alertmanager datasources.
     additionalDataSources:
