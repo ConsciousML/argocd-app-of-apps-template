@@ -1,4 +1,22 @@
 misconfigurations:
+  - id: AVD-KSV-0041
+    paths:
+      - "helm-loki/charts/loki/templates/backend/clusterrole.yaml"
+    statement: >
+      Grants cluster-wide get/list/watch on Secrets and ConfigMaps, gated by
+      sidecar.rules.enabled for Loki's rule-sync sidecar (loki-sc-rules,
+      running in this deployment). ConfigMaps and Secrets are granted together
+      by the same toggle, not separately scopable. Deferred, revisit if needed.
+  - id: AVD-KSV-0041
+    paths:
+      - "helm-alloy/charts/alloy/templates/rbac.yaml"
+    statement: >
+      Grants cluster-wide get/list/watch on Secrets, bundled by the chart under
+      rbac.rules for the remote.kubernetes.* components. This deployment's config
+      doesn't use those components (no basic_auth or other Secret-sourced value),
+      so the access is unused today. rbac.rules/clusterRules are overridable, but
+      left as the chart default rather than forked, revisit if this proves to
+      matter.
   - id: AVD-KSV-0056
     paths:
       - "helm-tailscale-operator/charts/tailscale-operator/templates/operator-rbac.yaml"
