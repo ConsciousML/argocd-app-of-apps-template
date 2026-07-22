@@ -1,8 +1,102 @@
-# Installed with an empty config first (alloy.alloy.configMap.content defaults to "").
-# The log-collection pipeline (discovery -> loki.source.* -> loki.write) is wired up
-# as a follow-up once the chart itself is confirmed healthy.
+# Pod logs and Kubernetes events are collected via the Kubernetes API (not by
+# reading files off disk). See:
+# https://grafana.com/docs/alloy/latest/collect/logs-in-kubernetes/
 
 alloy:
+  alloy:
+    configMap:
+      content: |
+        // Restrict to pods on the same node as this Alloy instance:
+        //https://grafana.com/docs/alloy/latest/reference/components/discovery/discovery.kubernetes/#limit-to-only-pods-on-the-same-node
+        discovery.kubernetes "pod" {
+          role = "pod"
+          selectors {
+            role  = "pod"
+            field = "spec.nodeName=" + coalesce(sys.env("HOSTNAME"), constants.hostname)
+          }
+        }
+
+        // Labels kept to namespace/pod/container/app/job/container_runtime: low
+        // cardinality, following best practices:
+        // https://grafana.com/docs/loki/latest/get-started/labels/bp-labels/
+        //
+        // To learn more about labels:
+        // https://grafana.com/docs/loki/latest/get-started/labels/
+        discovery.relabel "pod_logs" {
+          targets = discovery.kubernetes.pod.targets
+
+          rule {
+            source_labels = ["__meta_kubernetes_namespace"]
+            action        = "replace"
+            target_label  = "namespace"
+          }
+
+          rule {
+            source_labels = ["__meta_kubernetes_pod_name"]
+            action        = "replace"
+            target_label  = "pod"
+          }
+
+          rule {
+            source_labels = ["__meta_kubernetes_pod_container_name"]
+            action        = "replace"
+            target_label  = "container"
+          }
+
+          rule {
+            source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_name"]
+            action        = "replace"
+            target_label  = "app"
+          }
+
+          rule {
+            source_labels = ["__meta_kubernetes_namespace", "__meta_kubernetes_pod_container_name"]
+            action        = "replace"
+            target_label  = "job"
+            separator     = "/"
+            replacement   = "$1"
+          }
+
+          rule {
+            source_labels = ["__meta_kubernetes_pod_container_id"]
+            action        = "replace"
+            target_label  = "container_runtime"
+            regex         = `^(\S+):\/\/.+$`
+            replacement   = "$1"
+          }
+        }
+
+        loki.source.kubernetes "pod_logs" {
+          targets    = discovery.relabel.pod_logs.output
+          forward_to = [loki.write.default.receiver]
+        }
+
+        loki.source.kubernetes_events "cluster_events" {
+          job_name   = "integrations/kubernetes/eventhandler"
+          log_format = "logfmt"
+          forward_to = [loki.process.cluster_events.receiver]
+        }
+
+        // "job" is already a target label (from job_name above) and target labels
+        // are auto-added to the extracted map, so this copies it into a new label
+        // named kubernetes_cluster_events, distinguishing event streams from the
+        // "job" label pod-log streams use (namespace/container, set above).
+        loki.process "cluster_events" {
+          forward_to = [loki.write.default.receiver]
+
+          stage.labels {
+            values = {
+              kubernetes_cluster_events = "job",
+            }
+          }
+        }
+
+        loki.write "default" {
+          endpoint {
+            url = "http://loki-gateway.loki.svc.cluster.local:80/loki/api/v1/push"
+          }
+        }
+
   controller:
     type: daemonset # chart default, kept explicit: log collection needs one Alloy per node
     tolerations:
