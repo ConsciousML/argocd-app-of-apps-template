@@ -21,7 +21,7 @@ pass_filenames = false
 id = "trivy"
 name = "Trivy"
 language = "system"
-entry = "trivy config --config trivy.yaml --ignorefile .trivyignore.yaml ."
+entry = "scripts/trivy-scan.sh"
 files = '\.(yaml|yml)$'
 pass_filenames = false
 
