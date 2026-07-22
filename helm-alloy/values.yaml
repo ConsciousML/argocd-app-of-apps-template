@@ -97,8 +97,40 @@ alloy:
           }
         }
 
+    # UID/GID 473 matches the chart's own ci/nonroot-values.yaml fixture for the
+    # image's built-in non-root user.
+    securityContext:
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 473
+      runAsGroup: 473
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+
+    # No volume is mounted at alloy.storagePath (/tmp/alloy, the WAL/positions dir) by
+    # default, so it needs one for the container to run with readOnlyRootFilesystem above.
+    mounts:
+      extra:
+        - name: alloy-data
+          mountPath: /tmp/alloy
+
+  configReloader:
+    securityContext:
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+
   controller:
     type: daemonset # chart default, kept explicit: log collection needs one Alloy per node
+    podSecurityContext:
+      fsGroup: 473 # so the alloy-data emptyDir below is writable by the runAsUser above
+    volumes:
+      extra:
+        - name: alloy-data
+          emptyDir: {}
     tolerations:
       - key: karpenter.sh/provisioned
         operator: Exists
