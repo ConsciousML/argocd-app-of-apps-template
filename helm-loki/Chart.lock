@@ -1,0 +1,6 @@
+dependencies:
+- name: loki
+  repository: https://grafana-community.github.io/helm-charts
+  version: 18.5.1
+digest: sha256:6a6f2ed1ffb7f693aaa013a7a353ddd569bb1a3d0502aaa7c982eed22f7b9a82
+generated: "2026-07-21T15:30:33.860071-06:00"

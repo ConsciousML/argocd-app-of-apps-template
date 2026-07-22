@@ -25,6 +25,10 @@ kube-prometheus-stack:
 
   prometheus:
     prometheusSpec:
+      # 2 independent replicas, each with their own PVC below. No shared storage needed,
+      # Prometheus HA doesn't require it (dedup happens on the query/Grafana side).
+      replicas: 2
+
       # Scrape any ServiceMonitor/PodMonitor in the cluster regardless of labels, so
       # other addons can opt into scraping just by enabling their chart's serviceMonitor
       serviceMonitorSelectorNilUsesHelmValues: false
@@ -59,7 +63,7 @@ kube-prometheus-stack:
         whenScaled: Retain
 
   grafana:
-    # Dashboards/datasources are sidecar-provisioned from ConfigMaps, nothing to persist
+    # Dashboards and datasources are sidecar-provisioned from ConfigMaps, nothing to persist
     persistence:
       enabled: false
 
@@ -70,6 +74,30 @@ kube-prometheus-stack:
     sidecar:
       securityContext:
         readOnlyRootFilesystem: true # writes only into the already-mounted provisioning emptyDirs
+      # Setting env.GF_SECURITY_ADMIN_USER below stops the chart from auto-injecting
+      # REQ_USERNAME into the sidecars (see the grafana chart's _pod.tpl), so their
+      # provisioning-reload API calls go out with no username and always get 401'd. Without a
+      # successful reload, any dashboard/datasource ConfigMap picked up after Grafana's own
+      # boot-time provisioning scan is silently never loaded until the pod restarts and wins
+      # the sidecar-vs-grafana startup race by luck.
+      dashboards:
+        env:
+          REQ_USERNAME: admin
+      datasources:
+        env:
+          REQ_USERNAME: admin
+
+    # Appends to the chart's auto-provisioned Prometheus/Alertmanager datasources.
+    additionalDataSources:
+      - name: Loki
+        type: loki
+        access: proxy
+        url: http://loki-gateway.loki.svc.cluster.local:80
+        isDefault: false # keep Prometheus (chart default) as the org default
+        editable: false
+        jsonData:
+          maxLines: 1000
+          timeout: 60
 
     # Addon dashboards, provisioned via the Grafana chart's dashboard import
     # (https://github.com/grafana-community/helm-charts/blob/main/charts/grafana/README.md#import-dashboards).

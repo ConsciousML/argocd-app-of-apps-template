@@ -1,0 +1,13 @@
+# Used only by scripts/validate-helm.sh so standalone `helm template` and
+# kubeconform pass. Real values are injected by the catalog
+# (terragrunt-template-catalog-eks) via appParams, from the units/eks/addons/loki/s3
+# buckets and the EKS cluster's region. See units/eks/addons/argocd/app_of_apps in that
+# repo.
+loki:
+  loki:
+    storage:
+      bucketNames:
+        chunks: "placeholder-chunks"
+        ruler: "placeholder-ruler"
+      s3:
+        region: "us-east-1"

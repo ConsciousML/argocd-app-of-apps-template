@@ -1,0 +1,150 @@
+# Pod logs and Kubernetes events are collected via the Kubernetes API (not by
+# reading files off disk). See:
+# https://grafana.com/docs/alloy/latest/collect/logs-in-kubernetes/
+
+alloy:
+  alloy:
+    configMap:
+      content: |
+        // Restrict to pods on the same node as this Alloy instance:
+        //https://grafana.com/docs/alloy/latest/reference/components/discovery/discovery.kubernetes/#limit-to-only-pods-on-the-same-node
+        discovery.kubernetes "pod" {
+          role = "pod"
+          selectors {
+            role  = "pod"
+            field = "spec.nodeName=" + coalesce(sys.env("HOSTNAME"), constants.hostname)
+          }
+        }
+
+        // Labels kept to namespace/pod/container/app/job/container_runtime: low
+        // cardinality, following best practices:
+        // https://grafana.com/docs/loki/latest/get-started/labels/bp-labels/
+        //
+        // To learn more about labels:
+        // https://grafana.com/docs/loki/latest/get-started/labels/
+        discovery.relabel "pod_logs" {
+          targets = discovery.kubernetes.pod.targets
+
+          rule {
+            source_labels = ["__meta_kubernetes_namespace"]
+            action        = "replace"
+            target_label  = "namespace"
+          }
+
+          rule {
+            source_labels = ["__meta_kubernetes_pod_name"]
+            action        = "replace"
+            target_label  = "pod"
+          }
+
+          rule {
+            source_labels = ["__meta_kubernetes_pod_container_name"]
+            action        = "replace"
+            target_label  = "container"
+          }
+
+          rule {
+            source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_name"]
+            action        = "replace"
+            target_label  = "app"
+          }
+
+          rule {
+            source_labels = ["__meta_kubernetes_namespace", "__meta_kubernetes_pod_container_name"]
+            action        = "replace"
+            target_label  = "job"
+            separator     = "/"
+            replacement   = "$1"
+          }
+
+          rule {
+            source_labels = ["__meta_kubernetes_pod_container_id"]
+            action        = "replace"
+            target_label  = "container_runtime"
+            regex         = `^(\S+):\/\/.+$`
+            replacement   = "$1"
+          }
+        }
+
+        loki.source.kubernetes "pod_logs" {
+          targets    = discovery.relabel.pod_logs.output
+          forward_to = [loki.write.default.receiver]
+        }
+
+        loki.source.kubernetes_events "cluster_events" {
+          job_name   = "integrations/kubernetes/eventhandler"
+          log_format = "logfmt"
+          forward_to = [loki.process.cluster_events.receiver]
+        }
+
+        // "job" is already a target label (from job_name above) and target labels
+        // are auto-added to the extracted map, so this copies it into a new label
+        // named kubernetes_cluster_events, distinguishing event streams from the
+        // "job" label pod-log streams use (namespace/container, set above).
+        loki.process "cluster_events" {
+          forward_to = [loki.write.default.receiver]
+
+          stage.labels {
+            values = {
+              kubernetes_cluster_events = "job",
+            }
+          }
+        }
+
+        loki.write "default" {
+          endpoint {
+            url = "http://loki-gateway.loki.svc.cluster.local:80/loki/api/v1/push"
+          }
+        }
+
+    # UID/GID 473 matches the chart's own ci/nonroot-values.yaml fixture for the
+    # image's built-in non-root user.
+    securityContext:
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 473
+      runAsGroup: 473
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+
+    # No volume is mounted at alloy.storagePath (/tmp/alloy, the WAL/positions dir) by
+    # default, so it needs one for the container to run with readOnlyRootFilesystem above.
+    mounts:
+      extra:
+        - name: alloy-data
+          mountPath: /tmp/alloy
+
+  configReloader:
+    securityContext:
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      # Image's default user is the non-numeric "nobody", which Kubernetes can't verify
+      # as non-root on its own (fails with "cannot verify user is non-root"). 65534 is
+      # nobody's conventional UID/GID.
+      runAsUser: 65534
+      runAsGroup: 65534
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+
+  global:
+    # Pod-level securityContext (rendered from global, not controller, despite living
+    # alongside the DaemonSet spec).
+    podSecurityContext:
+      fsGroup: 473 # so the alloy-data emptyDir below is writable by the runAsUser above
+      runAsNonRoot: true # container-level runAsNonRoot alone doesn't satisfy the pod-level check
+
+  controller:
+    type: daemonset # chart default, kept explicit: log collection needs one Alloy per node
+    volumes:
+      extra:
+        - name: alloy-data
+          emptyDir: {}
+    tolerations:
+      - key: karpenter.sh/provisioned
+        operator: Exists
+        effect: NoSchedule
+      # Karpenter-provisioned nodes carry this taint (see
+      # helm-karpenter-config/templates/node-pool.yaml). Without it, Alloy won't
+      # schedule onto Karpenter nodes and their pod logs would go uncollected.
