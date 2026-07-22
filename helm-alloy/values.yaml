@@ -128,10 +128,15 @@ alloy:
       capabilities:
         drop: ["ALL"]
 
-  controller:
-    type: daemonset # chart default, kept explicit: log collection needs one Alloy per node
+  global:
+    # Pod-level securityContext (rendered from global, not controller, despite living
+    # alongside the DaemonSet spec).
     podSecurityContext:
       fsGroup: 473 # so the alloy-data emptyDir below is writable by the runAsUser above
+      runAsNonRoot: true # container-level runAsNonRoot alone doesn't satisfy the pod-level check
+
+  controller:
+    type: daemonset # chart default, kept explicit: log collection needs one Alloy per node
     volumes:
       extra:
         - name: alloy-data
