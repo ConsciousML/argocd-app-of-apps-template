@@ -151,6 +151,9 @@ applications:
     destination:
       namespace: loki
     syncWave: 1
+    tool:
+      helm:
+        releaseName: alloy
 
   # --- ArgoCD ---
   # Depends on helm-external-secrets-operator.
