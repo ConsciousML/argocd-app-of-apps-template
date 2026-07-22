@@ -63,7 +63,7 @@ kube-prometheus-stack:
         whenScaled: Retain
 
   grafana:
-    # Dashboards/datasources are sidecar-provisioned from ConfigMaps, nothing to persist
+    # Dashboards and datasources are sidecar-provisioned from ConfigMaps, nothing to persist
     persistence:
       enabled: false
 

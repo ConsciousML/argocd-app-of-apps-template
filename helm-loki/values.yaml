@@ -5,6 +5,10 @@ loki:
   deploymentMode: Monolithic
 
   loki:
+    # Single-tenant per environment, disable multi-tenancy (chart default: true,
+    # which rejects writes without an X-Scope-OrgID header, 401 "no org id").
+    auth_enabled: false
+
     commonConfig:
       replication_factor: 3
 
