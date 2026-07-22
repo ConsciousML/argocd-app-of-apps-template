@@ -119,6 +119,11 @@ alloy:
     securityContext:
       readOnlyRootFilesystem: true
       runAsNonRoot: true
+      # Image's default user is the non-numeric "nobody", which Kubernetes can't verify
+      # as non-root on its own (fails with "cannot verify user is non-root"). 65534 is
+      # nobody's conventional UID/GID.
+      runAsUser: 65534
+      runAsGroup: 65534
       allowPrivilegeEscalation: false
       capabilities:
         drop: ["ALL"]
