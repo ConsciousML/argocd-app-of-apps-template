@@ -52,8 +52,7 @@ loki:
 
   # Chart default (8192, ~9.6Gi pod memory) is sized for a large production cluster and
   # doesn't fit this dev cluster's nodes. 
-  # If queries are slow, check actual usage in Grafana's
-  # "Kubernetes / Compute Resources / Pod" dashboard before bumping it.
+  # If queries are slow or S3 GET cost increases, bumping the RAM
   # Otherwise read the following to speed up queries:
   # https://grafana.com/docs/loki/latest/operations/caching/
   chunksCache:

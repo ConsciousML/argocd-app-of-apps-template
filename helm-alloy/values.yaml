@@ -1,0 +1,14 @@
+# Installed with an empty config first (alloy.alloy.configMap.content defaults to "").
+# The log-collection pipeline (discovery -> loki.source.* -> loki.write) is wired up
+# as a follow-up once the chart itself is confirmed healthy.
+
+alloy:
+  controller:
+    type: daemonset # chart default, kept explicit: log collection needs one Alloy per node
+    tolerations:
+      - key: karpenter.sh/provisioned
+        operator: Exists
+        effect: NoSchedule
+      # Karpenter-provisioned nodes carry this taint (see
+      # helm-karpenter-config/templates/node-pool.yaml). Without it, Alloy won't
+      # schedule onto Karpenter nodes and their pod logs would go uncollected.

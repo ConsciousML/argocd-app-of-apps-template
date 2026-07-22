@@ -145,6 +145,13 @@ applications:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
         releaseName: loki
 
+  # --- Alloy ---
+  # Depends on helm-loki (pushes logs to loki-gateway.loki).
+  - name: helm-alloy
+    destination:
+      namespace: loki
+    syncWave: 1
+
   # --- ArgoCD ---
   # Depends on helm-external-secrets-operator.
   - name: argocd-secrets
