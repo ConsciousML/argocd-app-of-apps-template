@@ -99,8 +99,8 @@ kube-prometheus-stack:
 
       # Name must match targetSecretName in helm-eso-secret-sync/alertmanager-secrets-values.yaml.
       # The Prometheus Operator mounts each key of this Secret as a file under
-      # /etc/alertmanager/secrets/alertmanager-slack-bot/, which config.receivers below points
-      # at via app_token_file and app_url.
+      # /etc/alertmanager/secrets/alertmanager-slack-bot/, which config.global.http_config below
+      # points at.
       secrets:
         - alertmanager-slack-bot
 
@@ -111,6 +111,18 @@ kube-prometheus-stack:
     # unexpected component/severity) falls to the top-level "unrouted" receiver instead of
     # silently mixing into prometheus-stack-warning, so a gap in this routing tree is visible.
     config:
+      global:
+        # Bot token auth (https://prometheus.io/docs/alerting/latest/configuration/#slack_config):
+        # slack_api_url is this literal chat.postMessage endpoint, not a webhook URL, and the
+        # bot token is passed as a Bearer credential via the generic http_config.authorization
+        # block, not the app_token/app_token_file fields (a separate mechanism, mutually
+        # exclusive with setting api_url directly). Every slack_config below inherits both from
+        # these global defaults instead of repeating them per receiver.
+        slack_api_url: https://slack.com/api/chat.postMessage
+        http_config:
+          authorization:
+            type: Bearer
+            credentials_file: /etc/alertmanager/secrets/alertmanager-slack-bot/bot_token
       route:
         receiver: "unrouted"
         routes:
@@ -140,42 +152,22 @@ kube-prometheus-stack:
         - name: "null"
         - name: "unrouted"
           slack_configs:
-            # Bot token auth: api_url must be this literal chat.postMessage endpoint, not a
-            # webhook URL. app_token_file carries the bot token, app_url identifies the app.
-            - api_url: https://slack.com/api/chat.postMessage
-              channel: "#unrouted"
-              app_token_file: /etc/alertmanager/secrets/alertmanager-slack-bot/bot_token
-              app_url: /etc/alertmanager/secrets/alertmanager-slack-bot/app_url
+            - channel: "#unrouted"
         - name: "watchdog"
           slack_configs:
-            - api_url: https://slack.com/api/chat.postMessage
-              channel: "#watchdog"
-              app_token_file: /etc/alertmanager/secrets/alertmanager-slack-bot/bot_token
-              app_url: /etc/alertmanager/secrets/alertmanager-slack-bot/app_url
+            - channel: "#watchdog"
         - name: "k8s-critical"
           slack_configs:
-            - api_url: https://slack.com/api/chat.postMessage
-              channel: "#k8s-critical"
-              app_token_file: /etc/alertmanager/secrets/alertmanager-slack-bot/bot_token
-              app_url: /etc/alertmanager/secrets/alertmanager-slack-bot/app_url
+            - channel: "#k8s-critical"
         - name: "k8s-warning"
           slack_configs:
-            - api_url: https://slack.com/api/chat.postMessage
-              channel: "#k8s-warning"
-              app_token_file: /etc/alertmanager/secrets/alertmanager-slack-bot/bot_token
-              app_url: /etc/alertmanager/secrets/alertmanager-slack-bot/app_url
+            - channel: "#k8s-warning"
         - name: "prometheus-stack-critical"
           slack_configs:
-            - api_url: https://slack.com/api/chat.postMessage
-              channel: "#prometheus-stack-critical"
-              app_token_file: /etc/alertmanager/secrets/alertmanager-slack-bot/bot_token
-              app_url: /etc/alertmanager/secrets/alertmanager-slack-bot/app_url
+            - channel: "#prometheus-stack-critical"
         - name: "prometheus-stack-warning"
           slack_configs:
-            - api_url: https://slack.com/api/chat.postMessage
-              channel: "#prometheus-stack-warning"
-              app_token_file: /etc/alertmanager/secrets/alertmanager-slack-bot/bot_token
-              app_url: /etc/alertmanager/secrets/alertmanager-slack-bot/app_url
+            - channel: "#prometheus-stack-warning"
 
   grafana:
     # Dashboards and datasources are sidecar-provisioned from ConfigMaps, nothing to persist
