@@ -153,21 +153,27 @@ kube-prometheus-stack:
         - name: "unrouted"
           slack_configs:
             - channel: "#unrouted"
+              send_resolved: true
         - name: "watchdog"
           slack_configs:
             - channel: "#watchdog"
+              send_resolved: true
         - name: "k8s-critical"
           slack_configs:
             - channel: "#k8s-critical"
+              send_resolved: true
         - name: "k8s-warning"
           slack_configs:
             - channel: "#k8s-warning"
+              send_resolved: true
         - name: "prometheus-stack-critical"
           slack_configs:
             - channel: "#prometheus-stack-critical"
+              send_resolved: true
         - name: "prometheus-stack-warning"
           slack_configs:
             - channel: "#prometheus-stack-warning"
+              send_resolved: true
 
   grafana:
     # Dashboards and datasources are sidecar-provisioned from ConfigMaps, nothing to persist
