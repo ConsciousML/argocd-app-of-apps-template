@@ -23,6 +23,41 @@ kube-prometheus-stack:
       # N+1 node failure tolerance is a real concern the alert should keep catching.
       KubeCPUOvercommit: true
 
+    # Drives the Slack routing tree below (each component gets its own set of channels).
+    # general is deliberately left unlabeled: it only holds TargetDown, Watchdog, and
+    # InfoInhibitor, plumbing alerts about the alerting pipeline itself rather than a real
+    # component. Watchdog is isolated by an alertname matcher in the route; TargetDown and
+    # InfoInhibitor fall through to the route's default receiver instead.
+    additionalRuleGroupLabels:
+      alertmanager: { component: prometheus-stack }
+      configReloaders: { component: prometheus-stack }
+      prometheus: { component: prometheus-stack }
+      prometheusOperator: { component: prometheus-stack }
+      k8sContainerCpuUsageSecondsTotal: { component: k8s }
+      k8sContainerMemoryCache: { component: k8s }
+      k8sContainerMemoryRss: { component: k8s }
+      k8sContainerMemorySwap: { component: k8s }
+      k8sContainerMemoryWorkingSetBytes: { component: k8s }
+      k8sContainerResource: { component: k8s }
+      k8sPodOwner: { component: k8s }
+      kubeApiserverAvailability: { component: k8s }
+      kubeApiserverBurnrate: { component: k8s }
+      kubeApiserverHistogram: { component: k8s }
+      kubeApiserverSlos: { component: k8s }
+      kubePrometheusGeneral: { component: k8s }
+      kubePrometheusNodeRecording: { component: k8s }
+      kubeStateMetrics: { component: k8s }
+      kubelet: { component: k8s }
+      kubernetesApps: { component: k8s }
+      kubernetesResources: { component: k8s }
+      kubernetesStorage: { component: k8s }
+      kubernetesSystem: { component: k8s }
+      kubeProxy: { component: k8s }
+      nodeExporterRecording: { component: k8s }
+      nodeExporterAlerting: { component: k8s }
+      network: { component: k8s }
+      node: { component: k8s }
+
   prometheus:
     prometheusSpec:
       # 2 independent replicas, each with their own PVC below. No shared storage needed,
@@ -61,6 +96,84 @@ kube-prometheus-stack:
       persistentVolumeClaimRetentionPolicy:
         whenDeleted: Delete
         whenScaled: Retain
+
+      # Name must match targetSecretName in helm-eso-secret-sync/alertmanager-secrets-values.yaml.
+      # The Prometheus Operator mounts each key of this Secret as a file under
+      # /etc/alertmanager/secrets/alertmanager-slack-bot/, which config.global.http_config below
+      # points at.
+      secrets:
+        - alertmanager-slack-bot
+
+    # Flat routes, evaluated top to bottom, first match wins (continue defaults to false).
+    # component comes from defaultRules.additionalRuleGroupLabels above. Watchdog isn't a
+    # component, it's isolated by alertname, and must be matched before the info/none catch-all
+    # since Watchdog itself fires at severity: none. Anything matching none of these (missing or
+    # unexpected component/severity) falls to the top-level "unrouted" receiver instead of
+    # silently mixing into prometheus-stack-warning, so a gap in this routing tree is visible.
+    config:
+      global:
+        # Bot token auth (https://prometheus.io/docs/alerting/latest/configuration/#slack_config):
+        # slack_api_url is this literal chat.postMessage endpoint, not a webhook URL, and the
+        # bot token is passed as a Bearer credential via the generic http_config.authorization
+        # block, not the app_token/app_token_file fields (a separate mechanism, mutually
+        # exclusive with setting api_url directly). Every slack_config below inherits both from
+        # these global defaults instead of repeating them per receiver.
+        slack_api_url: https://slack.com/api/chat.postMessage
+        http_config:
+          authorization:
+            type: Bearer
+            credentials_file: /etc/alertmanager/secrets/alertmanager-slack-bot/bot_token
+      route:
+        receiver: "unrouted"
+        routes:
+          - receiver: "watchdog"
+            matchers:
+              - alertname = "Watchdog"
+          - receiver: "null"
+            matchers:
+              - severity =~ "info|none"
+          - receiver: "k8s-critical"
+            matchers:
+              - component = "k8s"
+              - severity = "critical"
+          - receiver: "k8s-warning"
+            matchers:
+              - component = "k8s"
+              - severity = "warning"
+          - receiver: "prometheus-stack-critical"
+            matchers:
+              - component = "prometheus-stack"
+              - severity = "critical"
+          - receiver: "prometheus-stack-warning"
+            matchers:
+              - component = "prometheus-stack"
+              - severity = "warning"
+      receivers:
+        - name: "null"
+        - name: "unrouted"
+          slack_configs:
+            - channel: "#unrouted"
+              send_resolved: true
+        - name: "watchdog"
+          slack_configs:
+            - channel: "#watchdog"
+              send_resolved: true
+        - name: "k8s-critical"
+          slack_configs:
+            - channel: "#k8s-critical"
+              send_resolved: true
+        - name: "k8s-warning"
+          slack_configs:
+            - channel: "#k8s-warning"
+              send_resolved: true
+        - name: "prometheus-stack-critical"
+          slack_configs:
+            - channel: "#prometheus-stack-critical"
+              send_resolved: true
+        - name: "prometheus-stack-warning"
+          slack_configs:
+            - channel: "#prometheus-stack-warning"
+              send_resolved: true
 
   grafana:
     # Dashboards and datasources are sidecar-provisioned from ConfigMaps, nothing to persist

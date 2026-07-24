@@ -204,7 +204,18 @@ applications:
     syncWave: 1
     extraValueFiles:
       - helm-eso-secret-sync/grafana-secrets-values.yaml
-  # Depends on grafana-secrets (needs the admin secret before Grafana's first boot).
+  # Depends on helm-external-secrets-operator.
+  - name: alertmanager-secrets
+    path: helm-eso-secret-sync
+    destination:
+      namespace: monitoring
+    syncWave: 1
+    extraValueFiles:
+      - helm-eso-secret-sync/alertmanager-secrets-values.yaml
+  # Depends on:
+  # - grafana-secrets (needs the admin secret before Grafana's first boot)
+  # - alertmanager-secrets (Alertmanager mounts it via alertmanagerSpec.secrets, so it must
+  #   exist before the pod can start)
   - name: helm-kube-prometheus-stack
     destination:
       namespace: monitoring
