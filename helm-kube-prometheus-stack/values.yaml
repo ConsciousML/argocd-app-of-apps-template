@@ -55,10 +55,12 @@ kube-prometheus-stack:
       # Prometheus HA doesn't require it (dedup happens on the query/Grafana side).
       replicas: 2
 
-      # Scrape any ServiceMonitor/PodMonitor in the cluster regardless of labels, so
-      # other addons can opt into scraping just by enabling their chart's serviceMonitor
+      # Scrape any ServiceMonitor/PodMonitor in the cluster regardless of labels, and load any
+      # PrometheusRule regardless of labels, so other addons can opt into scraping/alerting
+      # just by enabling their chart's serviceMonitor/PrometheusRule.
       serviceMonitorSelectorNilUsesHelmValues: false
       podMonitorSelectorNilUsesHelmValues: false
+      ruleSelectorNilUsesHelmValues: false
 
       storageSpec:
         volumeClaimTemplate:
