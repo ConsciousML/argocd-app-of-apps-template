@@ -5,8 +5,7 @@ loki:
   deploymentMode: Monolithic
 
   # Scraped by kube-prometheus-stack (serviceMonitorSelectorNilUsesHelmValues: false picks up
-  # any ServiceMonitor). relabelings (injecting the "cluster" label the Grafana Loki mixin
-  # dashboards require) is set via the catalog's appParams, see placeholder-values.yaml.
+  # any ServiceMonitor).
   monitoring:
     serviceMonitor:
       enabled: true

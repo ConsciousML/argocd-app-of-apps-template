@@ -293,23 +293,13 @@ kube-prometheus-stack:
         notifications-overview:
           gnetId: 19975
           revision: 8
-      # https://github.com/grafana/loki/tree/main/production/loki-mixin-compiled/dashboards
-      # Only the dashboards applicable to this stack's Monolithic deployment mode
-      # (helm-loki/values.yaml) are imported; read/write-split, bloom-filter, and the
-      # recording-rules file (not a dashboard) are left out.
+      # https://grafana.com/grafana/dashboards/17781-loki-metrics-dashboard/
       loki:
-        operational:
-          url: https://raw.githubusercontent.com/grafana/loki/main/production/loki-mixin-compiled/dashboards/loki-operational.json
-        chunks:
-          url: https://raw.githubusercontent.com/grafana/loki/main/production/loki-mixin-compiled/dashboards/loki-chunks.json
-        retention:
-          url: https://raw.githubusercontent.com/grafana/loki/main/production/loki-mixin-compiled/dashboards/loki-retention.json
-        deletion:
-          url: https://raw.githubusercontent.com/grafana/loki/main/production/loki-mixin-compiled/dashboards/loki-deletion.json
-        object-storage:
-          url: https://raw.githubusercontent.com/grafana/loki/main/production/loki-mixin-compiled/dashboards/loki-thanos-object-storage.json
-        logs:
-          url: https://raw.githubusercontent.com/grafana/loki/main/production/loki-mixin-compiled/dashboards/loki-logs.json
+        loki-metrics-dashboard:
+          gnetId: 17781
+          revision: 1
+          datasource:
+            - { name: DS_PROMETHEUS, value: Prometheus }
     # Placeholders for `helm template` to pass in CI. Overridden at sync time by appParams
     # (see the catalog's app_of_apps unit), which is also the single source of truth shared
     # with grafana-secrets' targetSecretName/secretKey.
