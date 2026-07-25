@@ -150,6 +150,14 @@ kube-prometheus-stack:
             matchers:
               - component = "prometheus-stack"
               - severity = "warning"
+          - receiver: "loki-critical"
+            matchers:
+              - component = "loki"
+              - severity = "critical"
+          - receiver: "loki-warning"
+            matchers:
+              - component = "loki"
+              - severity = "warning"
       receivers:
         - name: "null"
         - name: "unrouted"
@@ -175,6 +183,14 @@ kube-prometheus-stack:
         - name: "prometheus-stack-warning"
           slack_configs:
             - channel: "#{{ .Values.environment }}-prometheus-stack-warning"
+              send_resolved: true
+        - name: "loki-critical"
+          slack_configs:
+            - channel: "#{{ .Values.environment }}-loki-critical"
+              send_resolved: true
+        - name: "loki-warning"
+          slack_configs:
+            - channel: "#{{ .Values.environment }}-loki-warning"
               send_resolved: true
 
   grafana:

@@ -5,10 +5,18 @@ loki:
   deploymentMode: Monolithic
 
   # Scraped by kube-prometheus-stack (serviceMonitorSelectorNilUsesHelmValues: false picks up
-  # any ServiceMonitor).
+  # any ServiceMonitor). rules/alerts are the chart's built-in Grafana Loki mixin recording
+  # rules and alerts. component: loki drives Alertmanager's routing tree (see
+  # helm-kube-prometheus-stack/values.yaml).
   monitoring:
     serviceMonitor:
       enabled: true
+    rules:
+      enabled: true
+    alerts:
+      enabled: true
+      additionalRuleLabels:
+        component: loki
 
   loki:
     # Single-tenant per environment, disable multi-tenancy (chart default: true,
