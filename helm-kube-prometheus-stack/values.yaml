@@ -15,11 +15,13 @@ kube-prometheus-stack:
 
   defaultRules:
     # Drives the Slack routing tree below (each component gets its own set of channels).
-    # general is deliberately left unlabeled: it only holds TargetDown, Watchdog, and
-    # InfoInhibitor, plumbing alerts about the alerting pipeline itself rather than a real
-    # component. Watchdog is isolated by an alertname matcher in the route; TargetDown and
-    # InfoInhibitor fall through to the route's default receiver instead.
+    # general holds TargetDown, Watchdog, and InfoInhibitor. Labeling it component: k8s routes
+    # TargetDown to k8s-warning/critical (a target going unscrapeable is a cluster-health signal).
+    # Watchdog is still isolated by an alertname matcher evaluated before the component routes,
+    # and InfoInhibitor's severity: none is still caught by the info/none route before it, so
+    # this label only actually changes where TargetDown lands.
     additionalRuleGroupLabels:
+      general: { component: k8s }
       alertmanager: { component: prometheus-stack }
       configReloaders: { component: prometheus-stack }
       prometheus: { component: prometheus-stack }
