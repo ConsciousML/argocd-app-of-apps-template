@@ -1,9 +1,7 @@
 kube-prometheus-stack:
-  # Set via catalog appParams (local.kube_prometheus_stack_release in
-  # units/eks/addons/argocd/app_of_apps/terragrunt.hcl), which also composes the
-  # helm-httproute backendRef names from the same literal — Helm/YAML can't do that string
-  # interpolation itself, so this one value is coordinated from the catalog instead.
-  fullnameOverride: ""
+  # Both set via catalog appParams (units/eks/addons/argocd/app_of_apps/terragrunt.hcl)
+  fullnameOverride: "" # also composes the helm-httproute backendRef names, Helm/YAML can't do that string interpolation itself
+  environment: ""      # read by alertmanager.config below (via tplConfig) to prefix each Slack channel name
 
   # Installed by the catalog's prometheus_operator_crds unit ahead of ArgoCD, not this chart,
   # so the ServiceMonitor CRD already exists by first sync instead of only after this app.
@@ -104,6 +102,10 @@ kube-prometheus-stack:
       secrets:
         - alertmanager-slack-bot
 
+    # Renders config through Helm's tpl before writing the alertmanager secret, so the
+    # "{{ .Values.environment }}-" prefix on each receiver's channel below resolves.
+    tplConfig: true
+
     # Flat routes, evaluated top to bottom, first match wins (continue defaults to false).
     # component comes from defaultRules.additionalRuleGroupLabels above. Watchdog isn't a
     # component, it's isolated by alertname, and must be matched before the info/none catch-all
@@ -152,27 +154,27 @@ kube-prometheus-stack:
         - name: "null"
         - name: "unrouted"
           slack_configs:
-            - channel: "#unrouted"
+            - channel: "#{{ .Values.environment }}-unrouted"
               send_resolved: true
         - name: "watchdog"
           slack_configs:
-            - channel: "#watchdog"
+            - channel: "#{{ .Values.environment }}-watchdog"
               send_resolved: true
         - name: "k8s-critical"
           slack_configs:
-            - channel: "#k8s-critical"
+            - channel: "#{{ .Values.environment }}-k8s-critical"
               send_resolved: true
         - name: "k8s-warning"
           slack_configs:
-            - channel: "#k8s-warning"
+            - channel: "#{{ .Values.environment }}-k8s-warning"
               send_resolved: true
         - name: "prometheus-stack-critical"
           slack_configs:
-            - channel: "#prometheus-stack-critical"
+            - channel: "#{{ .Values.environment }}-prometheus-stack-critical"
               send_resolved: true
         - name: "prometheus-stack-warning"
           slack_configs:
-            - channel: "#prometheus-stack-warning"
+            - channel: "#{{ .Values.environment }}-prometheus-stack-warning"
               send_resolved: true
 
   grafana:
