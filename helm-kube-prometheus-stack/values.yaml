@@ -14,13 +14,6 @@ kube-prometheus-stack:
   kubeControllerManager: { enabled: false }
 
   defaultRules:
-    disabled:
-      # This node group intentionally runs 2 nodes; the rule can't tell EKS has no
-      # control-plane node label and treats <3 nodes as always failing N+1 tolerance.
-      # Dev-only: do not carry this disable over to staging/prod environments, where
-      # N+1 node failure tolerance is a real concern the alert should keep catching.
-      KubeCPUOvercommit: true
-
     # Drives the Slack routing tree below (each component gets its own set of channels).
     # general is deliberately left unlabeled: it only holds TargetDown, Watchdog, and
     # InfoInhibitor, plumbing alerts about the alerting pipeline itself rather than a real
