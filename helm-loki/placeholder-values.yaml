@@ -11,3 +11,8 @@ loki:
         ruler: "placeholder-ruler"
       s3:
         region: "us-east-1"
+  monitoring:
+    serviceMonitor:
+      relabelings:
+        - targetLabel: cluster
+          replacement: "placeholder-cluster"

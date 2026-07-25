@@ -250,6 +250,12 @@ kube-prometheus-stack:
             type: file
             options:
               path: /var/lib/grafana/dashboards/argocd
+          - name: loki
+            orgId: 1
+            folder: Loki
+            type: file
+            options:
+              path: /var/lib/grafana/dashboards/loki
     dashboards:
       # https://karpenter.sh/docs/getting-started/getting-started-with-karpenter/#monitoring-with-grafana-optional
       karpenter:
@@ -287,6 +293,23 @@ kube-prometheus-stack:
         notifications-overview:
           gnetId: 19975
           revision: 8
+      # https://github.com/grafana/loki/tree/main/production/loki-mixin-compiled/dashboards
+      # Only the dashboards applicable to this stack's Monolithic deployment mode
+      # (helm-loki/values.yaml) are imported; read/write-split, bloom-filter, and the
+      # recording-rules file (not a dashboard) are left out.
+      loki:
+        operational:
+          url: https://raw.githubusercontent.com/grafana/loki/main/production/loki-mixin-compiled/dashboards/loki-operational.json
+        chunks:
+          url: https://raw.githubusercontent.com/grafana/loki/main/production/loki-mixin-compiled/dashboards/loki-chunks.json
+        retention:
+          url: https://raw.githubusercontent.com/grafana/loki/main/production/loki-mixin-compiled/dashboards/loki-retention.json
+        deletion:
+          url: https://raw.githubusercontent.com/grafana/loki/main/production/loki-mixin-compiled/dashboards/loki-deletion.json
+        object-storage:
+          url: https://raw.githubusercontent.com/grafana/loki/main/production/loki-mixin-compiled/dashboards/loki-thanos-object-storage.json
+        logs:
+          url: https://raw.githubusercontent.com/grafana/loki/main/production/loki-mixin-compiled/dashboards/loki-logs.json
     # Placeholders for `helm template` to pass in CI. Overridden at sync time by appParams
     # (see the catalog's app_of_apps unit), which is also the single source of truth shared
     # with grafana-secrets' targetSecretName/secretKey.

@@ -4,6 +4,13 @@
 loki:
   deploymentMode: Monolithic
 
+  # Scraped by kube-prometheus-stack (serviceMonitorSelectorNilUsesHelmValues: false picks up
+  # any ServiceMonitor). relabelings (injecting the "cluster" label the Grafana Loki mixin
+  # dashboards require) is set via the catalog's appParams, see placeholder-values.yaml.
+  monitoring:
+    serviceMonitor:
+      enabled: true
+
   loki:
     # Single-tenant per environment, disable multi-tenancy (chart default: true,
     # which rejects writes without an X-Scope-OrgID header, 401 "no org id").
