@@ -1,10 +1,11 @@
 vpa:
   recommender:
     enabled: true
-    # Target CPU at p95 and memory at p99 instead of the chart's default p90/p90,
-    # so recommendations track burst/peak usage more closely.
+    # Memory targets p99 instead of the chart's default p90: OOM kills are a hard
+    # failure, so memory gets a higher percentile on top of the default 15% margin.
+    # CPU stays at the chart default (p90) since throttling is a soft failure and
+    # doesn't warrant stacking a higher percentile on top of the margin too.
     extraArgs:
-      target-cpu-percentile: "0.95"
       target-memory-percentile: "0.99"
   updater:
     enabled: false
