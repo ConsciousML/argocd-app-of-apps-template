@@ -164,3 +164,21 @@ misconfigurations:
       metrics it exports. Vendored upstream chart; the mounts are
       inherent to the exporter's function and cannot be removed without
       breaking node metric scraping.
+  - id: AVD-KSV-0046
+    paths:
+      - "helm-goldilocks/charts/goldilocks/templates/controller-clusterrole.yaml"
+    statement: >
+      Required for the Goldilocks controller to discover workloads
+      (Deployments, StatefulSets, DaemonSets, ReplicaSets) across the
+      apps API group and create VPAs for them. Read-only (get/list/watch).
+      Vendored upstream chart with no values option to scope resources
+      below '*' for this apiGroup; inherent to the controller's function.
+  - id: AVD-KSV-0046
+    paths:
+      - "helm-goldilocks/charts/goldilocks/templates/dashboard-clusterrole.yaml"
+    statement: >
+      Required for the Goldilocks dashboard to list workloads across the
+      apps API group and display their VPA recommendations. Read-only
+      (get/list). Vendored upstream chart with no values option to scope
+      resources below '*' for this apiGroup; inherent to the dashboard's
+      function.
