@@ -1,0 +1,13 @@
+goldilocks:
+  # VPA (recommender only) is installed separately by helm-vpa.
+  vpa:
+    enabled: false
+  # Provisioned as the EKS-managed metrics-server addon (terragrunt-template-catalog-eks),
+  # not by this chart.
+  metrics-server:
+    enabled: false
+  controller:
+    flags:
+      on-by-default: "true"
+  dashboard:
+    enabled: true
