@@ -1,0 +1,11 @@
+vpa:
+  recommender:
+    enabled: true
+  updater:
+    enabled: false
+  admissionController:
+    enabled: false
+  # Provisioned as the EKS-managed metrics-server addon (terragrunt-template-catalog-eks),
+  # not by this chart.
+  metrics-server:
+    enabled: false
