@@ -11,3 +11,7 @@ goldilocks:
       on-by-default: "true"
   dashboard:
     enabled: true
+    # Separate flag from controller.flags above, also needed for the dashboard to list
+    # every namespace instead of only labeled ones.
+    flags:
+      on-by-default: "true"
