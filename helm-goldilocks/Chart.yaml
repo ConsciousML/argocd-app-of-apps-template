@@ -1,0 +1,9 @@
+apiVersion: v2
+name: helm-goldilocks
+description: Goldilocks dashboard, reads VPA recommendations for resource-sizing visibility
+type: application
+version: 0.1.0
+dependencies:
+  - name: goldilocks
+    version: 10.4.1
+    repository: https://charts.fairwinds.com/stable

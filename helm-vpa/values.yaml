@@ -1,0 +1,17 @@
+vpa:
+  recommender:
+    enabled: true
+    # Memory targets p99 instead of the chart's default p90: OOM kills are a hard
+    # failure, so memory gets a higher percentile on top of the default 15% margin.
+    # CPU stays at the chart default (p90) since throttling is a soft failure and
+    # doesn't warrant stacking a higher percentile on top of the margin too.
+    extraArgs:
+      target-memory-percentile: "0.99"
+  updater:
+    enabled: false
+  admissionController:
+    enabled: false
+  # Provisioned as the EKS-managed metrics-server addon (terragrunt-template-catalog-eks),
+  # not by this chart.
+  metrics-server:
+    enabled: false
