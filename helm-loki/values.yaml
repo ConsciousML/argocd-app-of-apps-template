@@ -141,9 +141,9 @@ loki:
     resources:
       requests:
         cpu: 50m
-        memory: 128Mi
+        memory: 249M
       limits:
-        memory: 128Mi
+        memory: 249M
 
   # Other deployment modes, unused in Monolithic mode. Some (write/read/backend) default to
   # replicas: 3 regardless of deploymentMode, and the chart refuses to render if both
