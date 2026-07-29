@@ -1,0 +1,14 @@
+apiVersion: tailscale.com/v1alpha1
+kind: ProxyClass
+metadata:
+  name: elastic-nodepool
+spec:
+  statefulSet:
+    pod:
+      nodeSelector:
+        karpenter.sh/nodepool: elastic
+      tolerations:
+        - key: karpenter.sh/workload-class
+          operator: Equal
+          value: elastic
+          effect: NoSchedule

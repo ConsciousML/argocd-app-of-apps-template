@@ -71,6 +71,13 @@ loki:
         memory: 352M
       limits:
         memory: 352M
+    nodeSelector:
+      karpenter.sh/nodepool: critical
+    tolerations:
+      - key: karpenter.sh/workload-class
+        operator: Equal
+        value: critical
+        effect: NoSchedule
     persistence:
       size: 30Gi
       # Reclaim volumes on dev for cost savings, do not enable this on prod
@@ -90,6 +97,13 @@ loki:
       limits:
         cpu: 55m
         memory: 50Mi
+    nodeSelector:
+      karpenter.sh/nodepool: critical
+    tolerations:
+      - key: karpenter.sh/workload-class
+        operator: Equal
+        value: critical
+        effect: NoSchedule
 
   resultsCache:
     resources:
@@ -99,6 +113,13 @@ loki:
       limits:
         cpu: 55m
         memory: 50Mi
+    nodeSelector:
+      karpenter.sh/nodepool: critical
+    tolerations:
+      - key: karpenter.sh/workload-class
+        operator: Equal
+        value: critical
+        effect: NoSchedule
 
   # Shared by the exporter container in both chunksCache and resultsCache pods, the chart
   # has no per-cache override for it.
@@ -127,7 +148,16 @@ loki:
         limits:
           cpu: 55m
           memory: 50Mi
+    nodeSelector:
+      karpenter.sh/nodepool: critical
+    tolerations:
+      - key: karpenter.sh/workload-class
+        operator: Equal
+        value: critical
+        effect: NoSchedule
 
+  # DaemonSet, one pod per node (chart default kind): needs to verify log delivery from every
+  # node regardless of pool, so it tolerates both taints instead of pinning via nodeSelector.
   lokiCanary:
     resources:
       requests:
@@ -136,6 +166,10 @@ loki:
       limits:
         cpu: 15m
         memory: 100Mi
+    tolerations:
+      - key: karpenter.sh/workload-class
+        operator: Exists
+        effect: NoSchedule
 
   sidecar:
     resources:

@@ -13,7 +13,10 @@ spec:
       labels:
         app: guestbook-ui
     spec:
-      # Allows scheduling onto the elastic NodePool, which is tainted by default.
+      # Pins onto the elastic NodePool: the toleration alone only allows scheduling there,
+      # nodeSelector is what keeps it from landing on the untainted MNG instead.
+      nodeSelector:
+        karpenter.sh/nodepool: elastic
       tolerations:
         - key: "karpenter.sh/workload-class"
           operator: "Equal"

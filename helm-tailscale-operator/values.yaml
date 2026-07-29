@@ -14,3 +14,10 @@ tailscale-operator:
     podSecurityContext:
       seccompProfile:
         type: RuntimeDefault # apply the runtime's default seccomp profile to block risky syscalls
+    nodeSelector:
+      karpenter.sh/nodepool: elastic
+    tolerations:
+      - key: karpenter.sh/workload-class
+        operator: Equal
+        value: elastic
+        effect: NoSchedule

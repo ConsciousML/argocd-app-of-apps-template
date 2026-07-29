@@ -14,6 +14,13 @@ vpa:
         memory: 100Mi
       limits:
         memory: 100Mi
+    nodeSelector:
+      karpenter.sh/nodepool: elastic
+    tolerations:
+      - key: karpenter.sh/workload-class
+        operator: Equal
+        value: elastic
+        effect: NoSchedule
   updater:
     enabled: false
   admissionController:

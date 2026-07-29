@@ -32,7 +32,16 @@ kube-prometheus-stack:
       limits:
         cpu: 75m
         memory: 100Mi
+    nodeSelector:
+      karpenter.sh/nodepool: critical
+    tolerations:
+      - key: karpenter.sh/workload-class
+        operator: Equal
+        value: critical
+        effect: NoSchedule
 
+  # DaemonSet, one pod per node: needs metrics from every node regardless of pool, so it
+  # tolerates both taints instead of pinning to critical via nodeSelector.
   prometheus-node-exporter:
     resources:
       requests:
@@ -41,6 +50,10 @@ kube-prometheus-stack:
       limits:
         cpu: 75m
         memory: 100Mi
+    tolerations:
+      - key: karpenter.sh/workload-class
+        operator: Exists
+        effect: NoSchedule
 
   prometheusOperator:
     resources:
@@ -50,6 +63,13 @@ kube-prometheus-stack:
       limits:
         cpu: 15m
         memory: 100Mi
+    nodeSelector:
+      karpenter.sh/nodepool: critical
+    tolerations:
+      - key: karpenter.sh/workload-class
+        operator: Equal
+        value: critical
+        effect: NoSchedule
 
   defaultRules:
     # Drives the Slack routing tree below (each component gets its own set of channels).
@@ -112,6 +132,14 @@ kube-prometheus-stack:
         limits:
           memory: 920Mi
 
+      nodeSelector:
+        karpenter.sh/nodepool: critical
+      tolerations:
+        - key: karpenter.sh/workload-class
+          operator: Equal
+          value: critical
+          effect: NoSchedule
+
       storageSpec:
         volumeClaimTemplate:
           spec:
@@ -136,6 +164,13 @@ kube-prometheus-stack:
         limits:
           cpu: 15m
           memory: 50Mi
+      nodeSelector:
+        karpenter.sh/nodepool: critical
+      tolerations:
+        - key: karpenter.sh/workload-class
+          operator: Equal
+          value: critical
+          effect: NoSchedule
       storage:
         volumeClaimTemplate:
           spec:
@@ -259,6 +294,14 @@ kube-prometheus-stack:
       limits:
         cpu: 92m
         memory: 298M
+
+    nodeSelector:
+      karpenter.sh/nodepool: critical
+    tolerations:
+      - key: karpenter.sh/workload-class
+        operator: Equal
+        value: critical
+        effect: NoSchedule
 
     downloadDashboards:
       securityContext:
