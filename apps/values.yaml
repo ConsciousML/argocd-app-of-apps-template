@@ -69,22 +69,12 @@ applications:
         releaseName: aws-load-balancer-controller
 
   # --- Karpenter ---
-  - name: helm-karpenter
-    destination:
-      namespace: kube-system
-    syncWave: 0
-    # Chart bundles its own CRDs; avoids client-side apply's annotation size limit.
-    syncOptions:
-      - ServerSideApply=true
-    tool:
-      helm:
-        # Must match the catalog's Pod Identity association's expected ServiceAccount name.
-        releaseName: karpenter
-  # Depends on helm-karpenter (controller and its CRDs).
+  # The controller and its CRDs are applied by Terragrunt before app-of-apps ever syncs
+  # (units/eks/addons/karpenter/helm in the catalog repo), not by an in-cluster sync-wave.
   - name: helm-karpenter-config
     destination:
       namespace: kube-system
-    syncWave: 1
+    syncWave: 0
 
   # --- ExternalDNS ---
   # Depends on crds-gateway-api (watches gateway-httproute sources).

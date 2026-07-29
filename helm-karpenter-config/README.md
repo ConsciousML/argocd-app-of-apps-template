@@ -5,4 +5,4 @@ Deploys Karpenter's `EC2NodeClass` and `NodePool`, defining which EC2 instances 
 ## Upstream Dependencies
 
 - **[`units/eks/addons/karpenter/iam`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/eks/addons/karpenter/iam)** (catalog): provisions the node IAM role this chart's `nodeRole` value points at (see [values.yaml](values.yaml) for `clusterName`)
-- **[`helm-karpenter`](../helm-karpenter)**: depends on the controller and CRDs this chart's `EC2NodeClass` and `NodePool` rely on
+- **[`units/eks/addons/karpenter/helm`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/eks/addons/karpenter/helm)** (catalog): deploys the controller and CRDs this chart's `EC2NodeClass` and `NodePool` rely on
