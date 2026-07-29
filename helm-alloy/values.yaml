@@ -4,6 +4,12 @@
 
 alloy:
   alloy:
+    resources:
+      requests:
+        cpu: 11m
+        memory: 145M
+      limits:
+        memory: 145M
     configMap:
       content: |
         // Restrict to pods on the same node as this Alloy instance:
@@ -116,6 +122,13 @@ alloy:
           mountPath: /tmp/alloy
 
   configReloader:
+    resources:
+      requests:
+        cpu: 11m
+        memory: 50Mi
+      limits:
+        cpu: 11m
+        memory: 50Mi
     securityContext:
       readOnlyRootFilesystem: true
       runAsNonRoot: true

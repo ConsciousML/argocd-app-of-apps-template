@@ -9,11 +9,10 @@ karpenter:
   controller:
     resources:
       requests:
-        cpu: "1"
-        memory: "1Gi"
+        cpu: 49m
+        memory: 298M
       limits:
-        cpu: "1"
-        memory: "1Gi"
+        memory: 298M
   # Requires the ServiceMonitor CRD from helm-kube-prometheus-stack, which is why this
   # app syncs after it (see apps/values.yaml).
   serviceMonitor:

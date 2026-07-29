@@ -2,6 +2,14 @@ external-secrets:
   serviceMonitor:
     enabled: true
 
+  resources:
+    requests:
+      cpu: 15m
+      memory: 100Mi
+    limits:
+      cpu: 15m
+      memory: 100Mi
+
   # The chart only renders spec.securityContext (pod-level) when podSecurityContext has
   # more than just 'enabled', otherwise it's omitted even though container-level hardening
   # (readOnlyRootFilesystem, runAsNonRoot, runAsUser 1000, ...) is already applied by default.
@@ -12,7 +20,21 @@ external-secrets:
   webhook:
     podSecurityContext:
       runAsNonRoot: true
+    resources:
+      requests:
+        cpu: 15m
+        memory: 100Mi
+      limits:
+        cpu: 75m
+        memory: 100Mi
 
   certController:
     podSecurityContext:
       runAsNonRoot: true
+    resources:
+      requests:
+        cpu: 15m
+        memory: 100Mi
+      limits:
+        cpu: 15m
+        memory: 100Mi

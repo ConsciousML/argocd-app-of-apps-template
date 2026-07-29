@@ -7,3 +7,10 @@ aws-load-balancer-controller:
   enableServiceMutatorWebhook: false
   serviceMonitor:
     enabled: true
+  resources:
+    requests:
+      cpu: 15m
+      memory: 100Mi
+    limits:
+      cpu: 15m
+      memory: 100Mi

@@ -9,9 +9,23 @@ goldilocks:
   controller:
     flags:
       on-by-default: "true"
+    resources:
+      requests:
+        cpu: 93m
+        memory: 100Mi
+      limits:
+        cpu: 93m
+        memory: 100Mi
   dashboard:
     enabled: true
     # Separate flag from controller.flags above, also needed for the dashboard to list
     # every namespace instead of only labeled ones.
     flags:
       on-by-default: "true"
+    resources:
+      requests:
+        cpu: 15m
+        memory: 100Mi
+      limits:
+        cpu: 75m
+        memory: 100Mi

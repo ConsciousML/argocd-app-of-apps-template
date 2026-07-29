@@ -13,6 +13,33 @@ kube-prometheus-stack:
   kubeScheduler: { enabled: false }
   kubeControllerManager: { enabled: false }
 
+  kube-state-metrics:
+    resources:
+      requests:
+        cpu: 15m
+        memory: 100Mi
+      limits:
+        cpu: 75m
+        memory: 100Mi
+
+  prometheus-node-exporter:
+    resources:
+      requests:
+        cpu: 15m
+        memory: 100Mi
+      limits:
+        cpu: 75m
+        memory: 100Mi
+
+  prometheusOperator:
+    resources:
+      requests:
+        cpu: 15m
+        memory: 100Mi
+      limits:
+        cpu: 15m
+        memory: 100Mi
+
   defaultRules:
     # Drives the Slack routing tree below (each component gets its own set of channels).
     # general holds TargetDown, Watchdog, and InfoInhibitor. Labeling it component: k8s routes
@@ -195,11 +222,28 @@ kube-prometheus-stack:
     persistence:
       enabled: false
 
+    resources:
+      requests:
+        cpu: 11m
+        memory: 249M
+      limits:
+        cpu: 55m
+        memory: 249M
+
     downloadDashboards:
       securityContext:
         readOnlyRootFilesystem: true # writes only into the already-mounted storage emptyDir
 
     sidecar:
+      # Shared by both the dashboards and datasources sidecar containers, the chart has no
+      # per-container override.
+      resources:
+        requests:
+          cpu: 11m
+          memory: 94M
+        limits:
+          cpu: 11m
+          memory: 94M
       securityContext:
         readOnlyRootFilesystem: true # writes only into the already-mounted provisioning emptyDirs
       # Setting env.GF_SECURITY_ADMIN_USER below stops the chart from auto-injecting
