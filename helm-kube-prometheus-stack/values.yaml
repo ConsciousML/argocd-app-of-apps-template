@@ -13,6 +13,17 @@ kube-prometheus-stack:
   kubeScheduler: { enabled: false }
   kubeControllerManager: { enabled: false }
 
+  # Shared by the config-reloader sidecar in both the prometheus and alertmanager StatefulSets,
+  # the chart has no per-instance override. Sized from kubectl top: real usage was 15Mi and 13Mi.
+  prometheusConfigReloader:
+    resources:
+      requests:
+        cpu: 11m
+        memory: 32Mi
+      limits:
+        cpu: 11m
+        memory: 32Mi
+
   kube-state-metrics:
     resources:
       requests:
@@ -91,6 +102,16 @@ kube-prometheus-stack:
       podMonitorSelectorNilUsesHelmValues: false
       ruleSelectorNilUsesHelmValues: false
 
+      # Goldilocks/VPA can't produce a recommendation for this StatefulSet (prometheus-operator
+      # owns it, VPA won't target a StatefulSet with a non-scalable parent controller), sized
+      # from kubectl top instead: real usage peaked at 764Mi, memory guaranteed with 20% headroom.
+      resources:
+        requests:
+          cpu: 30m
+          memory: 920Mi
+        limits:
+          memory: 920Mi
+
       storageSpec:
         volumeClaimTemplate:
           spec:
@@ -106,6 +127,15 @@ kube-prometheus-stack:
 
   alertmanager:
     alertmanagerSpec:
+      # Same VPA limitation as prometheus above, sized from kubectl top instead: real usage
+      # was 21Mi.
+      resources:
+        requests:
+          cpu: 15m
+          memory: 50Mi
+        limits:
+          cpu: 15m
+          memory: 50Mi
       storage:
         volumeClaimTemplate:
           spec:
