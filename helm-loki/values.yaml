@@ -67,8 +67,9 @@ loki:
       requests:
         cpu: 35m
         memory: 352M
-      limits:
-        memory: 352M
+      # No memory limit: the request above was captured too early to reflect real traffic and
+      # crash looped the pod once enforced. Revisit once there's enough usage history to trust it.
+      limits: {}
     persistence:
       size: 30Gi
       # Reclaim volumes on dev for cost savings, do not enable this on prod
@@ -139,10 +140,10 @@ loki:
     resources:
       requests:
         cpu: 11m
-        memory: 94M
-      limits:
-        cpu: 11m
-        memory: 94M
+      # No memory request or limit: the original recommendation was captured too early and
+      # both throttled startup (CPU) and OOM killed the container (memory) once enforced.
+      # Needs burst headroom until there's enough usage history to trust a real value.
+      limits: {}
 
   # Other deployment modes, unused in Monolithic mode. Some (write/read/backend) default to
   # replicas: 3 regardless of deploymentMode, and the chart refuses to render if both
