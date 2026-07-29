@@ -6,7 +6,14 @@ vpa:
     # CPU stays at the chart default (p90) since throttling is a soft failure and
     # doesn't warrant stacking a higher percentile on top of the margin too.
     extraArgs:
+      target-cpu-percentile: "0.90"
       target-memory-percentile: "0.99"
+    resources:
+      requests:
+        cpu: 15m
+        memory: 100Mi
+      limits:
+        memory: 100Mi
   updater:
     enabled: false
   admissionController:

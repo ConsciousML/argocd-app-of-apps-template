@@ -63,6 +63,14 @@ loki:
 
   singleBinary:
     replicas: 3
+    # Memory guaranteed (limit = request) based on observed steady-state usage of 195-249Mi
+    # per pod, well under the request below.
+    resources:
+      requests:
+        cpu: 35m
+        memory: 352M
+      limits:
+        memory: 352M
     persistence:
       size: 30Gi
       # Reclaim volumes on dev for cost savings, do not enable this on prod
@@ -75,6 +83,67 @@ loki:
   # https://grafana.com/docs/loki/latest/operations/caching/
   chunksCache:
     allocatedMemory: 1024
+    resources:
+      requests:
+        cpu: 11m
+        memory: 50Mi
+      limits:
+        cpu: 55m
+        memory: 50Mi
+
+  resultsCache:
+    resources:
+      requests:
+        cpu: 11m
+        memory: 50Mi
+      limits:
+        cpu: 55m
+        memory: 50Mi
+
+  # Shared by the exporter container in both chunksCache and resultsCache pods, the chart
+  # has no per-cache override for it.
+  memcachedExporter:
+    resources:
+      requests:
+        cpu: 11m
+        memory: 50Mi
+      limits:
+        cpu: 55m
+        memory: 50Mi
+
+  gateway:
+    resources:
+      requests:
+        cpu: 11m
+        memory: 50Mi
+      limits:
+        cpu: 55m
+        memory: 50Mi
+    metrics:
+      resources:
+        requests:
+          cpu: 11m
+          memory: 50Mi
+        limits:
+          cpu: 55m
+          memory: 50Mi
+
+  lokiCanary:
+    resources:
+      requests:
+        cpu: 15m
+        memory: 100Mi
+      limits:
+        cpu: 15m
+        memory: 100Mi
+
+  sidecar:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 249M
+      limits:
+        memory: 249M
 
   # Other deployment modes, unused in Monolithic mode. Some (write/read/backend) default to
   # replicas: 3 regardless of deploymentMode, and the chart refuses to render if both
