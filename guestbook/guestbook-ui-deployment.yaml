@@ -13,10 +13,11 @@ spec:
       labels:
         app: guestbook-ui
     spec:
-      # Allows scheduling onto Karpenter-provisioned nodes, which are tainted by default.
+      # Allows scheduling onto the elastic NodePool, which is tainted by default.
       tolerations:
-        - key: "karpenter.sh/provisioned"
-          operator: "Exists"
+        - key: "karpenter.sh/workload-class"
+          operator: "Equal"
+          value: "elastic"
           effect: "NoSchedule"
       securityContext:
         runAsNonRoot: true

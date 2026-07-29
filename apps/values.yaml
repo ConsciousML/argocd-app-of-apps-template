@@ -68,13 +68,8 @@ applications:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
         releaseName: aws-load-balancer-controller
 
-  # --- Karpenter ---
-  # The controller and its CRDs are applied by Terragrunt before app-of-apps ever syncs
-  # (units/eks/addons/karpenter/helm in the catalog repo), not by an in-cluster sync-wave.
-  - name: helm-karpenter-config
-    destination:
-      namespace: kube-system
-    syncWave: 0
+  # Karpenter (controller, EC2NodeClass, and both NodePools) is entirely Terraform-managed,
+  # applied before app-of-apps ever syncs. See units/eks/addons/karpenter in the catalog repo.
 
   # --- ExternalDNS ---
   # Depends on crds-gateway-api (watches gateway-httproute sources).
@@ -282,7 +277,6 @@ applications:
       - helm-httproute/goldilocks-httproute-values.yaml
 
   # --- Guestbook ---
-  # Depends on helm-karpenter-config (NodePool must exist before the Deployment schedules).
   - name: guestbook
     destination:
       namespace: guestbook

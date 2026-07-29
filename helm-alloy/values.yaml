@@ -155,9 +155,9 @@ alloy:
         - name: alloy-data
           emptyDir: {}
     tolerations:
-      - key: karpenter.sh/provisioned
+      - key: karpenter.sh/workload-class
         operator: Exists
         effect: NoSchedule
-      # Karpenter-provisioned nodes carry this taint (see
-      # helm-karpenter-config/templates/node-pool.yaml). Without it, Alloy won't
-      # schedule onto Karpenter nodes and their pod logs would go uncollected.
+      # Both Karpenter NodePools carry this taint (see units/eks/addons/karpenter/node_pool
+      # in the catalog repo). Without it, Alloy won't schedule onto Karpenter nodes and
+      # their pod logs would go uncollected.
