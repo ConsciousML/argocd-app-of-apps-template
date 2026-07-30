@@ -196,7 +196,7 @@ applications:
   - name: helm-tailscale-operator
     destination:
       namespace: tailscale
-    syncWave: 5
+    syncWave: 3
     # Chart bundles its own CRDs; avoids client-side apply's annotation size limit.
     syncOptions:
       - ServerSideApply=true
@@ -204,7 +204,7 @@ applications:
   - name: helm-tailscale-connector
     destination:
       namespace: tailscale
-    syncWave: 6
+    syncWave: 4
 
   # --- Prometheus stack ---
   # Depends on helm-external-secrets-operator.
@@ -312,7 +312,7 @@ applications:
   - name: guestbook
     destination:
       namespace: guestbook
-    syncWave: 5
+    syncWave: 3
   # Depends on:
   # - gateway-public
   # - guestbook (the backend Service)
