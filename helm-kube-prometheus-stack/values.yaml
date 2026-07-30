@@ -42,7 +42,12 @@ kube-prometheus-stack:
 
   # DaemonSet, one pod per node: needs metrics from every node regardless of pool, so it
   # tolerates both taints instead of pinning to critical via nodeSelector.
+  # Karpenter only accounts for a DaemonSet's overhead when a node is first launched, so a
+  # DaemonSet pod that needs to land on an already-full node would otherwise stay Pending
+  # indefinitely. system-node-critical lets it preempt a lower-priority pod instead, which
+  # turns into a new pending pod that Karpenter will scale up for.
   prometheus-node-exporter:
+    priorityClassName: system-node-critical
     resources:
       requests:
         cpu: 15m
@@ -148,7 +153,8 @@ kube-prometheus-stack:
             resources:
               requests:
                 storage: 50Gi
-      # Reclaim volumes on dev for cost savings, do not enable this on prod
+      # DEV: reclaim volumes for cost savings, do not enable this on prod. See
+      # https://github.com/ConsciousML/terragrunt-template-live-eks/issues/38 for details.
       persistentVolumeClaimRetentionPolicy:
         whenDeleted: Delete
         whenScaled: Retain
@@ -179,7 +185,8 @@ kube-prometheus-stack:
             resources:
               requests:
                 storage: 10Gi
-      # Reclaim volumes on dev for cost savings, do not enable this on prod
+      # DEV: reclaim volumes for cost savings, do not enable this on prod. See
+      # https://github.com/ConsciousML/terragrunt-template-live-eks/issues/38 for details.
       persistentVolumeClaimRetentionPolicy:
         whenDeleted: Delete
         whenScaled: Retain

@@ -150,6 +150,11 @@ alloy:
 
   controller:
     type: daemonset # chart default, kept explicit: log collection needs one Alloy per node
+    # Karpenter only accounts for a DaemonSet's overhead when a node is first launched, so a
+    # DaemonSet pod that needs to land on an already-full node would otherwise stay Pending
+    # indefinitely. system-node-critical lets it preempt a lower-priority pod instead, which
+    # turns into a new pending pod that Karpenter will scale up for.
+    priorityClassName: system-node-critical
     volumes:
       extra:
         - name: alloy-data
