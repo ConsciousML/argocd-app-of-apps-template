@@ -15,6 +15,12 @@ applications:
       namespace: kube-system
     syncWave: -1
 
+  # --- Priority Classes ---
+  - name: priority-classes
+    destination:
+      namespace: kube-system
+    syncWave: -1
+
   # --- Gateway API ---
   - name: crds-gateway-api
     destination:

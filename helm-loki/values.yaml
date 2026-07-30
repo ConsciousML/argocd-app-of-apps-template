@@ -162,10 +162,12 @@ loki:
   # Karpenter only accounts for a DaemonSet's overhead when a node is first launched, so a
   # DaemonSet pod that needs to land on an already-full node (e.g. added after the node was
   # provisioned) would otherwise stay Pending indefinitely: Karpenter won't scale up for a lone
-  # DaemonSet pod on its own. system-node-critical lets it preempt a lower-priority pod instead,
-  # which turns into a new pending pod that Karpenter will scale up for.
+  # DaemonSet pod on its own. daemonset-critical (see priority-classes/) lets it preempt
+  # a lower-priority pod instead, which turns into a new pending pod that Karpenter will scale
+  # up for, without being able to preempt cluster-critical controllers like Karpenter itself or
+  # the ArgoCD application-controller to do it.
   lokiCanary:
-    priorityClassName: system-node-critical
+    priorityClassName: daemonset-critical
     resources:
       requests:
         cpu: 15m
