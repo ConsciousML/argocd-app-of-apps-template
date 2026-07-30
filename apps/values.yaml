@@ -21,6 +21,15 @@ applications:
       namespace: kube-system
     syncWave: -1
 
+  # --- DaemonSets Priority ---
+  # helm-loki, helm-alloy, and helm-kube-prometheus-stack (wave 2) carry the cluster's
+  # DaemonSets: Alloy itself, Loki's lokiCanary, and kube-prometheus-stack's node-exporter.
+  # Karpenter only sizes a new node for a DaemonSet it already knows about, so a DaemonSet
+  # that syncs after another app has already triggered a node launch can land Pending and
+  # rely on daemonset-critical preemption to fit instead. Every app marked "See DaemonSets
+  # Priority above" is held to wave 3 or later for this reason, on top of whatever real
+  # dependencies it has.
+
   # --- Gateway API ---
   - name: crds-gateway-api
     destination:
@@ -34,20 +43,22 @@ applications:
   # - crds-gateway-api (GatewayClass CRD)
   # - helm-aws-lbc (the controller sets GatewayClass's Accepted condition, which its health
   #   check waits on)
+  # - See DaemonSets Priority above.
   - name: gateway-class
     path: helm-gateway-api-gateway-class
     destination:
       namespace: gateway
-    syncWave: 1
+    syncWave: 4
   # Depends on:
   # - gateway-class
   # - crds-aws-lbc-gateway-api (LoadBalancerConfiguration/TargetGroupConfiguration CRDs)
   # - helm-aws-lbc (controller reconciles into an ALB)
+  # - See DaemonSets Priority above.
   - name: gateway-public
     path: helm-gateway-api-gateway
     destination:
       namespace: gateway
-    syncWave: 2
+    syncWave: 5
     extraValueFiles:
       - helm-gateway-api-gateway-class/values.yaml
       - helm-gateway-api-gateway/public-gateway-values.yaml
@@ -56,16 +67,18 @@ applications:
     path: helm-gateway-api-gateway
     destination:
       namespace: gateway
-    syncWave: 2
+    syncWave: 5
     extraValueFiles:
       - helm-gateway-api-gateway-class/values.yaml
       - helm-gateway-api-gateway/private-gateway-values.yaml
 
   # --- AWS Load Balancer Controller ---
+  # Depends on:
+  # - See DaemonSets Priority above.
   - name: helm-aws-lbc
     destination:
       namespace: kube-system
-    syncWave: 0
+    syncWave: 3
     # Chart bundles its own CRDs; avoids client-side apply's annotation size limit.
     syncOptions:
       - ServerSideApply=true
@@ -78,12 +91,14 @@ applications:
   # applied before app-of-apps ever syncs. See units/eks/addons/karpenter in the catalog repo.
 
   # --- ExternalDNS ---
-  # Depends on crds-gateway-api (watches gateway-httproute sources).
+  # Depends on:
+  # - crds-gateway-api (watches gateway-httproute sources)
+  # - See DaemonSets Priority above.
   - name: helm-external-dns-private
     path: helm-external-dns
     destination:
       namespace: external-dns
-    syncWave: 0
+    syncWave: 3
     syncOptions:
       - ServerSideApply=true
     tool:
@@ -101,7 +116,7 @@ applications:
     path: helm-external-dns
     destination:
       namespace: external-dns
-    syncWave: 0
+    syncWave: 3
     syncOptions:
       - ServerSideApply=true
     tool:
@@ -137,11 +152,14 @@ applications:
         releaseName: loki
 
   # --- Alloy ---
-  # Depends on helm-loki (pushes logs to loki-gateway.loki).
+  # No hard dependency on helm-loki: it pushes logs to loki-gateway.loki but retries on
+  # write failure, so it doesn't need Loki up first. Synced in the same wave as Loki so both
+  # DaemonSets (Alloy itself, Loki's lokiCanary) exist as early as possible. See DaemonSets
+  # Priority above.
   - name: helm-alloy
     destination:
       namespace: loki
-    syncWave: 1
+    syncWave: 0
     tool:
       helm:
         releaseName: alloy
@@ -161,7 +179,7 @@ applications:
   - name: helm-argocd-ingress
     destination:
       namespace: argocd
-    syncWave: 3
+    syncWave: 6
 
   # --- Tailscale ---
   # Depends on helm-external-secrets-operator.
@@ -172,11 +190,13 @@ applications:
     syncWave: 1
     extraValueFiles:
       - helm-eso-secret-sync/tailscale-secrets-values.yaml
-  # Depends on tailscale-secrets (needs the oauth secret before it can register with Tailscale).
+  # Depends on:
+  # - tailscale-secrets (needs the oauth secret before it can register with Tailscale)
+  # - See DaemonSets Priority above.
   - name: helm-tailscale-operator
     destination:
       namespace: tailscale
-    syncWave: 2
+    syncWave: 5
     # Chart bundles its own CRDs; avoids client-side apply's annotation size limit.
     syncOptions:
       - ServerSideApply=true
@@ -184,7 +204,7 @@ applications:
   - name: helm-tailscale-connector
     destination:
       namespace: tailscale
-    syncWave: 3
+    syncWave: 6
 
   # --- Prometheus stack ---
   # Depends on helm-external-secrets-operator.
@@ -232,7 +252,7 @@ applications:
     path: helm-httproute
     destination:
       namespace: monitoring
-    syncWave: 3
+    syncWave: 6
     extraValueFiles:
       - helm-gateway-api-gateway/private-gateway-values.yaml
       - helm-httproute/grafana-httproute-values.yaml
@@ -241,7 +261,7 @@ applications:
     path: helm-httproute
     destination:
       namespace: monitoring
-    syncWave: 3
+    syncWave: 6
     extraValueFiles:
       - helm-gateway-api-gateway/private-gateway-values.yaml
       - helm-httproute/prometheus-httproute-values.yaml
@@ -250,26 +270,30 @@ applications:
     path: helm-httproute
     destination:
       namespace: monitoring
-    syncWave: 3
+    syncWave: 6
     extraValueFiles:
       - helm-gateway-api-gateway/private-gateway-values.yaml
       - helm-httproute/alertmanager-httproute-values.yaml
 
   # --- VPA (recommender only) ---
+  # Depends on:
+  # - See DaemonSets Priority above.
   - name: helm-vpa
     destination:
       namespace: vpa
-    syncWave: 0
+    syncWave: 3
     # Chart bundles its own CRDs; avoids client-side apply's annotation size limit.
     syncOptions:
       - ServerSideApply=true
 
   # --- Goldilocks ---
-  # Depends on helm-vpa (recommender + VPA CRD).
+  # Depends on:
+  # - helm-vpa (recommender + VPA CRD)
+  # - See DaemonSets Priority above.
   - name: helm-goldilocks
     destination:
       namespace: goldilocks
-    syncWave: 1
+    syncWave: 4
   # Depends on:
   # - gateway-private
   # - helm-goldilocks (the backend Service)
@@ -277,16 +301,18 @@ applications:
     path: helm-httproute
     destination:
       namespace: goldilocks
-    syncWave: 3
+    syncWave: 6
     extraValueFiles:
       - helm-gateway-api-gateway/private-gateway-values.yaml
       - helm-httproute/goldilocks-httproute-values.yaml
 
   # --- Guestbook ---
+  # Depends on:
+  # - See DaemonSets Priority above.
   - name: guestbook
     destination:
       namespace: guestbook
-    syncWave: 2
+    syncWave: 5
   # Depends on:
   # - gateway-public
   # - guestbook (the backend Service)
@@ -294,7 +320,7 @@ applications:
     path: helm-httproute
     destination:
       namespace: guestbook
-    syncWave: 3
+    syncWave: 6
     extraValueFiles:
       - helm-gateway-api-gateway/public-gateway-values.yaml
       - helm-httproute/guestbook-httproute-values.yaml
