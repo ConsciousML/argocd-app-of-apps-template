@@ -1,0 +1,12 @@
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: daemonset-critical
+# Kubernetes caps user-defined priority values at 1000000000 (values at or above that are
+# reserved for system classes like system-cluster-critical). Using the max allowed value:
+# high enough to preempt ordinary workloads so a DaemonSet pod isn't left Pending on an
+# already-full node, but still below system-cluster-critical/system-node-critical, so it
+# can never preempt cluster-critical controllers (Karpenter, the ArgoCD application-controller).
+value: 999999000
+globalDefault: false
+description: For cluster-wide DaemonSets that must land on every node but shouldn't be able to preempt cluster-critical controllers to do it.

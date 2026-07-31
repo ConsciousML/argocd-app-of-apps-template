@@ -16,6 +16,13 @@ goldilocks:
       limits:
         cpu: 93m
         memory: 100Mi
+    nodeSelector:
+      karpenter.sh/nodepool: elastic
+    tolerations:
+      - key: karpenter.sh/workload-class
+        operator: Equal
+        value: elastic
+        effect: NoSchedule
   dashboard:
     enabled: true
     # Separate flag from controller.flags above, also needed for the dashboard to list
@@ -29,3 +36,10 @@ goldilocks:
       limits:
         cpu: 75m
         memory: 100Mi
+    nodeSelector:
+      karpenter.sh/nodepool: elastic
+    tolerations:
+      - key: karpenter.sh/workload-class
+        operator: Equal
+        value: elastic
+        effect: NoSchedule

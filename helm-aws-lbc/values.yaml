@@ -7,6 +7,13 @@ aws-load-balancer-controller:
   enableServiceMutatorWebhook: false
   serviceMonitor:
     enabled: true
+  nodeSelector:
+    karpenter.sh/nodepool: elastic
+  tolerations:
+    - key: karpenter.sh/workload-class
+      operator: Equal
+      value: elastic
+      effect: NoSchedule
   resources:
     requests:
       cpu: 15m

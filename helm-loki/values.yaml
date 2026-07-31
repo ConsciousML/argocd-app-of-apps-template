@@ -71,13 +71,21 @@ loki:
         memory: 352M
       limits:
         memory: 352M
+    nodeSelector:
+      karpenter.sh/nodepool: critical
+    tolerations:
+      - key: karpenter.sh/workload-class
+        operator: Equal
+        value: critical
+        effect: NoSchedule
     persistence:
       size: 30Gi
-      # Reclaim volumes on dev for cost savings, do not enable this on prod
+      # DEV: reclaim volumes for cost savings, do not enable this on prod. See
+      # https://github.com/ConsciousML/terragrunt-template-live-eks/issues/38 for details.
       enableStatefulSetAutoDeletePVC: true
 
   # Chart default (8192, ~9.6Gi pod memory) is sized for a large production cluster and
-  # doesn't fit this dev cluster's nodes. 
+  # doesn't fit this dev cluster's nodes, tune for prod.
   # If queries are slow or S3 GET cost increases, bumping the RAM
   # Otherwise read the following to speed up queries:
   # https://grafana.com/docs/loki/latest/operations/caching/
@@ -90,6 +98,13 @@ loki:
       limits:
         cpu: 55m
         memory: 50Mi
+    nodeSelector:
+      karpenter.sh/nodepool: critical
+    tolerations:
+      - key: karpenter.sh/workload-class
+        operator: Equal
+        value: critical
+        effect: NoSchedule
 
   resultsCache:
     resources:
@@ -99,6 +114,13 @@ loki:
       limits:
         cpu: 55m
         memory: 50Mi
+    nodeSelector:
+      karpenter.sh/nodepool: critical
+    tolerations:
+      - key: karpenter.sh/workload-class
+        operator: Equal
+        value: critical
+        effect: NoSchedule
 
   # Shared by the exporter container in both chunksCache and resultsCache pods, the chart
   # has no per-cache override for it.
@@ -127,8 +149,25 @@ loki:
         limits:
           cpu: 55m
           memory: 50Mi
+    nodeSelector:
+      karpenter.sh/nodepool: critical
+    tolerations:
+      - key: karpenter.sh/workload-class
+        operator: Equal
+        value: critical
+        effect: NoSchedule
 
+  # DaemonSet, one pod per node (chart default kind): needs to verify log delivery from every
+  # node regardless of pool, so it tolerates both taints instead of pinning via nodeSelector.
+  # Karpenter only accounts for a DaemonSet's overhead when a node is first launched, so a
+  # DaemonSet pod that needs to land on an already-full node (e.g. added after the node was
+  # provisioned) would otherwise stay Pending indefinitely: Karpenter won't scale up for a lone
+  # DaemonSet pod on its own. daemonset-critical (see priority-classes/) lets it preempt
+  # a lower-priority pod instead, which turns into a new pending pod that Karpenter will scale
+  # up for, without being able to preempt cluster-critical controllers like Karpenter itself or
+  # the ArgoCD application-controller to do it.
   lokiCanary:
+    priorityClassName: daemonset-critical
     resources:
       requests:
         cpu: 15m
@@ -136,6 +175,10 @@ loki:
       limits:
         cpu: 15m
         memory: 100Mi
+    tolerations:
+      - key: karpenter.sh/workload-class
+        operator: Exists
+        effect: NoSchedule
 
   sidecar:
     resources:

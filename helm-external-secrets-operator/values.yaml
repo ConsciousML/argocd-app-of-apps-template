@@ -17,6 +17,14 @@ external-secrets:
   podSecurityContext:
     runAsNonRoot: true
 
+  nodeSelector:
+    karpenter.sh/nodepool: elastic
+  tolerations:
+    - key: karpenter.sh/workload-class
+      operator: Equal
+      value: elastic
+      effect: NoSchedule
+
   webhook:
     podSecurityContext:
       runAsNonRoot: true
@@ -27,6 +35,13 @@ external-secrets:
       limits:
         cpu: 75m
         memory: 100Mi
+    nodeSelector:
+      karpenter.sh/nodepool: elastic
+    tolerations:
+      - key: karpenter.sh/workload-class
+        operator: Equal
+        value: elastic
+        effect: NoSchedule
 
   certController:
     podSecurityContext:
@@ -38,3 +53,10 @@ external-secrets:
       limits:
         cpu: 15m
         memory: 100Mi
+    nodeSelector:
+      karpenter.sh/nodepool: elastic
+    tolerations:
+      - key: karpenter.sh/workload-class
+        operator: Equal
+        value: elastic
+        effect: NoSchedule

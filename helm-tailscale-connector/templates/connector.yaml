@@ -5,6 +5,10 @@ metadata:
 spec:
   hostnamePrefix: {{ .Values.hostnamePrefix | quote }}
   replicas: {{ .Values.replicas }}
+  # Pins the operator-managed subnet router pod onto the elastic NodePool (a Connector has
+  # no nodeSelector/tolerations field of its own, ProxyClass is the operator's mechanism for
+  # configuring the proxy Pod it creates).
+  proxyClass: elastic-nodepool
   subnetRouter:
     advertiseRoutes:
       {{- toYaml .Values.advertiseRoutes | nindent 6 }}

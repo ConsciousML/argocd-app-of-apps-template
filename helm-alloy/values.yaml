@@ -150,14 +150,21 @@ alloy:
 
   controller:
     type: daemonset # chart default, kept explicit: log collection needs one Alloy per node
+    # Karpenter only accounts for a DaemonSet's overhead when a node is first launched, so a
+    # DaemonSet pod that needs to land on an already-full node would otherwise stay Pending
+    # indefinitely. daemonset-critical (see priority-classes/) lets it preempt a
+    # lower-priority pod instead, which turns into a new pending pod that Karpenter will scale
+    # up for, without being able to preempt cluster-critical controllers like Karpenter itself
+    # or the ArgoCD application-controller to do it.
+    priorityClassName: daemonset-critical
     volumes:
       extra:
         - name: alloy-data
           emptyDir: {}
     tolerations:
-      - key: karpenter.sh/provisioned
+      - key: karpenter.sh/workload-class
         operator: Exists
         effect: NoSchedule
-      # Karpenter-provisioned nodes carry this taint (see
-      # helm-karpenter-config/templates/node-pool.yaml). Without it, Alloy won't
-      # schedule onto Karpenter nodes and their pod logs would go uncollected.
+      # Both Karpenter NodePools carry this taint (see units/eks/addons/karpenter/node_pool
+      # in the catalog repo). Without it, Alloy won't schedule onto Karpenter nodes and
+      # their pod logs would go uncollected.
