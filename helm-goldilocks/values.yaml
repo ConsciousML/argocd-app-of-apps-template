@@ -23,6 +23,21 @@ goldilocks:
         operator: Equal
         value: elastic
         effect: NoSchedule
+    rbac:
+      # Without this, the controller can't walk the owner chain from an alertmanager-*/
+      # prometheus-* pod to its Prometheus Operator CR, and logs a "forbidden" error on
+      # every reconcile (VPAs still get created via fallback, but the top-level-owner
+      # lookup fails).
+      extraRules:
+        - apiGroups:
+            - 'monitoring.coreos.com'
+          resources:
+            - 'alertmanagers'
+            - 'prometheuses'
+          verbs:
+            - 'get'
+            - 'list'
+            - 'watch'
   dashboard:
     enabled: true
     # Separate flag from controller.flags above, also needed for the dashboard to list
