@@ -179,6 +179,10 @@ loki:
       - key: karpenter.sh/workload-class
         operator: Exists
         effect: NoSchedule
+      - key: node-role.kubernetes.io/mng
+        operator: Equal
+        value: "true"
+        effect: NoSchedule
 
   sidecar:
     resources:
