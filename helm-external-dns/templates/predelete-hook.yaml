@@ -13,6 +13,8 @@ spec:
   template:
     spec:
       restartPolicy: Never
+      tolerations:
+        {{- toYaml (index .Values "external-dns" "tolerations") | nindent 8 }}
       securityContext:
         runAsNonRoot: true
         runAsUser: 65534
