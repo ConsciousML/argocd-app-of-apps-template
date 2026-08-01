@@ -61,6 +61,10 @@ kube-prometheus-stack:
       - key: karpenter.sh/workload-class
         operator: Exists
         effect: NoSchedule
+      - key: node-role.kubernetes.io/mng
+        operator: Equal
+        value: "true"
+        effect: NoSchedule
 
   prometheusOperator:
     resources:
@@ -77,6 +81,17 @@ kube-prometheus-stack:
         operator: Equal
         value: critical
         effect: NoSchedule
+    admissionWebhooks:
+      # The admission-create/admission-patch hook Jobs don't inherit prometheusOperator's own
+      # nodeSelector/tolerations above, they need their own or they're unschedulable.
+      patch:
+        nodeSelector:
+          karpenter.sh/nodepool: critical
+        tolerations:
+          - key: karpenter.sh/workload-class
+            operator: Equal
+            value: critical
+            effect: NoSchedule
 
   defaultRules:
     # Drives the Slack routing tree below (each component gets its own set of channels).
