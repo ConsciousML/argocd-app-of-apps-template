@@ -8,6 +8,9 @@ vpa:
     extraArgs:
       target-cpu-percentile: "0.90"
       target-memory-percentile: "0.99"
+      # Backfills history from Prometheus so recommendations exist immediately, not after 24h.
+      storage: prometheus
+      prometheus-address: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
     resources:
       requests:
         cpu: 15m

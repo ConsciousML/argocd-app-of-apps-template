@@ -278,6 +278,7 @@ applications:
   # --- VPA (recommender only) ---
   # Depends on:
   # - See DaemonSets Priority above.
+  # - helm-kube-prometheus-stack (startup history backfill, non-fatal if not ready yet)
   - name: helm-vpa
     destination:
       namespace: vpa
