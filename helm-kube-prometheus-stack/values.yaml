@@ -219,6 +219,25 @@ kube-prometheus-stack:
     # "{{ .Values.environment }}-" prefix on each receiver's channel below resolves.
     tplConfig: true
 
+    # Unlike config above, the chart writes templateFiles straight to the secret without
+    # running Helm's tpl on it. So the {{ }} below is Alertmanager's own template syntax,
+    # evaluated later at notification-send time, not Helm's, and needs no escaping here.
+    #
+    # Overrides Alertmanager's built-in slack.default.title and slack.default.text template
+    # names (see https://github.com/prometheus/alertmanager/blob/main/template/default.tmpl),
+    # so every slack_config below picks up this formatting without overriding either template
+    # itself. Upstream's slack.default.text renders empty, which is why a Slack notification
+    # would otherwise show only a bare title with no body.
+    templateFiles:
+      slack.tmpl: |-
+        {{ define "slack.default.title" }}[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }} ({{ .CommonLabels.severity }})
+        {{ end }}
+        {{ define "slack.default.text" }}
+        {{ range .Alerts }}*{{ .Annotations.summary }}*
+        {{ .Annotations.description }}
+        {{ end }}
+        {{ end }}
+
     # Flat routes, evaluated top to bottom, first match wins (continue defaults to false).
     # component comes from defaultRules.additionalRuleGroupLabels above. Watchdog isn't a
     # component, it's isolated by alertname, and must be matched before the info/none catch-all
