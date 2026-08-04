@@ -8,6 +8,20 @@ vpa:
     extraArgs:
       target-cpu-percentile: "0.90"
       target-memory-percentile: "0.99"
+      # Backfills history from Prometheus so recommendations exist immediately, not after 24h.
+      storage: prometheus
+      prometheus-address: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
+      # kube-prometheus-stack's cadvisor metrics use job=kubelet and label pod, not
+      # the recommender's defaults (kubernetes-cadvisor and pod_name).
+      prometheus-cadvisor-job-name: kubelet
+      container-pod-name-label: pod
+      # Works around a recommender bug (kubernetes/autoscaler#5031): the default
+      # pod-labels query has no range selector, so it can never satisfy the matrix
+      # result the recommender requires. kube_pod_labels isn't scraped here, so use
+      # kube_pod_info instead, which carries the same namespace and pod labels.
+      metric-for-pod-labels: kube_pod_info{job="kube-state-metrics"}[8d]
+      pod-namespace-label: namespace
+      pod-name-label: pod
     resources:
       requests:
         cpu: 15m

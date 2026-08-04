@@ -168,7 +168,7 @@ alloy:
       # Both Karpenter NodePools carry this taint (see units/eks/addons/karpenter/node_pool
       # in the catalog repo). Without it, Alloy won't schedule onto Karpenter nodes and
       # their pod logs would go uncollected.
-      - key: node-role.kubernetes.io/mng
+      - key: node-role/mng
         operator: Equal
         value: "true"
         effect: NoSchedule
