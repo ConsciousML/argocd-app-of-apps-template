@@ -461,6 +461,12 @@ kube-prometheus-stack:
             type: file
             options:
               path: /var/lib/grafana/dashboards/loki
+          - name: blackbox-exporter
+            orgId: 1
+            folder: Blackbox Exporter
+            type: file
+            options:
+              path: /var/lib/grafana/dashboards/blackbox-exporter
     dashboards:
       # https://karpenter.sh/docs/getting-started/getting-started-with-karpenter/#monitoring-with-grafana-optional
       karpenter:
@@ -503,6 +509,13 @@ kube-prometheus-stack:
         loki-metrics-dashboard:
           gnetId: 17781
           revision: 1
+          datasource:
+            - { name: DS_PROMETHEUS, value: Prometheus }
+      # https://grafana.com/grafana/dashboards/14928-prometheus-blackbox-exporter/
+      blackbox-exporter:
+        blackbox-exporter-dashboard:
+          gnetId: 14928
+          revision: 6
           datasource:
             - { name: DS_PROMETHEUS, value: Prometheus }
     # Placeholders for `helm template` to pass in CI. Overridden at sync time by appParams
