@@ -1,4 +1,10 @@
 prometheus-blackbox-exporter:
+  # From the VPA target recommendation (goldilocks-helm-blackbox-exporter-prometheus-blackbox-exporter),
+  # revisit once more usage history accumulates.
+  resources:
+    requests: { cpu: 15m, memory: 100Mi }
+    limits: { memory: 100Mi }
+
   nodeSelector:
     karpenter.sh/nodepool: critical
   tolerations:
