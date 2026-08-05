@@ -15,44 +15,44 @@ prometheus-blackbox-exporter:
       module: http_2xx
     targets: []
 
-  # component: uptime drives Alertmanager's routing tree (see helm-kube-prometheus-stack).
+  # component: uptime on each rule (not additionalLabels, that only sets the PrometheusRule
+  # object's own k8s labels, not each alert's) drives Alertmanager's routing tree (see
+  # helm-kube-prometheus-stack).
   prometheusRule:
     enabled: true
-    additionalLabels:
-      component: uptime
     rules:
       - alert: EndpointDown
         expr: probe_success == 0
         for: 5m
-        labels: { severity: critical }
+        labels: { severity: critical, component: uptime }
         annotations:
           summary: "{{ $labels.target }} is unreachable"
           description: "Probe to {{ $labels.target }} has failed for 5m."
       - alert: BlackboxSlowProbe
         expr: avg_over_time(probe_duration_seconds[1m]) > 1
         for: 1m
-        labels: { severity: warning }
+        labels: { severity: warning, component: uptime }
         annotations:
           summary: "{{ $labels.target }} probe is slow"
           description: "Probe to {{ $labels.target }} has averaged over 1s for 1m."
       - alert: BlackboxSslCertificateWillExpireSoon
         expr: probe_ssl_earliest_cert_expiry - time() < 86400 * 30
         for: 0m
-        labels: { severity: warning }
+        labels: { severity: warning, component: uptime }
         annotations:
           summary: "{{ $labels.target }} SSL certificate expiring soon"
           description: "SSL certificate for {{ $labels.target }} expires in under 30 days."
       - alert: BlackboxSslCertificateWillExpireCritical
         expr: probe_ssl_earliest_cert_expiry - time() < 86400 * 3
         for: 0m
-        labels: { severity: critical }
+        labels: { severity: critical, component: uptime }
         annotations:
           summary: "{{ $labels.target }} SSL certificate expiring imminently"
           description: "SSL certificate for {{ $labels.target }} expires in under 3 days."
       - alert: BlackboxSslCertificateExpired
         expr: probe_ssl_earliest_cert_expiry - time() <= 0
         for: 0m
-        labels: { severity: critical }
+        labels: { severity: critical, component: uptime }
         annotations:
           summary: "{{ $labels.target }} SSL certificate expired"
           description: "SSL certificate for {{ $labels.target }} has expired."
