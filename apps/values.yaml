@@ -164,7 +164,19 @@ applications:
       helm:
         releaseName: alloy
 
-  # --- ArgoCD ---
+  # --- Blackbox Exporter ---
+  # No hard dependency: ServiceMonitor/PrometheusRule CRDs are Terraform-managed, applied
+  # before ArgoCD ever syncs.
+  - name: helm-blackbox-exporter
+    destination:
+      namespace: monitoring
+    syncWave: 2
+
+  # --- Prometheus Rules ---
+  - name: prometheus-rules
+    destination:
+      namespace: monitoring
+    syncWave: 0
   # Depends on helm-external-secrets-operator.
   - name: argocd-secrets
     path: helm-eso-secret-sync

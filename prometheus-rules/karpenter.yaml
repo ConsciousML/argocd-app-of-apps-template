@@ -1,0 +1,95 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: karpenter-mixin
+spec:
+  groups:
+    - name: karpenter
+      rules:
+        - alert: KarpenterCloudProviderErrors
+          annotations:
+            description: "The Karpenter provider {{ $labels.provider }} with the controller {{ $labels.controller }} has errors with the method {{ $labels.method }}."
+            summary: "Karpenter has Cloud Provider Errors."
+          expr: |
+            sum(
+              increase(
+                karpenter_cloudprovider_errors_total{
+                  job="karpenter",
+                  controller!~"nodeclaim.termination|node.termination",
+                  error!="NodeClaimNotFoundError"
+                }[5m]
+              )
+            ) by (cluster, namespace, job, provider, controller, method) > 0
+          for: 5m
+          labels:
+            severity: warning
+            component: k8s
+        - alert: KarpenterNodeClaimsTerminationDurationHigh
+          annotations:
+            description: "The average node claim termination duration in Karpenter has exceeded 20 minutes for more than 15 minutes in nodepool {{ $labels.nodepool }}. This may indicate cloud provider issues or improper instance termination handling."
+            summary: "Karpenter Node Claims Termination Duration is High."
+          expr: |
+            sum(
+              rate(
+                karpenter_nodeclaims_termination_duration_seconds_sum{
+                  job="karpenter"
+                }[5m]
+              )
+            ) by (cluster, namespace, job, nodepool)
+            /
+            sum(
+              rate(
+                karpenter_nodeclaims_termination_duration_seconds_count{
+                  job="karpenter"
+                }[5m]
+              )
+            ) by (cluster, namespace, job, nodepool) > 1200
+          for: 15m
+          labels:
+            severity: warning
+            component: k8s
+        - alert: KarpenterNodepoolNearCapacity
+          annotations:
+            description: "The resource {{ $labels.resource_type }} in the Karpenter node pool {{ $labels.nodepool }} is nearing its limit. Consider scaling or adding resources."
+            summary: "Karpenter Nodepool near capacity."
+          expr: |
+            sum (
+              karpenter_nodepools_usage{job="karpenter"}
+            ) by (cluster, namespace, job, nodepool, resource_type)
+            /
+            sum (
+              karpenter_nodepools_limit{job="karpenter"}
+            ) by (cluster, namespace, job, nodepool, resource_type)
+            * 100 > 75
+          for: 15m
+          labels:
+            severity: warning
+            component: k8s
+        - alert: KarpenterClusterStateNotSynced
+          annotations:
+            description: "The Karpenter cluster state is not synced. This indicates Karpenter cannot properly track cluster resources and may fail to provision or deprovision nodes correctly."
+            summary: "Karpenter Cluster State Not Synced."
+          expr: |
+            sum(
+              karpenter_cluster_state_synced{
+                job="karpenter"
+              }
+            ) by (cluster, namespace, job) == 0
+          for: 15m
+          labels:
+            severity: warning
+            component: k8s
+        - alert: KarpenterSchedulerQueueDepthHigh
+          annotations:
+            description: "The Karpenter scheduler has {{ $value }} pods waiting to be scheduled. This may indicate provisioning issues or insufficient capacity."
+            summary: "Karpenter Scheduler Queue Depth High."
+          expr: |
+            sum(
+              karpenter_scheduler_queue_depth{
+                job="karpenter"
+              }
+            ) by (cluster, namespace, job) > 50
+          for: 15m
+          labels:
+            severity: warning
+            component: k8s

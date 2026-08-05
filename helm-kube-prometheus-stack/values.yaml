@@ -219,6 +219,25 @@ kube-prometheus-stack:
     # "{{ .Values.environment }}-" prefix on each receiver's channel below resolves.
     tplConfig: true
 
+    # Unlike config above, the chart writes templateFiles straight to the secret without
+    # running Helm's tpl on it. So the {{ }} below is Alertmanager's own template syntax,
+    # evaluated later at notification-send time, not Helm's, and needs no escaping here.
+    #
+    # Overrides Alertmanager's built-in slack.default.title and slack.default.text template
+    # names (see https://github.com/prometheus/alertmanager/blob/main/template/default.tmpl),
+    # so every slack_config below picks up this formatting without overriding either template
+    # itself. Upstream's slack.default.text renders empty, which is why a Slack notification
+    # would otherwise show only a bare title with no body.
+    templateFiles:
+      slack.tmpl: |-
+        {{ define "slack.default.title" }}[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }} ({{ .CommonLabels.severity }})
+        {{ end }}
+        {{ define "slack.default.text" }}
+        {{ range .Alerts }}*{{ .Annotations.summary }}*
+        {{ .Annotations.description }}
+        {{ end }}
+        {{ end }}
+
     # Flat routes, evaluated top to bottom, first match wins (continue defaults to false).
     # component comes from defaultRules.additionalRuleGroupLabels above. Watchdog isn't a
     # component, it's isolated by alertname, and must be matched before the info/none catch-all
@@ -271,6 +290,22 @@ kube-prometheus-stack:
             matchers:
               - component = "loki"
               - severity = "warning"
+          - receiver: "argocd-critical"
+            matchers:
+              - component = "argocd"
+              - severity = "critical"
+          - receiver: "argocd-warning"
+            matchers:
+              - component = "argocd"
+              - severity = "warning"
+          - receiver: "uptime-critical"
+            matchers:
+              - component = "uptime"
+              - severity = "critical"
+          - receiver: "uptime-warning"
+            matchers:
+              - component = "uptime"
+              - severity = "warning"
       receivers:
         - name: "null"
         - name: "unrouted"
@@ -304,6 +339,22 @@ kube-prometheus-stack:
         - name: "loki-warning"
           slack_configs:
             - channel: "#{{ .Values.environment }}-loki-warning"
+              send_resolved: true
+        - name: "argocd-critical"
+          slack_configs:
+            - channel: "#{{ .Values.environment }}-argocd-critical"
+              send_resolved: true
+        - name: "argocd-warning"
+          slack_configs:
+            - channel: "#{{ .Values.environment }}-argocd-warning"
+              send_resolved: true
+        - name: "uptime-critical"
+          slack_configs:
+            - channel: "#{{ .Values.environment }}-uptime-critical"
+              send_resolved: true
+        - name: "uptime-warning"
+          slack_configs:
+            - channel: "#{{ .Values.environment }}-uptime-warning"
               send_resolved: true
 
   grafana:
@@ -410,6 +461,12 @@ kube-prometheus-stack:
             type: file
             options:
               path: /var/lib/grafana/dashboards/loki
+          - name: blackbox-exporter
+            orgId: 1
+            folder: Blackbox Exporter
+            type: file
+            options:
+              path: /var/lib/grafana/dashboards/blackbox-exporter
     dashboards:
       # https://karpenter.sh/docs/getting-started/getting-started-with-karpenter/#monitoring-with-grafana-optional
       karpenter:
@@ -452,6 +509,13 @@ kube-prometheus-stack:
         loki-metrics-dashboard:
           gnetId: 17781
           revision: 1
+          datasource:
+            - { name: DS_PROMETHEUS, value: Prometheus }
+      # https://grafana.com/grafana/dashboards/14928-prometheus-blackbox-exporter/
+      blackbox-exporter:
+        blackbox-exporter-dashboard:
+          gnetId: 14928
+          revision: 6
           datasource:
             - { name: DS_PROMETHEUS, value: Prometheus }
     # Placeholders for `helm template` to pass in CI. Overridden at sync time by appParams
