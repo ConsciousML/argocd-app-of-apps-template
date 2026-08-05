@@ -7,9 +7,9 @@ alloy:
     resources:
       requests:
         cpu: 11m
-        memory: 145M
+        memory: 94M
       limits:
-        memory: 145M
+        memory: 94M
     configMap:
       content: |
         // Restrict to pods on the same node as this Alloy instance:
@@ -125,10 +125,10 @@ alloy:
     resources:
       requests:
         cpu: 11m
-        memory: 50Mi
+        memory: 12M
       limits:
         cpu: 11m
-        memory: 50Mi
+        memory: 12M
     securityContext:
       readOnlyRootFilesystem: true
       runAsNonRoot: true

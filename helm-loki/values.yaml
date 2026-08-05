@@ -4,6 +4,13 @@
 loki:
   deploymentMode: Monolithic
 
+  # Parallel pod management creates all 3 replicas at once on a fresh apply, so none is
+  # Ready yet to appear in loki-memberlist's endpoints, deadlocking startup. This lets
+  # not-yet-ready pods be discovered so they can join each other.
+  memberlist:
+    service:
+      publishNotReadyAddresses: true
+
   # Scraped by kube-prometheus-stack (serviceMonitorSelectorNilUsesHelmValues: false picks up
   # any ServiceMonitor). rules/alerts are the chart's built-in Grafana Loki mixin recording
   # rules and alerts. component: loki drives Alertmanager's routing tree (see
@@ -67,10 +74,10 @@ loki:
     # per pod, well under the request below.
     resources:
       requests:
-        cpu: 35m
-        memory: 352M
+        cpu: 93m
+        memory: 164M
       limits:
-        memory: 352M
+        memory: 164M
     nodeSelector:
       karpenter.sh/nodepool: critical
     tolerations:
@@ -94,10 +101,10 @@ loki:
     resources:
       requests:
         cpu: 11m
-        memory: 50Mi
+        memory: 64M
       limits:
         cpu: 55m
-        memory: 50Mi
+        memory: 64M
     nodeSelector:
       karpenter.sh/nodepool: critical
     tolerations:
@@ -110,10 +117,10 @@ loki:
     resources:
       requests:
         cpu: 11m
-        memory: 50Mi
+        memory: 24M
       limits:
         cpu: 55m
-        memory: 50Mi
+        memory: 24M
     nodeSelector:
       karpenter.sh/nodepool: critical
     tolerations:
@@ -128,27 +135,27 @@ loki:
     resources:
       requests:
         cpu: 11m
-        memory: 50Mi
+        memory: 21M
       limits:
         cpu: 55m
-        memory: 50Mi
+        memory: 21M
 
   gateway:
     resources:
       requests:
         cpu: 11m
-        memory: 50Mi
+        memory: 24M
       limits:
         cpu: 55m
-        memory: 50Mi
+        memory: 24M
     metrics:
       resources:
         requests:
           cpu: 11m
-          memory: 50Mi
+          memory: 24M
         limits:
           cpu: 55m
-          memory: 50Mi
+          memory: 24M
     nodeSelector:
       karpenter.sh/nodepool: critical
     tolerations:
@@ -170,11 +177,11 @@ loki:
     priorityClassName: daemonset-critical
     resources:
       requests:
-        cpu: 15m
-        memory: 100Mi
+        cpu: 11m
+        memory: 24M
       limits:
-        cpu: 15m
-        memory: 100Mi
+        cpu: 11m
+        memory: 24M
     tolerations:
       - key: karpenter.sh/workload-class
         operator: Exists
