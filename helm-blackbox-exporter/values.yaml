@@ -5,6 +5,13 @@ prometheus-blackbox-exporter:
     requests: { cpu: 15m, memory: 100Mi }
     limits: { memory: 100Mi }
 
+  # Chart only sets this at the container level by default; matches it here to satisfy
+  # KSV-0118 (pod-level securityContext).
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+
   nodeSelector:
     karpenter.sh/nodepool: critical
   tolerations:
