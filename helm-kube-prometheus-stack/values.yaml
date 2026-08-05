@@ -387,11 +387,11 @@ kube-prometheus-stack:
       # per-container override.
       resources:
         requests:
-          cpu: 11m
-          memory: 94M
+          cpu: 35m
+          memory: 249M
         limits:
-          cpu: 55m
-          memory: 94M
+          cpu: 175m
+          memory: 249M
       securityContext:
         readOnlyRootFilesystem: true # writes only into the already-mounted provisioning emptyDirs
       # Setting env.GF_SECURITY_ADMIN_USER below stops the chart from auto-injecting
