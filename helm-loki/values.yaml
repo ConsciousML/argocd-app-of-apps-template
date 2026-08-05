@@ -4,6 +4,13 @@
 loki:
   deploymentMode: Monolithic
 
+  # Parallel pod management creates all 3 replicas at once on a fresh apply, so none is
+  # Ready yet to appear in loki-memberlist's endpoints, deadlocking startup. This lets
+  # not-yet-ready pods be discovered so they can join each other.
+  memberlist:
+    service:
+      publishNotReadyAddresses: true
+
   # Scraped by kube-prometheus-stack (serviceMonitorSelectorNilUsesHelmValues: false picks up
   # any ServiceMonitor). rules/alerts are the chart's built-in Grafana Loki mixin recording
   # rules and alerts. component: loki drives Alertmanager's routing tree (see
