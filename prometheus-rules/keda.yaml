@@ -1,0 +1,85 @@
+# Disabled: KEDA isn't deployed in this cluster, only Karpenter handles autoscaling.
+# Kept here (fully commented, no resource applied) from
+# https://github.com/adinhodovic/kubernetes-autoscaling-mixin/blob/main/prometheus_alerts.yaml
+# as a ready-to-use reference if KEDA is ever adopted. Uncomment and add a `component`
+# label (see karpenter.yaml) to enable.
+
+# apiVersion: monitoring.coreos.com/v1
+# kind: PrometheusRule
+# metadata:
+#   name: keda-mixin
+# spec:
+#   groups:
+#     - name: keda
+#       rules:
+#         - alert: KedaScaledJobErrors
+#           annotations:
+#             description: "KEDA scaled jobs are experiencing errors. Check the scaled job {{ $labels.scaledObject }} in the namespace {{ $labels.exported_namespace }}."
+#             summary: "Errors detected for KEDA scaled jobs."
+#           expr: |
+#             sum(
+#               increase(
+#                 keda_scaled_job_errors_total{
+#                   job="keda-operator"
+#                 }[10m]
+#               )
+#             ) by (cluster, job, exported_namespace, scaledObject) > 0
+#           for: 1m
+#           labels:
+#             severity: warning
+#         - alert: KedaScaledObjectErrors
+#           annotations:
+#             description: "KEDA scaled objects are experiencing errors. Check the scaled object {{ $labels.scaledObject }} in the namespace {{ $labels.exported_namespace }}."
+#             summary: "Errors detected for KEDA scaled objects."
+#           expr: |
+#             sum(
+#               increase(
+#                 keda_scaled_object_errors_total{
+#                   job="keda-operator"
+#                 }[10m]
+#               )
+#             ) by (cluster, job, exported_namespace, scaledObject) > 0
+#           for: 1m
+#           labels:
+#             severity: warning
+#         - alert: KedaScalerLatencyHigh
+#           annotations:
+#             description: "Metric latency for scaler {{ $labels.scaler }} for the object {{ $labels.scaledObject }} has exceeded acceptable limits."
+#             summary: "High latency for KEDA scaler metrics."
+#           expr: |
+#             avg(
+#               keda_scaler_metrics_latency_seconds{
+#                 job="keda-operator"
+#               }
+#             ) by (cluster, job, exported_namespace, scaledObject, scaler) > 5
+#           for: 10m
+#           labels:
+#             severity: warning
+#         - alert: KedaScaledObjectPaused
+#           annotations:
+#             description: "The scaled object {{ $labels.scaledObject }} in namespace {{ $labels.exported_namespace }} is paused for longer than 25h. This may indicate a configuration issue or manual intervention."
+#             summary: "KEDA scaled object is paused."
+#           expr: |
+#             max(
+#               keda_scaled_object_paused{
+#                 job="keda-operator"
+#               }
+#             ) by (cluster, job, exported_namespace, scaledObject) > 0
+#           for: 25h
+#           labels:
+#             severity: warning
+#         - alert: KedaScalerDetailErrors
+#           annotations:
+#             description: "Errors have occurred in the KEDA scaler {{ $labels.scaler }}. Investigate the scaler for the {{ $labels.type }} {{ $labels.scaledObject }} in namespace {{ $labels.exported_namespace }}."
+#             summary: "Errors detected in KEDA scaler."
+#           expr: |
+#             sum(
+#               increase(
+#                 keda_scaler_detail_errors_total{
+#                   job="keda-operator"
+#                 }[10m]
+#               )
+#             ) by (cluster, job, exported_namespace, scaledObject, type, scaler) > 0
+#           for: 1m
+#           labels:
+#             severity: warning
