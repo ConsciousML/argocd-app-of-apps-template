@@ -194,10 +194,10 @@ loki:
   sidecar:
     resources:
       requests:
-        cpu: 11m
-        memory: 94M
+        cpu: 50m
+        memory: 249M
       limits:
-        memory: 94M
+        memory: 249M
 
   # Other deployment modes, unused in Monolithic mode. Some (write/read/backend) default to
   # replicas: 3 regardless of deploymentMode, and the chart refuses to render if both
