@@ -4,11 +4,11 @@ external-secrets:
 
   resources:
     requests:
-      cpu: 15m
-      memory: 100Mi
+      cpu: 11m
+      memory: 50M
     limits:
-      cpu: 15m
-      memory: 100Mi
+      cpu: 11m
+      memory: 50M
 
   # The chart only renders spec.securityContext (pod-level) when podSecurityContext has
   # more than just 'enabled', otherwise it's omitted even though container-level hardening
@@ -30,11 +30,11 @@ external-secrets:
       runAsNonRoot: true
     resources:
       requests:
-        cpu: 15m
-        memory: 100Mi
+        cpu: 11m
+        memory: 50M
       limits:
-        cpu: 75m
-        memory: 100Mi
+        cpu: 55m
+        memory: 50M
     nodeSelector:
       karpenter.sh/nodepool: elastic
     tolerations:
@@ -48,11 +48,11 @@ external-secrets:
       runAsNonRoot: true
     resources:
       requests:
-        cpu: 15m
-        memory: 100Mi
+        cpu: 11m
+        memory: 79M
       limits:
-        cpu: 15m
-        memory: 100Mi
+        cpu: 11m
+        memory: 79M
     nodeSelector:
       karpenter.sh/nodepool: elastic
     tolerations:

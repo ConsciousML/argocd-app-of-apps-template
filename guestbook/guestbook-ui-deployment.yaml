@@ -35,11 +35,11 @@ spec:
             - containerPort: 80
           resources:
             requests:
-              cpu: "15m"
-              memory: "100Mi"
+              cpu: "11m"
+              memory: "35M"
             limits:
-              cpu: "75m"
-              memory: "100Mi"
+              cpu: "55m"
+              memory: "35M"
           securityContext:
             readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false

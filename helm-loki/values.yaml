@@ -67,10 +67,10 @@ loki:
     # per pod, well under the request below.
     resources:
       requests:
-        cpu: 35m
-        memory: 352M
+        cpu: 93m
+        memory: 164M
       limits:
-        memory: 352M
+        memory: 164M
     nodeSelector:
       karpenter.sh/nodepool: critical
     tolerations:
@@ -94,10 +94,10 @@ loki:
     resources:
       requests:
         cpu: 11m
-        memory: 50Mi
+        memory: 64M
       limits:
         cpu: 55m
-        memory: 50Mi
+        memory: 64M
     nodeSelector:
       karpenter.sh/nodepool: critical
     tolerations:
@@ -110,10 +110,10 @@ loki:
     resources:
       requests:
         cpu: 11m
-        memory: 50Mi
+        memory: 24M
       limits:
         cpu: 55m
-        memory: 50Mi
+        memory: 24M
     nodeSelector:
       karpenter.sh/nodepool: critical
     tolerations:
@@ -128,27 +128,27 @@ loki:
     resources:
       requests:
         cpu: 11m
-        memory: 50Mi
+        memory: 21M
       limits:
         cpu: 55m
-        memory: 50Mi
+        memory: 21M
 
   gateway:
     resources:
       requests:
         cpu: 11m
-        memory: 50Mi
+        memory: 24M
       limits:
         cpu: 55m
-        memory: 50Mi
+        memory: 24M
     metrics:
       resources:
         requests:
           cpu: 11m
-          memory: 50Mi
+          memory: 24M
         limits:
           cpu: 55m
-          memory: 50Mi
+          memory: 24M
     nodeSelector:
       karpenter.sh/nodepool: critical
     tolerations:
@@ -170,11 +170,11 @@ loki:
     priorityClassName: daemonset-critical
     resources:
       requests:
-        cpu: 15m
-        memory: 100Mi
+        cpu: 11m
+        memory: 24M
       limits:
-        cpu: 15m
-        memory: 100Mi
+        cpu: 11m
+        memory: 24M
     tolerations:
       - key: karpenter.sh/workload-class
         operator: Exists
@@ -187,10 +187,10 @@ loki:
   sidecar:
     resources:
       requests:
-        cpu: 50m
-        memory: 249M
+        cpu: 11m
+        memory: 94M
       limits:
-        memory: 249M
+        memory: 94M
 
   # Other deployment modes, unused in Monolithic mode. Some (write/read/backend) default to
   # replicas: 3 regardless of deploymentMode, and the chart refuses to render if both

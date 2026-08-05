@@ -25,11 +25,11 @@ external-dns:
     name: ""
   resources:
     requests:
-      cpu: 15m
-      memory: 100Mi
+      cpu: 11m
+      memory: 36M
     limits:
-      cpu: 15m
-      memory: 100Mi
+      cpu: 11m
+      memory: 36M
   nodeSelector:
     karpenter.sh/nodepool: elastic
   tolerations:

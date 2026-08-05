@@ -2,11 +2,11 @@ tailscale-operator:
   operatorConfig:
     resources:
       requests:
-        cpu: 15m
-        memory: 100Mi
+        cpu: 11m
+        memory: 36M
       limits:
-        cpu: 15m
-        memory: 100Mi
+        cpu: 11m
+        memory: 36M
     securityContext:
       allowPrivilegeEscalation: false
       capabilities:
