@@ -298,6 +298,14 @@ kube-prometheus-stack:
             matchers:
               - component = "argocd"
               - severity = "warning"
+          - receiver: "uptime-critical"
+            matchers:
+              - component = "uptime"
+              - severity = "critical"
+          - receiver: "uptime-warning"
+            matchers:
+              - component = "uptime"
+              - severity = "warning"
       receivers:
         - name: "null"
         - name: "unrouted"
@@ -339,6 +347,14 @@ kube-prometheus-stack:
         - name: "argocd-warning"
           slack_configs:
             - channel: "#{{ .Values.environment }}-argocd-warning"
+              send_resolved: true
+        - name: "uptime-critical"
+          slack_configs:
+            - channel: "#{{ .Values.environment }}-uptime-critical"
+              send_resolved: true
+        - name: "uptime-warning"
+          slack_configs:
+            - channel: "#{{ .Values.environment }}-uptime-warning"
               send_resolved: true
 
   grafana:
