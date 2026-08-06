@@ -1,6 +1,6 @@
 # helm-blackbox-exporter
 
-Deploys [blackbox-exporter](https://github.com/prometheus/blackbox_exporter) via the upstream `prometheus-blackbox-exporter` chart, probing Grafana, Prometheus, Alertmanager, ArgoCD, and guestbook for HTTP reachability.
+Deploys [blackbox-exporter](https://github.com/prometheus/blackbox_exporter) via the upstream `prometheus-blackbox-exporter` chart, probing Grafana, Prometheus, Alertmanager, ArgoCD, and podinfo for HTTP reachability.
 
 ## Upstream Dependencies
 

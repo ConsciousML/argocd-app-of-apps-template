@@ -329,21 +329,21 @@ applications:
       - helm-gateway-api-gateway/private-gateway-values.yaml
       - helm-httproute/goldilocks-httproute-values.yaml
 
-  # --- Guestbook ---
+  # --- Podinfo ---
   # Depends on:
   # - See DaemonSets Priority above.
-  - name: guestbook
+  - name: podinfo
     destination:
-      namespace: guestbook
+      namespace: podinfo
     syncWave: 3
   # Depends on:
   # - gateway-public
-  # - guestbook (the backend Service)
-  - name: guestbook-httproute
+  # - podinfo (the backend Service)
+  - name: podinfo-httproute
     path: helm-httproute
     destination:
-      namespace: guestbook
+      namespace: podinfo
     syncWave: 6
     extraValueFiles:
       - helm-gateway-api-gateway/public-gateway-values.yaml
-      - helm-httproute/guestbook-httproute-values.yaml
+      - helm-httproute/podinfo-httproute-values.yaml

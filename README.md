@@ -12,11 +12,11 @@ An ArgoCD template repository implementing the [App of Apps pattern](https://arg
 2. In [`apps/values.yaml`](apps/values.yaml) set `repoURL` to your forked repository url.
 3. Deploy the app-of-apps Application using the [terragrunt-template-catalog-eks](https://github.com/ConsciousML/terragrunt-template-catalog-eks) catalog. See its [App of Apps integration guide](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/docs/app-of-apps-integration.md) for how the catalog threads Terraform-sourced values into this chart's `appParams`.
 
-Access the ArgoCD UI and verify the `guestbook` app has been deployed.
+Access the ArgoCD UI and verify the `podinfo` app has been deployed.
 
 ### Adding an App
 
-1. Create a directory for your application at the root of the repository. Plain manifest directories and Helm charts are both supported. See [`guestbook`](guestbook) as a reference.
+1. Create a directory for your application at the root of the repository. Plain manifest directories and Helm charts are both supported. See [`podinfo`](podinfo) as a reference.
 2. In [`apps/values.yaml`](apps/values.yaml), under `applications`, add one entry with the directory name and target namespace.
 3. For Helm chart apps that require runtime values, pass them via `spec.source.helm.values` on the app-of-apps Application CR. The `appParams.<app-name>` map is injected as a Helm values file into the child Application at sync time. See the catalog's [App of Apps integration guide](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/docs/app-of-apps-integration.md) for the catalog-side steps to wire a new app's values.
 
