@@ -40,3 +40,10 @@ spec:
             httpGet:
               path: /readyz
               port: http
+          resources:
+            requests:
+              cpu: 11m
+              memory: 35M
+            limits:
+              cpu: 11m
+              memory: 35M
