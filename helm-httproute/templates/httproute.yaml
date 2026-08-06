@@ -21,10 +21,10 @@ spec:
   hostnames:
     - {{ .Values.host | quote }}
   rules:
+    {{- range .Values.rules }}
     - matches:
-        - path:
-            type: PathPrefix
-            value: /
+        {{- toYaml .matches | nindent 8 }}
       backendRefs:
-        - name: {{ .Values.backendRef.name | quote }}
-          port: {{ .Values.backendRef.port }}
+        - name: {{ (index $.Values.backendRefs .backendRefKey).name | quote }}
+          port: {{ (index $.Values.backendRefs .backendRefKey).port }}
+    {{- end }}

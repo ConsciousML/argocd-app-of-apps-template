@@ -1,9 +1,16 @@
-# backendRef.name is injected by the catalog (terragrunt-template-catalog-eks) via
-# appParams, composed from local.kube_prometheus_stack_release — see
+# backendRefs.default.name is injected by the catalog (terragrunt-template-catalog-eks)
+# via appParams, composed from local.kube_prometheus_stack_release — see
 # units/eks/addons/argocd/app_of_apps in that repo. Not set here since plain YAML can't
 # compose "<release>-prometheus" itself.
 name: prometheus
-backendRef:
-  port: 9090
+rules:
+  - matches:
+      - path:
+          type: PathPrefix
+          value: /
+    backendRefKey: default
+backendRefs:
+  default:
+    port: 9090
 annotations:
   external-dns.alpha.kubernetes.io/scope: private

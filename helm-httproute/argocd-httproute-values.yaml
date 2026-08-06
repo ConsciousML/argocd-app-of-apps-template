@@ -1,0 +1,29 @@
+# host is injected by the catalog (terragrunt-template-catalog-eks) via appParams, from
+# domains.hcl. See units/eks/addons/argocd/app_of_apps in that repo. Not set here.
+name: argocd-server
+rules:
+  # ArgoCD serves gRPC (CLI, API) and the web UI on the same host and path, so gRPC
+  # requests are singled out by Content-Type before falling through to the default rule.
+  - matches:
+      - path:
+          type: PathPrefix
+          value: /
+        headers:
+          - type: Exact
+            name: Content-Type
+            value: application/grpc
+    backendRefKey: grpc
+  - matches:
+      - path:
+          type: PathPrefix
+          value: /
+    backendRefKey: default
+backendRefs:
+  grpc:
+    name: argocd-server-grpc
+    port: 80
+  default:
+    name: argocd-server
+    port: 80
+annotations:
+  external-dns.alpha.kubernetes.io/scope: private

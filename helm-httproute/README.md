@@ -5,7 +5,7 @@ Generic `HTTPRoute` chart bound to a shared `Gateway`, reused by every app that 
 ## What's Inside
 
 - **[templates/httproute.yaml](templates/httproute.yaml)**: binds to both the `http` and `https` listener `sectionName`s of the target `Gateway`, so the route works over either
-- **[values.yaml](values.yaml)**: empty placeholders. Each instance's `*-values.yaml` is loaded via `extraValueFiles` in [`apps/values.yaml`](../apps/values.yaml). See inline comments for which fields the catalog's `app_of_apps` unit injects via `appParams` instead
+- **[values.yaml](values.yaml)**: empty placeholders. Each instance's `*-values.yaml` is loaded via `extraValueFiles` in [`apps/values.yaml`](../apps/values.yaml). See its inline comments for the `rules` and `backendRefs` shape and which fields the catalog's `app_of_apps` unit injects via `appParams` instead
 
 Every instance's `annotations` sets `external-dns.alpha.kubernetes.io/scope` to `public` or `private`. Each `helm-external-dns` instance filters on that annotation to claim only the routes meant for its hosted zone.
 

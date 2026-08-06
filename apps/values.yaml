@@ -187,11 +187,21 @@ applications:
       - helm-eso-secret-sync/argocd-secrets-values.yaml
   # Depends on:
   # - helm-aws-lbc
-  # - gateway-private (ingress routes through the private gateway)
-  - name: helm-argocd-ingress
+  - name: argocd-server-grpc-service
     destination:
       namespace: argocd
     syncWave: 6
+  # Depends on:
+  # - argocd-server-grpc-service (backendRefs must exist first)
+  # - gateway-private
+  - name: argocd-httproute
+    path: helm-httproute
+    destination:
+      namespace: argocd
+    syncWave: 7
+    extraValueFiles:
+      - helm-gateway-api-gateway/private-gateway-values.yaml
+      - helm-httproute/argocd-httproute-values.yaml
 
   # --- Tailscale ---
   # Depends on helm-external-secrets-operator.

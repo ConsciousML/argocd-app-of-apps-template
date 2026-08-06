@@ -6,9 +6,9 @@ name: ""
 # from domains.hcl. See units/eks/addons/argocd/app_of_apps in that repo. No instance
 # sets this itself.
 host: ""
-backendRef:
-  # Some instances also leave this empty. Plain YAML can't compose "<release>-grafana"
-  # from the Helm release name, so app_of_apps injects it via appParams too.
-  name: ""
-  port: 80
+# matches is Gateway API HTTPRouteMatch syntax. backendRefKey is a key into backendRefs,
+# not the backend itself, so appParams can override just a name (e.g. compose
+# "<release>-grafana") without restating the whole rules list.
+rules: []
+backendRefs: {}
 annotations: {}

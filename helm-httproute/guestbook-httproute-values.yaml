@@ -1,6 +1,13 @@
 name: guestbook-ui
-backendRef:
-  name: guestbook-ui
-  port: 80
+rules:
+  - matches:
+      - path:
+          type: PathPrefix
+          value: /
+    backendRefKey: default
+backendRefs:
+  default:
+    name: guestbook-ui
+    port: 80
 annotations:
   external-dns.alpha.kubernetes.io/scope: public

@@ -6,6 +6,13 @@ gateway:
   namespace: "placeholder"
 name: "placeholder"
 host: "placeholder"
-backendRef:
-  name: "placeholder"
-  port: 80
+rules:
+  - matches:
+      - path:
+          type: PathPrefix
+          value: /
+    backendRefKey: default
+backendRefs:
+  default:
+    name: "placeholder"
+    port: 80

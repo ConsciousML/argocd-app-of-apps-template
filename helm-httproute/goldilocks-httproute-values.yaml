@@ -1,8 +1,15 @@
 # host is injected by the catalog (terragrunt-template-catalog-eks) via appParams, from
 # domains.hcl. See units/eks/addons/argocd/app_of_apps in that repo. Not set here.
 name: goldilocks
-backendRef:
-  name: helm-goldilocks-dashboard
-  port: 80
+rules:
+  - matches:
+      - path:
+          type: PathPrefix
+          value: /
+    backendRefKey: default
+backendRefs:
+  default:
+    name: helm-goldilocks-dashboard
+    port: 80
 annotations:
   external-dns.alpha.kubernetes.io/scope: private
