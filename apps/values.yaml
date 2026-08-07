@@ -9,6 +9,12 @@ config:
 appParams: {}
 
 applications:
+  # --- Namespace Pod Security Admission ---
+  - name: namespace-pod-security-admission
+    destination:
+      namespace: kube-system
+    syncWave: -1
+
   # --- EBS CSI Driver ---
   - name: storage-class-gp3
     destination:
