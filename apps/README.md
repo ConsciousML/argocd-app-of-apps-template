@@ -15,6 +15,7 @@ Each entry under `applications` accepts:
 | **`extraValueFiles`** | paths to additional Helm values files, loaded through a second `source` entry referenced via `$values`. Use this to share values between a chart instance and a related one, like `helm-kube-prometheus-stack` pulling in `helm-eso-secret-sync`'s Grafana secret name |
 | **`tool.helm.releaseName`** | pins the Helm release name. Several instances rely on this to match a Pod Identity association's expected `ServiceAccount` name or a catalog-side Terraform local. See the comments beside each entry in `values.yaml` for specifics |
 | **`syncOptions`** | extra entries appended to `syncPolicy.syncOptions`, alongside the default `CreateNamespace=false` |
+| **`preventCascadeDelete`** | when `true`, drops the cascade-delete finalizer and sets `automated.prune: false`, so this app can never delete a resource it manages. Only set for apps owning cluster-scoped resources like `Namespace`, where deleting the app must not delete everything inside them |
 | **`finalizers`** | extra finalizers appended alongside the default `resources-finalizer.argocd.argoproj.io` |
 | **`project`** | ArgoCD project, defaults to `default` |
 

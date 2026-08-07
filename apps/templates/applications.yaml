@@ -9,10 +9,12 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: {{ .syncWave | quote }}
   {{- end }}
+  {{- if not .preventCascadeDelete }}
   finalizers:
   - resources-finalizer.argocd.argoproj.io
   {{- range .finalizers }}
   - {{ . }}
+  {{- end }}
   {{- end }}
 spec:
   destination:
@@ -73,7 +75,7 @@ spec:
       - {{ . }}
       {{- end }}
     automated:
-      prune: true
+      prune: {{ not .preventCascadeDelete }}
       selfHeal: true
 ---
 {{ end -}}
