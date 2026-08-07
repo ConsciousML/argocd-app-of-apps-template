@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: guestbook-ui
+  name: podinfo
 spec:
   replicas: 1
   revisionHistoryLimit: 3
   selector:
     matchLabels:
-      app: guestbook-ui
+      app: podinfo
   template:
     metadata:
       labels:
-        app: guestbook-ui
+        app: podinfo
     spec:
       # Pins onto the elastic NodePool: the toleration alone only allows scheduling there,
       # nodeSelector is what keeps it from landing on the untainted MNG instead.
@@ -29,36 +29,32 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       containers:
-        - image: gcr.io/google-samples/gb-frontend:v5
-          name: guestbook-ui
-          ports:
-            - containerPort: 80
-          resources:
-            requests:
-              cpu: "11m"
-              memory: "35M"
-            limits:
-              cpu: "55m"
-              memory: "35M"
+        - image: ghcr.io/stefanprodan/podinfo:6.14.1
+          name: podinfo
           securityContext:
             readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false
             capabilities:
               drop: ["ALL"]
-          volumeMounts:
-            - name: apache-run
-              mountPath: /var/run/apache2
-            - name: apache-lock
-              mountPath: /var/lock/apache2
-            - name: apache-log
-              mountPath: /var/log/apache2
-      volumes:
-        - name: apache-run
-          emptyDir:
-            sizeLimit: 16Mi
-        - name: apache-lock
-          emptyDir:
-            sizeLimit: 16Mi
-        - name: apache-log
-          emptyDir:
-            sizeLimit: 64Mi
+          ports:
+            - name: http
+              containerPort: 9898
+            - name: http-metrics
+              containerPort: 9797
+            - name: grpc
+              containerPort: 9999
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+          resources:
+            requests:
+              cpu: 11m
+              memory: 35M
+            limits:
+              cpu: 11m
+              memory: 35M

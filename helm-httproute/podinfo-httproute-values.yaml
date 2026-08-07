@@ -1,4 +1,4 @@
-name: guestbook-ui
+name: podinfo
 rules:
   - matches:
       - path:
@@ -7,7 +7,7 @@ rules:
     backendRefKey: default
 backendRefs:
   default:
-    name: guestbook-ui
-    port: 80
+    name: podinfo
+    port: 9898
 annotations:
   external-dns.alpha.kubernetes.io/scope: public

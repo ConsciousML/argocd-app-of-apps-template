@@ -10,7 +10,7 @@ the dependency graph.
   `StorageClass`, `GatewayClass`, `Gateway`/`LoadBalancerConfiguration`/
   `TargetGroupConfiguration`, `SecretStore`/`ExternalSecret`, `HTTPRoute`, ...).
 - **App**: renders an actual workload (has a `Deployment`/`StatefulSet`/`DaemonSet` and/or
-  `Service`) — e.g. a controller, `helm-kube-prometheus-stack`, `guestbook`.
+  `Service`), e.g. a controller, `helm-kube-prometheus-stack`, `podinfo`.
 
 ## 2. Write down what each entry actually depends on
 
