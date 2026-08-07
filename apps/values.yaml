@@ -10,10 +10,13 @@ appParams: {}
 
 applications:
   # --- Namespace Pod Security Admission ---
+  # Owns Namespace resources: pruning or cascade-deleting this app must never delete one,
+  # that would wipe out everything inside it, including argocd's own namespace.
   - name: namespace-pod-security-admission
     destination:
       namespace: kube-system
     syncWave: -1
+    preventCascadeDelete: true
 
   # --- EBS CSI Driver ---
   - name: storage-class-gp3
