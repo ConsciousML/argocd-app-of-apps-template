@@ -202,6 +202,28 @@ kube-prometheus-stack:
 
   alertmanager:
     alertmanagerSpec:
+      # Replicas gossip to sync silences and notification state, no leader or majority
+      # needed. 2 replicas removes the single point of failure but can't resolve
+      # conflicts from a network partition, 3 can.
+      replicas: 3
+
+      # Hard, not soft default: matches prometheus.prometheusSpec above.
+      podAntiAffinity: hard
+
+      # Spreads replicas across AZs, see prometheus.prometheusSpec above for rationale.
+      # No additionalLabelSelectors here: that field only exists on PrometheusSpec (tied to
+      # Prometheus's shard concept), Alertmanager has no sharding. The operator auto-fills
+      # labelSelector to match this Alertmanager's own pods when omitted.
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: DoNotSchedule
+
+      # Keep a majority (2/3) up during voluntary disruption.
+      podDisruptionBudget:
+        enabled: true
+        minAvailable: 2
+
       # Same VPA limitation as prometheus above, sized from kubectl top instead: real usage
       # was 21Mi.
       resources:
