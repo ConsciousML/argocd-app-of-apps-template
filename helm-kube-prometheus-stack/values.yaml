@@ -132,10 +132,34 @@ kube-prometheus-stack:
       node: { component: k8s }
 
   prometheus:
+    service:
+      # Without this the Service round-robins per request across replicas that scrape
+      # independently and can briefly hold different data, so graphs jump on refresh.
+      # https://prometheus-operator.dev/docs/platform/high-availability/
+      sessionAffinity: ClientIP
+
     prometheusSpec:
       # 2 independent replicas, each with their own PVC below. No shared storage needed,
       # Prometheus HA doesn't require it (dedup happens on the query/Grafana side).
       replicas: 2
+
+      # Hard, not the chart's soft default: the critical NodePool can launch a second spot
+      # node on demand, so a real guarantee against sharing a node is safe here.
+      podAntiAffinity: hard
+
+      # Spreads replicas across AZs. A replica stuck Pending on
+      # DoNotSchedule doesn't take Prometheus down, the other replica keeps serving, so the
+      # stronger guarantee is worth the risk over ScheduleAnyway.
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: DoNotSchedule
+          additionalLabelSelectors: OnResource
+
+      # During disruption, always keep 1 replica up
+      podDisruptionBudget:
+        enabled: true
+        minAvailable: 1
 
       # Scrape any ServiceMonitor/PodMonitor in the cluster regardless of labels, and load any
       # PrometheusRule regardless of labels, so other addons can opt into scraping/alerting
@@ -146,7 +170,7 @@ kube-prometheus-stack:
 
       # Goldilocks/VPA can't produce a recommendation for this StatefulSet (prometheus-operator
       # owns it, VPA won't target a StatefulSet with a non-scalable parent controller), sized
-      # from kubectl top instead: real usage peaked at 764Mi, memory guaranteed with 20% headroom.
+      # from kubectl top instead
       resources:
         requests:
           cpu: 93m
@@ -178,6 +202,28 @@ kube-prometheus-stack:
 
   alertmanager:
     alertmanagerSpec:
+      # Replicas gossip to sync silences and notification state, no leader or majority
+      # needed. 2 replicas removes the single point of failure but can't resolve
+      # conflicts from a network partition, 3 can.
+      replicas: 3
+
+      # Hard, not soft default: matches prometheus.prometheusSpec above.
+      podAntiAffinity: hard
+
+      # Spreads replicas across AZs, see prometheus.prometheusSpec above for rationale.
+      # No additionalLabelSelectors here: that field only exists on PrometheusSpec (tied to
+      # Prometheus's shard concept), Alertmanager has no sharding. The operator auto-fills
+      # labelSelector to match this Alertmanager's own pods when omitted.
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: DoNotSchedule
+
+      # Keep a majority (2/3) up during voluntary disruption.
+      podDisruptionBudget:
+        enabled: true
+        minAvailable: 2
+
       # Same VPA limitation as prometheus above, sized from kubectl top instead: real usage
       # was 21Mi.
       resources:
