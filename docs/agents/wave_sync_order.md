@@ -10,7 +10,7 @@ the dependency graph.
   `StorageClass`, `GatewayClass`, `Gateway`/`LoadBalancerConfiguration`/
   `TargetGroupConfiguration`, `SecretStore`/`ExternalSecret`, `HTTPRoute`, ...).
 - **App**: renders an actual workload (has a `Deployment`/`StatefulSet`/`DaemonSet` and/or
-  `Service`), e.g. a controller, `helm-kube-prometheus-stack`, `podinfo`.
+  `Service`), e.g. a controller, `kube-prometheus-stack`, `podinfo`.
 
 ## 2. Write down what each entry actually depends on
 
@@ -21,7 +21,7 @@ dependency list:
 ```yaml
 # Depends on:
 # - gateway-class
-# - helm-aws-lbc (controller reconciles into an ALB)
+# - aws-lbc (controller reconciles into an ALB)
 - name: gateway-public
   ...
 ```
@@ -33,7 +33,7 @@ the three Prometheus stack HTTPRoutes).
 A "dependency" here means: the other entry's resource must exist and be reported `Healthy`
 by ArgoCD before this one can be created or would function correctly. Health-check
 semantics count — e.g. `GatewayClass` only reports `Healthy` once the AWS LBC controller
-sets its `Accepted` condition, so `gateway-class` genuinely depends on `helm-aws-lbc` even
+sets its `Accepted` condition, so `gateway-class` genuinely depends on `aws-lbc` even
 though nothing in `gateway-class`'s own manifest references it.
 
 ## 3. Compute the wave number from the dependency graph
@@ -46,7 +46,7 @@ Not a judgment call — compute it:
 
 A prerequisite is not required to stay negative — if its real dependency is an app, its
 wave follows the formula like anything else (e.g. `gateway-class` depends on
-`helm-aws-lbc` at wave 0, so it lands at wave 1, not `-1`).
+`aws-lbc` at wave 0, so it lands at wave 1, not `-1`).
 
 Recompute the whole graph whenever a dependency changes, rather than patching one number
 in isolation — a shifted upstream wave cascades to everything downstream of it.

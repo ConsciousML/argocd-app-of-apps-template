@@ -1,7 +1,7 @@
 misconfigurations:
   - id: AVD-KSV-0041
     paths:
-      - "helm-loki/charts/loki/templates/backend/clusterrole.yaml"
+      - "charts/monitoring/loki/charts/loki/templates/backend/clusterrole.yaml"
     statement: >
       Grants cluster-wide get/list/watch on Secrets and ConfigMaps, gated by
       sidecar.rules.enabled for Loki's rule-sync sidecar (loki-sc-rules,
@@ -9,7 +9,7 @@ misconfigurations:
       by the same toggle, not separately scopable. Deferred, revisit if needed.
   - id: AVD-KSV-0041
     paths:
-      - "helm-alloy/charts/alloy/templates/rbac.yaml"
+      - "charts/monitoring/alloy/charts/alloy/templates/rbac.yaml"
     statement: >
       Grants cluster-wide get/list/watch on Secrets, bundled by the chart under
       rbac.rules for the remote.kubernetes.* components. This deployment's config
@@ -19,7 +19,7 @@ misconfigurations:
       matter.
   - id: AVD-KSV-0056
     paths:
-      - "helm-tailscale-operator/charts/tailscale-operator/templates/operator-rbac.yaml"
+      - "charts/tailscale/operator/charts/tailscale-operator/templates/operator-rbac.yaml"
     statement: >
       Required for the Tailscale Kubernetes operator to reconcile Services,
       Endpoints, EndpointSlices, NetworkPolicies, and Ingresses for
@@ -28,7 +28,7 @@ misconfigurations:
       without breaking it.
   - id: AVD-KSV-0041
     paths:
-      - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/templates/prometheus-operator/clusterrole.yaml"
+      - "charts/monitoring/kube-prometheus-stack/charts/kube-prometheus-stack/templates/prometheus-operator/clusterrole.yaml"
     statement: >
       Required for the Prometheus operator to generate and own Secrets
       holding rendered Prometheus and Alertmanager config, webhook TLS
@@ -40,7 +40,7 @@ misconfigurations:
       be scoped down without breaking it.
   - id: AVD-KSV-0045
     paths:
-      - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/templates/prometheus-operator/clusterrole.yaml"
+      - "charts/monitoring/kube-prometheus-stack/charts/kube-prometheus-stack/templates/prometheus-operator/clusterrole.yaml"
     statement: >
       Required for the Prometheus operator to fully create and reconcile
       the StatefulSets, ConfigMaps, and Secrets it owns for the Prometheus
@@ -50,7 +50,7 @@ misconfigurations:
       be scoped down without breaking it.
   - id: AVD-KSV-0056
     paths:
-      - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/templates/prometheus-operator/clusterrole.yaml"
+      - "charts/monitoring/kube-prometheus-stack/charts/kube-prometheus-stack/templates/prometheus-operator/clusterrole.yaml"
     statement: >
       Required for the Prometheus operator to manage the governing
       Service and Endpoints objects for the Prometheus and Alertmanager
@@ -61,7 +61,7 @@ misconfigurations:
       breaking it.
   - id: AVD-KSV-0014
     paths:
-      - "helm-tailscale-operator/charts/tailscale-operator/templates/deployment.yaml"
+      - "charts/tailscale/operator/charts/tailscale-operator/templates/deployment.yaml"
     statement: >
       The operator's tsnet client writes its Tailscale state to
       /root/.config at startup. Vendored upstream chart with no volume
@@ -70,7 +70,7 @@ misconfigurations:
       container on startup.
   - id: AVD-KSV-0041
     paths:
-      - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/charts/grafana/templates/clusterrole.yaml"
+      - "charts/monitoring/kube-prometheus-stack/charts/kube-prometheus-stack/charts/grafana/templates/clusterrole.yaml"
     statement: >
       Backs the sidecar.datasources watch (needed for the default
       Prometheus and Alertmanager datasources) and is kept cluster-wide
@@ -80,7 +80,7 @@ misconfigurations:
       Read-only (get/watch/list), not write access.
   - id: AVD-KSV-0014
     paths:
-      - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/charts/grafana/templates/deployment.yaml"
+      - "charts/monitoring/kube-prometheus-stack/charts/kube-prometheus-stack/charts/grafana/templates/deployment.yaml"
     statement: >
       The grafana container defaults GF_PATHS_TEMP to /tmp, which isn't
       backed by a volume in this chart; plugin installs and image
@@ -92,7 +92,7 @@ misconfigurations:
       emptyDir.
   - id: AVD-KSV-0041
     paths:
-      - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/charts/kube-state-metrics/templates/role.yaml"
+      - "charts/monitoring/kube-prometheus-stack/charts/kube-prometheus-stack/charts/kube-state-metrics/templates/role.yaml"
     statement: >
       The 'secrets' collector is kept enabled (upstream default) so
       Secret metadata (count, age, type, labels) stays available for
@@ -101,19 +101,19 @@ misconfigurations:
       rather than just narrowing scope.
   - id: AVD-KSV-0041
     paths:
-      - "helm-external-secrets-operator/charts/external-secrets/templates/rbac.yaml"
+      - "charts/external-secrets-operator/operator/charts/external-secrets/templates/rbac.yaml"
     statement: >
       Required for the ESO controller to create and update the target
       Secrets ExternalSecret resources define. No ClusterSecretStore is
       used, but SecretStore/ExternalSecret pairs are already spread
       across multiple namespaces (argocd, tailscale, monitoring) via
-      helm-eso-secret-sync, with more addons expected to follow the
+      the secret-sync chart, with more addons expected to follow the
       same pattern, so a single cluster-wide controller identity is
       needed rather than per-namespace RBAC. Vendored upstream chart;
       inherent to the controller's function.
   - id: AVD-KSV-0041
     paths:
-      - "helm-external-secrets-operator/charts/external-secrets/templates/cert-controller-rbac.yaml"
+      - "charts/external-secrets-operator/operator/charts/external-secrets/templates/cert-controller-rbac.yaml"
     statement: >
       Required for the cert-controller to read and rotate its own
       webhook TLS Secret. Vendored upstream chart with no namespace
@@ -121,7 +121,7 @@ misconfigurations:
       controller's function.
   - id: AVD-KSV-0114
     paths:
-      - "helm-external-secrets-operator/charts/external-secrets/templates/cert-controller-rbac.yaml"
+      - "charts/external-secrets-operator/operator/charts/external-secrets/templates/cert-controller-rbac.yaml"
     statement: >
       Required for the cert-controller to push the rotated CA bundle
       into the secretstore-validate and externalsecret-validate
@@ -130,7 +130,7 @@ misconfigurations:
       inherent to the controller's function.
   - id: AVD-KSV-0056
     paths:
-      - "helm-aws-lbc/charts/aws-load-balancer-controller/templates/rbac.yaml"
+      - "charts/aws-lbc/charts/aws-load-balancer-controller/templates/rbac.yaml"
     statement: >
       Required for the AWS Load Balancer Controller to reconcile
       Services and Ingresses cluster-wide and update their status
@@ -140,7 +140,7 @@ misconfigurations:
       breaking it.
   - id: AVD-KSV-0009
     paths:
-      - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/charts/prometheus-node-exporter/templates/daemonset.yaml"
+      - "charts/monitoring/kube-prometheus-stack/charts/kube-prometheus-stack/charts/prometheus-node-exporter/templates/daemonset.yaml"
     statement: >
       Required for node-exporter to bind directly to the host network
       namespace and expose node-level metrics on the node's own IP.
@@ -149,7 +149,7 @@ misconfigurations:
       metric scraping.
   - id: AVD-KSV-0010
     paths:
-      - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/charts/prometheus-node-exporter/templates/daemonset.yaml"
+      - "charts/monitoring/kube-prometheus-stack/charts/kube-prometheus-stack/charts/prometheus-node-exporter/templates/daemonset.yaml"
     statement: >
       Required for node-exporter to read host process information for
       process and scheduler metrics. Vendored upstream chart; the
@@ -157,7 +157,7 @@ misconfigurations:
       disabled without breaking node metric scraping.
   - id: AVD-KSV-0121
     paths:
-      - "helm-kube-prometheus-stack/charts/kube-prometheus-stack/charts/prometheus-node-exporter/templates/daemonset.yaml"
+      - "charts/monitoring/kube-prometheus-stack/charts/kube-prometheus-stack/charts/prometheus-node-exporter/templates/daemonset.yaml"
     statement: >
       Required for node-exporter to read the host's filesystem, proc,
       and sysfs trees, the source of the filesystem, memory, and kernel
@@ -166,7 +166,7 @@ misconfigurations:
       breaking node metric scraping.
   - id: AVD-KSV-0046
     paths:
-      - "helm-goldilocks/charts/goldilocks/templates/controller-clusterrole.yaml"
+      - "charts/right-sizing/goldilocks/charts/goldilocks/templates/controller-clusterrole.yaml"
     statement: >
       Required for the Goldilocks controller to discover workloads
       (Deployments, StatefulSets, DaemonSets, ReplicaSets) across the
@@ -175,7 +175,7 @@ misconfigurations:
       below '*' for this apiGroup; inherent to the controller's function.
   - id: AVD-KSV-0046
     paths:
-      - "helm-goldilocks/charts/goldilocks/templates/dashboard-clusterrole.yaml"
+      - "charts/right-sizing/goldilocks/charts/goldilocks/templates/dashboard-clusterrole.yaml"
     statement: >
       Required for the Goldilocks dashboard to list workloads across the
       apps API group and display their VPA recommendations. Read-only

@@ -1,0 +1,5 @@
+apiVersion: v2
+name: gateway
+description: A single Gateway API Gateway, backed by an ALB via the AWS Load Balancer Controller
+type: application
+version: 0.1.0

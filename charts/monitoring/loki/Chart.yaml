@@ -1,0 +1,9 @@
+apiVersion: v2
+name: loki
+description: Loki log aggregation, monolithic mode with S3 storage
+type: application
+version: 0.1.0
+dependencies:
+  - name: loki
+    version: 18.5.1
+    repository: https://grafana-community.github.io/helm-charts

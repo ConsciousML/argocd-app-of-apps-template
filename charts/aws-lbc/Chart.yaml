@@ -1,0 +1,11 @@
+apiVersion: v2
+name: aws-lbc
+description: AWS Load Balancer Controller
+type: application
+version: 0.1.0
+dependencies:
+  - name: aws-load-balancer-controller
+    # Keep in sync with local.version_aws_lbc in the catalog repo's
+    # pipelines/dev/eks/stack/terragrunt.stack.hcl
+    version: 3.2.1
+    repository: https://aws.github.io/eks-charts

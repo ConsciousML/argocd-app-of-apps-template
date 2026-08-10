@@ -75,7 +75,9 @@ spec:
       - {{ . }}
       {{- end }}
     automated:
-      prune: {{ not .preventCascadeDelete }}
+      {{- if not .preventCascadeDelete }}
+      prune: true
+      {{- end }}
       selfHeal: true
 ---
 {{ end -}}

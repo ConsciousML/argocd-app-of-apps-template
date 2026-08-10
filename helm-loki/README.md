@@ -1,7 +1,0 @@
-# helm-loki
-
-Deploys [Loki](https://grafana.com/docs/loki/latest/) via the upstream `loki` chart, monolithic mode with S3 storage.
-
-## Upstream Dependencies
-
-- **[`units/eks/addons/loki`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/eks/addons/loki)** (catalog): provisions the two S3 buckets `loki.loki.storage.bucketNames` points at (see [values.yaml](values.yaml) for how it's injected), and the Pod Identity association the `releaseName` in [`apps/values.yaml`](../apps/values.yaml) must match

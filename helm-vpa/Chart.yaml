@@ -1,9 +1,0 @@
-apiVersion: v2
-name: helm-vpa
-description: VPA recommender-only install (no updater, no admission controller), source data for Goldilocks
-type: application
-version: 0.1.0
-dependencies:
-  - name: vpa
-    version: 4.12.4
-    repository: https://charts.fairwinds.com/stable

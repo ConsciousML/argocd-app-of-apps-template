@@ -13,6 +13,7 @@ applications:
   # Owns Namespace resources: pruning or cascade-deleting this app must never delete one,
   # that would wipe out everything inside it, including argocd's own namespace.
   - name: namespace-pod-security-admission
+    path: manifests/namespace-pod-security-admission
     destination:
       namespace: kube-system
     syncWave: -1
@@ -20,18 +21,20 @@ applications:
 
   # --- EBS CSI Driver ---
   - name: storage-class-gp3
+    path: manifests/storage-class-gp3
     destination:
       namespace: kube-system
     syncWave: -1
 
   # --- Priority Classes ---
   - name: priority-classes
+    path: manifests/priority-classes
     destination:
       namespace: kube-system
     syncWave: -1
 
   # --- DaemonSets Priority ---
-  # helm-loki, helm-alloy, and helm-kube-prometheus-stack (wave 2) carry the cluster's
+  # loki, alloy, and kube-prometheus-stack (wave 2) carry the cluster's
   # DaemonSets: Alloy itself, Loki's lokiCanary, and kube-prometheus-stack's node-exporter.
   # Karpenter only sizes a new node for a DaemonSet it already knows about, so a DaemonSet
   # that syncs after another app has already triggered a node launch can land Pending and
@@ -41,50 +44,53 @@ applications:
 
   # --- Gateway API ---
   - name: crds-gateway-api
+    path: manifests/crds/gateway-api
     destination:
       namespace: argocd
     syncWave: -1
   - name: crds-aws-lbc-gateway-api
+    path: manifests/crds/aws-lbc-gateway-api
     destination:
       namespace: argocd
     syncWave: -1
   # Depends on:
   # - crds-gateway-api (GatewayClass CRD)
-  # - helm-aws-lbc (the controller sets GatewayClass's Accepted condition, which its health
+  # - aws-lbc (the controller sets GatewayClass's Accepted condition, which its health
   #   check waits on)
   # - See DaemonSets Priority above.
   - name: gateway-class
-    path: helm-gateway-api-gateway-class
+    path: charts/gateway-api/gateway-class
     destination:
       namespace: gateway
     syncWave: 4
   # Depends on:
   # - gateway-class
   # - crds-aws-lbc-gateway-api (LoadBalancerConfiguration/TargetGroupConfiguration CRDs)
-  # - helm-aws-lbc (controller reconciles into an ALB)
+  # - aws-lbc (controller reconciles into an ALB)
   # - See DaemonSets Priority above.
   - name: gateway-public
-    path: helm-gateway-api-gateway
+    path: charts/gateway-api/gateway
     destination:
       namespace: gateway
     syncWave: 5
     extraValueFiles:
-      - helm-gateway-api-gateway-class/values.yaml
-      - helm-gateway-api-gateway/public-gateway-values.yaml
+      - charts/gateway-api/gateway-class/values.yaml
+      - charts/gateway-api/gateway/public-gateway-values.yaml
   # Same dependencies as gateway-public.
   - name: gateway-private
-    path: helm-gateway-api-gateway
+    path: charts/gateway-api/gateway
     destination:
       namespace: gateway
     syncWave: 5
     extraValueFiles:
-      - helm-gateway-api-gateway-class/values.yaml
-      - helm-gateway-api-gateway/private-gateway-values.yaml
+      - charts/gateway-api/gateway-class/values.yaml
+      - charts/gateway-api/gateway/private-gateway-values.yaml
 
   # --- AWS Load Balancer Controller ---
   # Depends on:
   # - See DaemonSets Priority above.
-  - name: helm-aws-lbc
+  - name: aws-lbc
+    path: charts/aws-lbc
     destination:
       namespace: kube-system
     syncWave: 3
@@ -103,8 +109,8 @@ applications:
   # Depends on:
   # - crds-gateway-api (watches gateway-httproute sources)
   # - See DaemonSets Priority above.
-  - name: helm-external-dns-private
-    path: helm-external-dns
+  - name: external-dns-private
+    path: charts/external-dns
     destination:
       namespace: external-dns
     syncWave: 3
@@ -115,14 +121,14 @@ applications:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
         releaseName: external-dns-private
     extraValueFiles:
-      - helm-external-dns/external-dns-private-values.yaml
+      - charts/external-dns/external-dns-private-values.yaml
     # ArgoCD auto-adds these for the PreDelete hook in predelete-hook.yaml; declared here so sync doesn't flap.
     finalizers:
       - pre-delete-finalizer.argocd.argoproj.io
       - pre-delete-finalizer.argocd.argoproj.io/cleanup
-  # Same dependencies as helm-external-dns-private.
-  - name: helm-external-dns-public
-    path: helm-external-dns
+  # Same dependencies as external-dns-private.
+  - name: external-dns-public
+    path: charts/external-dns
     destination:
       namespace: external-dns
     syncWave: 3
@@ -133,13 +139,14 @@ applications:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
         releaseName: external-dns-public
     extraValueFiles:
-      - helm-external-dns/external-dns-public-values.yaml
+      - charts/external-dns/external-dns-public-values.yaml
     finalizers:
       - pre-delete-finalizer.argocd.argoproj.io
       - pre-delete-finalizer.argocd.argoproj.io/cleanup
 
   # --- External Secrets Operator ---
-  - name: helm-external-secrets-operator
+  - name: external-secrets-operator
+    path: charts/external-secrets-operator/operator
     destination:
       namespace: external-secrets
     syncWave: 0
@@ -151,7 +158,8 @@ applications:
         releaseName: external-secrets
 
   # --- Loki ---
-  - name: helm-loki
+  - name: loki
+    path: charts/monitoring/loki
     destination:
       namespace: loki
     syncWave: 0
@@ -161,11 +169,12 @@ applications:
         releaseName: loki
 
   # --- Alloy ---
-  # No hard dependency on helm-loki: it pushes logs to loki-gateway.loki but retries on
+  # No hard dependency on loki: it pushes logs to loki-gateway.loki but retries on
   # write failure, so it doesn't need Loki up first. Synced in the same wave as Loki so both
   # DaemonSets (Alloy itself, Loki's lokiCanary) exist as early as possible. See DaemonSets
   # Priority above.
-  - name: helm-alloy
+  - name: alloy
+    path: charts/monitoring/alloy
     destination:
       namespace: loki
     syncWave: 0
@@ -176,27 +185,30 @@ applications:
   # --- Blackbox Exporter ---
   # No hard dependency: ServiceMonitor/PrometheusRule CRDs are Terraform-managed, applied
   # before ArgoCD ever syncs.
-  - name: helm-blackbox-exporter
+  - name: blackbox-exporter
+    path: charts/monitoring/blackbox-exporter
     destination:
       namespace: monitoring
     syncWave: 2
 
   # --- Prometheus Rules ---
   - name: prometheus-rules
+    path: charts/monitoring/prometheus-rules
     destination:
       namespace: monitoring
     syncWave: 0
-  # Depends on helm-external-secrets-operator.
+  # Depends on external-secrets-operator.
   - name: argocd-secrets
-    path: helm-eso-secret-sync
+    path: charts/external-secrets-operator/secret-sync
     destination:
       namespace: argocd
     syncWave: 1
     extraValueFiles:
-      - helm-eso-secret-sync/argocd-secrets-values.yaml
+      - charts/external-secrets-operator/secret-sync/argocd-secrets-values.yaml
   # Depends on:
-  # - helm-aws-lbc
+  # - aws-lbc
   - name: argocd-server-grpc-service
+    path: manifests/argocd-server-grpc-service
     destination:
       namespace: argocd
     syncWave: 6
@@ -204,61 +216,64 @@ applications:
   # - argocd-server-grpc-service (backendRefs must exist first)
   # - gateway-private
   - name: argocd-httproute
-    path: helm-httproute
+    path: charts/gateway-api/httproute
     destination:
       namespace: argocd
     syncWave: 7
     extraValueFiles:
-      - helm-gateway-api-gateway/private-gateway-values.yaml
-      - helm-httproute/argocd-httproute-values.yaml
+      - charts/gateway-api/gateway/private-gateway-values.yaml
+      - charts/gateway-api/httproute/argocd-httproute-values.yaml
 
   # --- Tailscale ---
-  # Depends on helm-external-secrets-operator.
+  # Depends on external-secrets-operator.
   - name: tailscale-secrets
-    path: helm-eso-secret-sync
+    path: charts/external-secrets-operator/secret-sync
     destination:
       namespace: tailscale
     syncWave: 1
     extraValueFiles:
-      - helm-eso-secret-sync/tailscale-secrets-values.yaml
+      - charts/external-secrets-operator/secret-sync/tailscale-secrets-values.yaml
   # Depends on:
   # - tailscale-secrets (needs the oauth secret before it can register with Tailscale)
   # - See DaemonSets Priority above.
-  - name: helm-tailscale-operator
+  - name: tailscale-operator
+    path: charts/tailscale/operator
     destination:
       namespace: tailscale
     syncWave: 3
     # Chart bundles its own CRDs; avoids client-side apply's annotation size limit.
     syncOptions:
       - ServerSideApply=true
-  # Depends on helm-tailscale-operator (controller and its CRDs).
-  - name: helm-tailscale-connector
+  # Depends on tailscale-operator (controller and its CRDs).
+  - name: tailscale-connector
+    path: charts/tailscale/connector
     destination:
       namespace: tailscale
     syncWave: 4
 
   # --- Prometheus stack ---
-  # Depends on helm-external-secrets-operator.
+  # Depends on external-secrets-operator.
   - name: grafana-secrets
-    path: helm-eso-secret-sync
+    path: charts/external-secrets-operator/secret-sync
     destination:
       namespace: monitoring
     syncWave: 1
     extraValueFiles:
-      - helm-eso-secret-sync/grafana-secrets-values.yaml
-  # Depends on helm-external-secrets-operator.
+      - charts/external-secrets-operator/secret-sync/grafana-secrets-values.yaml
+  # Depends on external-secrets-operator.
   - name: alertmanager-secrets
-    path: helm-eso-secret-sync
+    path: charts/external-secrets-operator/secret-sync
     destination:
       namespace: monitoring
     syncWave: 1
     extraValueFiles:
-      - helm-eso-secret-sync/alertmanager-secrets-values.yaml
+      - charts/external-secrets-operator/secret-sync/alertmanager-secrets-values.yaml
   # Depends on:
   # - grafana-secrets (needs the admin secret before Grafana's first boot)
   # - alertmanager-secrets (Alertmanager mounts it via alertmanagerSpec.secrets, so it must
   #   exist before the pod can start)
-  - name: helm-kube-prometheus-stack
+  - name: kube-prometheus-stack
+    path: charts/monitoring/kube-prometheus-stack
     destination:
       namespace: monitoring
     syncWave: 2
@@ -275,42 +290,43 @@ applications:
         # app_of_apps/terragrunt.hcl in terragrunt-template-catalog-eks).
         releaseName: kube-prometheus-stack
     extraValueFiles:
-      - helm-eso-secret-sync/grafana-secrets-values.yaml
+      - charts/external-secrets-operator/secret-sync/grafana-secrets-values.yaml
   # Depends on:
   # - gateway-private
-  # - helm-kube-prometheus-stack (the backend Service)
+  # - kube-prometheus-stack (the backend Service)
   - name: grafana-httproute
-    path: helm-httproute
+    path: charts/gateway-api/httproute
     destination:
       namespace: monitoring
     syncWave: 6
     extraValueFiles:
-      - helm-gateway-api-gateway/private-gateway-values.yaml
-      - helm-httproute/grafana-httproute-values.yaml
+      - charts/gateway-api/gateway/private-gateway-values.yaml
+      - charts/gateway-api/httproute/grafana-httproute-values.yaml
   # Same dependencies as grafana-httproute.
   - name: prometheus-httproute
-    path: helm-httproute
+    path: charts/gateway-api/httproute
     destination:
       namespace: monitoring
     syncWave: 6
     extraValueFiles:
-      - helm-gateway-api-gateway/private-gateway-values.yaml
-      - helm-httproute/prometheus-httproute-values.yaml
+      - charts/gateway-api/gateway/private-gateway-values.yaml
+      - charts/gateway-api/httproute/prometheus-httproute-values.yaml
   # Same dependencies as grafana-httproute.
   - name: alertmanager-httproute
-    path: helm-httproute
+    path: charts/gateway-api/httproute
     destination:
       namespace: monitoring
     syncWave: 6
     extraValueFiles:
-      - helm-gateway-api-gateway/private-gateway-values.yaml
-      - helm-httproute/alertmanager-httproute-values.yaml
+      - charts/gateway-api/gateway/private-gateway-values.yaml
+      - charts/gateway-api/httproute/alertmanager-httproute-values.yaml
 
   # --- VPA (recommender only) ---
   # Depends on:
   # - See DaemonSets Priority above.
-  # - helm-kube-prometheus-stack (startup history backfill, non-fatal if not ready yet)
-  - name: helm-vpa
+  # - kube-prometheus-stack (startup history backfill, non-fatal if not ready yet)
+  - name: vpa
+    path: charts/right-sizing/vpa
     destination:
       namespace: vpa
     syncWave: 3
@@ -320,28 +336,30 @@ applications:
 
   # --- Goldilocks ---
   # Depends on:
-  # - helm-vpa (recommender + VPA CRD)
+  # - vpa (recommender + VPA CRD)
   # - See DaemonSets Priority above.
-  - name: helm-goldilocks
+  - name: goldilocks
+    path: charts/right-sizing/goldilocks
     destination:
       namespace: goldilocks
     syncWave: 4
   # Depends on:
   # - gateway-private
-  # - helm-goldilocks (the backend Service)
+  # - goldilocks (the backend Service)
   - name: goldilocks-httproute
-    path: helm-httproute
+    path: charts/gateway-api/httproute
     destination:
       namespace: goldilocks
     syncWave: 6
     extraValueFiles:
-      - helm-gateway-api-gateway/private-gateway-values.yaml
-      - helm-httproute/goldilocks-httproute-values.yaml
+      - charts/gateway-api/gateway/private-gateway-values.yaml
+      - charts/gateway-api/httproute/goldilocks-httproute-values.yaml
 
   # --- Podinfo ---
   # Depends on:
   # - See DaemonSets Priority above.
   - name: podinfo
+    path: manifests/podinfo
     destination:
       namespace: podinfo
     syncWave: 3
@@ -349,10 +367,10 @@ applications:
   # - gateway-public
   # - podinfo (the backend Service)
   - name: podinfo-httproute
-    path: helm-httproute
+    path: charts/gateway-api/httproute
     destination:
       namespace: podinfo
     syncWave: 6
     extraValueFiles:
-      - helm-gateway-api-gateway/public-gateway-values.yaml
-      - helm-httproute/podinfo-httproute-values.yaml
+      - charts/gateway-api/gateway/public-gateway-values.yaml
+      - charts/gateway-api/httproute/podinfo-httproute-values.yaml

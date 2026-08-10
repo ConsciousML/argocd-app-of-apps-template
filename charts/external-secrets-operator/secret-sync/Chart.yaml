@@ -1,0 +1,6 @@
+apiVersion: v2
+name: secret-sync
+description: Generic ESO SecretStore backed by AWS Secrets Manager, plus a list of ExternalSecrets syncing from it
+type: application
+version: 0.1.0
+appVersion: "1.0"

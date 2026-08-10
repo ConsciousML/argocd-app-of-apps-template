@@ -1,0 +1,9 @@
+apiVersion: v2
+name: alloy
+description: Grafana Alloy, deployed as a DaemonSet for cluster-wide log collection
+type: application
+version: 0.1.0
+dependencies:
+  - name: alloy
+    version: 1.11.0
+    repository: https://grafana.github.io/helm-charts
