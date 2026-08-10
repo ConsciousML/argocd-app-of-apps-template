@@ -1,5 +1,6 @@
 [tools]
 helm = "4.2.0"
+kbld = "0.49.1"
 kubeconform = "0.7.0"
 prek = "0.4.3"
 trivy = "0.72.0"

@@ -35,3 +35,7 @@ jobs:
         uses: j178/prek-action@v2.0.4
         with:
           extra-args: --all-files trivy
+
+      # Not run via prek: doesn't fail on vulnerabilities, it's for auditing only.
+      - name: Trivy image vulnerability scan
+        run: scripts/trivy-image-scan.sh

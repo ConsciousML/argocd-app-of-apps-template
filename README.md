@@ -84,5 +84,7 @@ Some charts leave required fields blank in `values.yaml` because they're filled 
 
 To trigger CI manually, use the **Run workflow** button on the [Actions tab](../../actions/workflows/ci.yaml).
 
+Run `scripts/find-images.sh` to list every image (`repo:tag`, unresolved) referenced by charts and plain manifests, for offline scanning with tools like `trivy image`.
+
 ## License
 This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.

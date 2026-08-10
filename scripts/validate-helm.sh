@@ -1,26 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_ROOT="$(git rev-parse --show-toplevel)"
+source "$(dirname "${BASH_SOURCE[0]}")/lib/discovery.sh"
+
 ERRORS=0
-
-# CRD schemas, not covered by kubeconform's default source
-CRD_CATALOG='https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json'
-
-KUBECONFORM_ARGS=(
-  --strict
-  --ignore-missing-schemas
-  --schema-location default
-  --schema-location "$CRD_CATALOG"
-  --summary
-)
 
 # Get all the directory paths containing Helm Charts
 HELM_CHARTS=()
 while IFS= read -r dir; do
   echo "[INFO] Found chart: ${dir#"$REPO_ROOT"/}"
   HELM_CHARTS+=("$dir")
-done < <(find "$REPO_ROOT" -name Chart.yaml -not -path '*/.git/*' -exec dirname {} \;)
+done < <(find_helm_charts)
 
 if [[ ${#HELM_CHARTS[@]} -eq 0 ]]; then
   echo "[INFO] No Helm charts found."
@@ -46,8 +36,8 @@ for chart_dir in "${HELM_CHARTS[@]}"; do
   fi
 
   template_args=("$chart_dir")
-  placeholder_values="$chart_dir/placeholder-values.yaml"
-  if [[ -f "$placeholder_values" ]]; then
+  placeholder_values="$(placeholder_values_file "$chart_dir")"
+  if [[ -n "$placeholder_values" ]]; then
     template_args+=(-f "$placeholder_values")
   fi
 
