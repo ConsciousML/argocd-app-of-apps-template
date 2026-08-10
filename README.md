@@ -3,8 +3,9 @@
 An ArgoCD template repository implementing the [App of Apps pattern](https://argo-cd.readthedocs.io/en/latest/operator-manual/cluster-bootstrapping/#app-of-apps-pattern-alternative) with CI checks.
 
 ## Prerequisites
-- A functional [terragrunt-template-catalog-eks](https://github.com/ConsciousML/terragrunt-template-catalog-eks) deployment. Its [EKS Cluster Stack](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/README.md) provisions ArgoCD and the `argocd` namespace
-- Knowledge of the [App of Apps pattern](https://argo-cd.readthedocs.io/en/latest/operator-manual/cluster-bootstrapping/#app-of-apps-pattern-alternative)
+- A functional [terragrunt-template-catalog-eks](https://github.com/ConsciousML/terragrunt-template-catalog-eks) deployment. Its [EKS Cluster Stack](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/README.md)
+- Understand of [ArgoCD](https://argo-cd.readthedocs.io/en/stable/)
+- Understanding of the [App of Apps pattern](https://argo-cd.readthedocs.io/en/latest/operator-manual/cluster-bootstrapping/#app-of-apps-pattern-alternative)
 
 ## Getting Started
 
