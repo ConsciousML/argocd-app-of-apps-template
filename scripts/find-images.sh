@@ -2,7 +2,8 @@
 set -euo pipefail
 
 # Lists container images (repo:tag, unresolved) referenced in charts and plain
-# manifests. Stdout: per-source output, then a deduped aggregate at the end.
+# manifests. Stdout: only the deduped image list, one per line. Progress and
+# per-source kbld output go to stderr.
 
 source "$(dirname "${BASH_SOURCE[0]}")/lib/discovery.sh"
 
@@ -43,7 +44,7 @@ while IFS= read -r chart_dir; do
     continue
   fi
 
-  echo "$kbld_output" | grep -v '^null$' || true
+  echo "$kbld_output" | grep -v '^null$' >&2 || true
   while IFS= read -r image; do
     IMAGES+=("$image")
   done < <(echo "$kbld_output" | extract_images)
@@ -61,7 +62,7 @@ if [[ ${#PLAIN_MANIFESTS[@]} -gt 0 ]]; then
     echo "$kbld_output" >&2
     ERRORS=$((ERRORS + 1))
   else
-    echo "$kbld_output" | grep -v '^null$' || true
+    echo "$kbld_output" | grep -v '^null$' >&2 || true
     while IFS= read -r image; do
       IMAGES+=("$image")
     done < <(echo "$kbld_output" | extract_images)
