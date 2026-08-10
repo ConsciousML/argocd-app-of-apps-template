@@ -7,11 +7,10 @@ set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/lib/discovery.sh"
 
 ERRORS=0
-IMAGES_TMP="$(mktemp)"
-trap 'rm -f "$IMAGES_TMP"' EXIT
+IMAGES=()
 
 extract_images() {
-  grep -oE '^- image: .+' | sed -E 's/^- image: //'
+  sed -n 's/^- image: //p'
 }
 
 while IFS= read -r chart_dir; do
@@ -45,7 +44,9 @@ while IFS= read -r chart_dir; do
   fi
 
   echo "$kbld_output" | grep -v '^null$' || true
-  echo "$kbld_output" | extract_images >>"$IMAGES_TMP" || true
+  while IFS= read -r image; do
+    IMAGES+=("$image")
+  done < <(echo "$kbld_output" | extract_images)
 done < <(find_helm_charts)
 
 PLAIN_MANIFESTS=()
@@ -61,13 +62,15 @@ if [[ ${#PLAIN_MANIFESTS[@]} -gt 0 ]]; then
     ERRORS=$((ERRORS + 1))
   else
     echo "$kbld_output" | grep -v '^null$' || true
-    echo "$kbld_output" | extract_images >>"$IMAGES_TMP" || true
+    while IFS= read -r image; do
+      IMAGES+=("$image")
+    done < <(echo "$kbld_output" | extract_images)
   fi
 fi
 
 echo "" >&2
 echo "[INFO] All images (deduped):" >&2
-sort -u "$IMAGES_TMP"
+printf '%s\n' ${IMAGES[@]+"${IMAGES[@]}"} | sort -u
 
 if [[ $ERRORS -gt 0 ]]; then
   echo "" >&2
