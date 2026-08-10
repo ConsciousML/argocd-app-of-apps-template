@@ -1,26 +1,30 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_ROOT="$(git rev-parse --show-toplevel)"
+source "$(dirname "${BASH_SOURCE[0]}")/lib/discovery.sh"
+
+CHART_FILES=()
+while IFS= read -r chart_dir; do
+  CHART_FILES+=("$chart_dir/Chart.yaml")
+done < <(find_helm_charts)
 
 # Discover every "repository:" URL declared under Chart.yaml dependencies,
 # so adding a new chart never requires touching this script.
 REPO_URLS="$(
-  find "$REPO_ROOT" -name Chart.yaml -not -path '*/.git/*' -print0 |
-    xargs -0 grep -h -E '^[[:space:]]*repository:[[:space:]]*https?://' |
+  grep -h -E '^[[:space:]]*repository:[[:space:]]*https?://' "${CHART_FILES[@]}" |
     sed -E 's/^[[:space:]]*repository:[[:space:]]*//' |
     sort -u
 )"
 
 if [[ -z "$REPO_URLS" ]]; then
-  echo "No Helm chart repositories to add."
+  echo "[INFO] No Helm chart repositories to add."
   exit 0
 fi
 
 while IFS= read -r url; do
   # Derive a stable repo name from the host, since it's only used locally as an alias.
   name="$(echo "$url" | sed -E 's#^https?://##; s#/.*##; s/[^a-zA-Z0-9]+/-/g')"
-  echo "==> helm repo add $name $url"
+  echo "[INFO] helm repo add $name $url"
   helm repo add "$name" "$url" --force-update
 done <<< "$REPO_URLS"
 
