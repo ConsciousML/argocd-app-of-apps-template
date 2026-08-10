@@ -1,10 +1,10 @@
-# helm-external-secrets-operator
+# external-secrets-operator
 
 Deploys the [External Secrets Operator](https://external-secrets.io/latest/) controller and CRDs (`SecretStore`, `ExternalSecret`) via the upstream `external-secrets` chart, unmodified.
 
 ## What's Inside
 
-- **[Chart.yaml](Chart.yaml)**: vendors the upstream chart with no value overrides. See its entry in [`apps/values.yaml`](../apps/values.yaml) for the `tool.helm.releaseName` pin
+- **[Chart.yaml](Chart.yaml)**: vendors the upstream chart with no value overrides. See its entry in [`apps/values.yaml`](../../../apps/values.yaml) for the `tool.helm.releaseName` pin
 
 ## Upstream Dependencies
 

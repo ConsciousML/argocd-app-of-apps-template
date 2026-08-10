@@ -1,6 +1,6 @@
 # argocd-server-grpc-service
 
-Plain manifests (no Helm) for the extra `Service` ArgoCD's gRPC traffic needs, routed via the shared private Gateway's `HTTPRoute` (see [`helm-httproute`](../helm-httproute)).
+Plain manifests (no Helm) for the extra `Service` ArgoCD's gRPC traffic needs, routed via the shared private Gateway's `HTTPRoute` (see [`httproute`](../../charts/gateway-api/httproute)).
 
 ## What's Inside
 

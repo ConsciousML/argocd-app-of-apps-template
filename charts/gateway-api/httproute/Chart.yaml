@@ -1,5 +1,5 @@
 apiVersion: v2
-name: helm-httproute
+name: httproute
 description: Generic HTTPRoute(s) bound to a shared Gateway
 type: application
 version: 0.1.0

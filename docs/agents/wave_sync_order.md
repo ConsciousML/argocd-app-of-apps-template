@@ -21,7 +21,7 @@ dependency list:
 ```yaml
 # Depends on:
 # - gateway-class
-# - helm-aws-lbc (controller reconciles into an ALB)
+# - aws-lbc (controller reconciles into an ALB)
 - name: gateway-public
   ...
 ```

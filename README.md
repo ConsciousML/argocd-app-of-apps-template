@@ -17,9 +17,9 @@ Access the ArgoCD UI and verify the `podinfo` app has been deployed.
 
 ### Adding an App
 
-1. Create a directory for your application at the root of the repository. Plain manifest directories and Helm charts are both supported. See [`podinfo`](podinfo) as a reference.
-2. Add a `Namespace` manifest for your app's target namespace to [`namespace-pod-security-admission`](namespace-pod-security-admission) or sync fails. `privileged` unblocks local testing, but switch to `baseline` before merging unless the workload needs host access. See the [Pod Security Admission docs](https://kubernetes.io/docs/concepts/security/pod-security-admission/).
-3. In [`apps/values.yaml`](apps/values.yaml), under `applications`, add one entry with the directory name and target namespace.
+1. Create a directory under `manifests/<name>` (plain manifests) or `charts/<component>` (Helm charts). See [`manifests/podinfo`](manifests/podinfo) as a reference.
+2. Add a `Namespace` manifest for your app's target namespace to [`manifests/namespace-pod-security-admission`](manifests/namespace-pod-security-admission) or sync fails. `privileged` unblocks local testing, but switch to `baseline` before merging unless the workload needs host access. See the [Pod Security Admission docs](https://kubernetes.io/docs/concepts/security/pod-security-admission/).
+3. In [`apps/values.yaml`](apps/values.yaml), under `applications`, add one entry with the app's `name`, `path`, and target namespace.
 4. For Helm chart apps that require runtime values, pass them via `spec.source.helm.values` on the app-of-apps Application CR. The `appParams.<app-name>` map is injected as a Helm values file into the child Application at sync time. See the catalog's [App of Apps integration guide](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/docs/app-of-apps-integration.md) for the catalog-side steps to wire a new app's values.
 
 ## Pre-commit Setup (recommended)

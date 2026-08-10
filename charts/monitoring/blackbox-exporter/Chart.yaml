@@ -1,5 +1,5 @@
 apiVersion: v2
-name: helm-blackbox-exporter
+name: blackbox-exporter
 description: Blackbox exporter, HTTP reachability probing for the cluster's private and public endpoints
 type: application
 version: 0.1.0

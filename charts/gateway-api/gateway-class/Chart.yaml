@@ -1,5 +1,5 @@
 apiVersion: v2
-name: helm-gateway-api-gateway-class
+name: gateway-class
 description: GatewayClass for the AWS Load Balancer Controller's Gateway API implementation
 type: application
 version: 0.1.0

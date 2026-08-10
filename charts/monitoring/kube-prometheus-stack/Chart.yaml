@@ -1,5 +1,5 @@
 apiVersion: v2
-name: helm-kube-prometheus-stack
+name: kube-prometheus-stack
 description: kube-prometheus-stack (Prometheus, Alertmanager, Grafana)
 type: application
 version: 0.1.0
