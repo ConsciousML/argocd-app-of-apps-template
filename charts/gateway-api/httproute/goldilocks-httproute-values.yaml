@@ -9,7 +9,7 @@ rules:
     backendRefKey: default
 backendRefs:
   default:
-    name: helm-goldilocks-dashboard
+    name: goldilocks-dashboard
     port: 80
 annotations:
   external-dns.alpha.kubernetes.io/scope: private
