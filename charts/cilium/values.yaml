@@ -60,6 +60,8 @@ cilium:
   prometheus:
     serviceMonitor:
       enabled: true
+      # CI's helm template has no cluster to check against. kube-prometheus-stack provides these CRDs at deploy time.
+      trustCRDsExist: true
   dashboards:
     enabled: true
 
