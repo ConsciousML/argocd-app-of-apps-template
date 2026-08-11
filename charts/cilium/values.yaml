@@ -56,6 +56,8 @@ cilium:
         enabled: true
       dashboards:
         enabled: true
+        annotations:
+          grafana_folder: Hubble
 
   prometheus:
     enabled: true
@@ -65,6 +67,8 @@ cilium:
       trustCRDsExist: true
   dashboards:
     enabled: true
+    annotations:
+      grafana_folder: Cilium
 
   operator:
     replicas: 2
@@ -73,6 +77,8 @@ cilium:
         enabled: true
     dashboards:
       enabled: true
+      annotations:
+        grafana_folder: Cilium
     nodeSelector:
       karpenter.sh/nodepool: critical
     tolerations:

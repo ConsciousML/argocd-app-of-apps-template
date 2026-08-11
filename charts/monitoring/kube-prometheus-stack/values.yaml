@@ -447,6 +447,10 @@ kube-prometheus-stack:
       # boot-time provisioning scan is silently never loaded until the pod restarts and wins
       # the sidecar-vs-grafana startup race by luck.
       dashboards:
+        # Lets sidecar-discovered ConfigMaps opt into a folder via grafana_folder annotation.
+        folderAnnotation: grafana_folder
+        provider:
+          foldersFromFilesStructure: true
         env:
           REQ_USERNAME: admin
       datasources:
