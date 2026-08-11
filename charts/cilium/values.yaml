@@ -1,0 +1,79 @@
+cilium:
+  # Chaining mode: layers onto vpc-cni instead of replacing it, purely for Hubble flow visibility.
+  cni:
+    chainingMode: aws-cni
+    exclusive: false
+  routingMode: native
+  enableIPv4Masquerade: false
+  kubeProxyReplacement: false
+  # Avoids conflicting with vpc-cni's own NetworkPolicy enforcement.
+  policyEnforcementMode: never
+  # L7 proxy, unneeded for L3/4 flow visibility, would add another DaemonSet per node.
+  envoy:
+    enabled: false
+  # Agent must reach the API server before its own service load-balancing is up, can't use
+  # kubernetes.default.svc. auto needs a kubeadm-only kube-public/cluster-info ConfigMap, so
+  # these are injected by the catalog via appParams from the EKS cluster endpoint instead.
+  # See units/eks/addons/argocd/app_of_apps in terragrunt-template-catalog-eks.
+  k8sServiceHost: ""
+  k8sServicePort: ""
+
+  hubble:
+    enabled: true
+    relay:
+      enabled: true
+      replicas: 1
+      prometheus:
+        serviceMonitor:
+          enabled: true
+      nodeSelector:
+        karpenter.sh/nodepool: critical
+      tolerations:
+        - key: karpenter.sh/workload-class
+          operator: Equal
+          value: critical
+          effect: NoSchedule
+    ui:
+      enabled: true
+      replicas: 1
+      nodeSelector:
+        karpenter.sh/nodepool: critical
+      tolerations:
+        - key: karpenter.sh/workload-class
+          operator: Equal
+          value: critical
+          effect: NoSchedule
+    metrics:
+      # Standard set for the bundled Hubble Grafana dashboard.
+      enabled:
+        - "dns:query;ignoreAAAA"
+        - drop
+        - tcp
+        - flow
+        - icmp
+        - http
+      serviceMonitor:
+        enabled: true
+      dashboards:
+        enabled: true
+
+  prometheus:
+    serviceMonitor:
+      enabled: true
+  dashboards:
+    enabled: true
+
+  operator:
+    replicas: 2
+    prometheus:
+      serviceMonitor:
+        enabled: true
+    dashboards:
+      enabled: true
+    nodeSelector:
+      karpenter.sh/nodepool: critical
+    tolerations:
+      - key: karpenter.sh/workload-class
+        operator: Equal
+        value: critical
+        effect: NoSchedule
