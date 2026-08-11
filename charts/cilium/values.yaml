@@ -18,11 +18,27 @@ cilium:
   k8sServiceHost: ""
   k8sServicePort: ""
 
+  # Background worker: no CPU limit, throttling the dataplane risks packet drops cluster-wide.
+  resources:
+    requests:
+      cpu: 63m
+      memory: 273M
+    limits:
+      memory: 273M
+
   hubble:
     enabled: true
     relay:
       enabled: true
       replicas: 1
+      # Web API: bursty with flow-query load, needs CPU headroom.
+      resources:
+        requests:
+          cpu: 23m
+          memory: 50M
+        limits:
+          cpu: 100m
+          memory: 50M
       prometheus:
         serviceMonitor:
           enabled: true
@@ -36,6 +52,24 @@ cilium:
     ui:
       enabled: true
       replicas: 1
+      backend:
+        # Web API: bursty with dashboard usage.
+        resources:
+          requests:
+            cpu: 49m
+            memory: 127M
+          limits:
+            cpu: 200m
+            memory: 127M
+      frontend:
+        # Lightweight idle: static assets, no burst shape to plan for.
+        resources:
+          requests:
+            cpu: 11m
+            memory: 20Mi
+          limits:
+            cpu: 11m
+            memory: 20Mi
       nodeSelector:
         karpenter.sh/nodepool: critical
       tolerations:
