@@ -70,10 +70,10 @@ kube-prometheus-stack:
     resources:
       requests:
         cpu: 11m
-        memory: 37M
+        memory: 50M
       limits:
         cpu: 11m
-        memory: 37M
+        memory: 50M
     nodeSelector:
       karpenter.sh/nodepool: critical
     tolerations:
@@ -411,10 +411,10 @@ kube-prometheus-stack:
     resources:
       requests:
         cpu: 23m
-        memory: 381M
+        memory: 443M
       limits:
         cpu: 115m
-        memory: 381M
+        memory: 443M
 
     nodeSelector:
       karpenter.sh/nodepool: critical
@@ -447,6 +447,10 @@ kube-prometheus-stack:
       # boot-time provisioning scan is silently never loaded until the pod restarts and wins
       # the sidecar-vs-grafana startup race by luck.
       dashboards:
+        # Lets sidecar-discovered ConfigMaps opt into a folder via grafana_folder annotation.
+        folderAnnotation: grafana_folder
+        provider:
+          foldersFromFilesStructure: true
         env:
           REQ_USERNAME: admin
       datasources:

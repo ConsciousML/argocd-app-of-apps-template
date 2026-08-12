@@ -1,0 +1,142 @@
+cilium:
+  # Chaining mode: layers onto vpc-cni instead of replacing it, purely for Hubble flow visibility.
+  cni:
+    chainingMode: aws-cni
+    exclusive: false
+  routingMode: native
+  enableIPv4Masquerade: false
+  kubeProxyReplacement: false
+  # Avoids conflicting with vpc-cni's own NetworkPolicy enforcement.
+  policyEnforcementMode: never
+  # L7 proxy, unneeded for L3/4 flow visibility, would add another DaemonSet per node.
+  envoy:
+    enabled: false
+  # Agent must reach the API server before its own service load-balancing is up, can't use
+  # kubernetes.default.svc. auto needs a kubeadm-only kube-public/cluster-info ConfigMap, so
+  # these are injected by the catalog via appParams from the EKS cluster endpoint instead.
+  # See units/eks/addons/argocd/app_of_apps in terragrunt-template-catalog-eks.
+  k8sServiceHost: ""
+  k8sServicePort: ""
+
+  # Background worker: no CPU limit, throttling the dataplane risks packet drops cluster-wide.
+  resources:
+    requests:
+      cpu: 63m
+      memory: 273M
+    limits:
+      memory: 273M
+
+  hubble:
+    enabled: true
+    relay:
+      enabled: true
+      replicas: 1
+      # Web API: bursty with flow-query load, needs CPU headroom.
+      resources:
+        requests:
+          cpu: 23m
+          memory: 50M
+        limits:
+          cpu: 100m
+          memory: 50M
+      prometheus:
+        serviceMonitor:
+          enabled: true
+      nodeSelector:
+        karpenter.sh/nodepool: critical
+      tolerations:
+        - key: karpenter.sh/workload-class
+          operator: Equal
+          value: critical
+          effect: NoSchedule
+    ui:
+      enabled: true
+      replicas: 1
+      backend:
+        # Web API: bursty with dashboard usage.
+        resources:
+          requests:
+            cpu: 49m
+            memory: 127M
+          limits:
+            cpu: 200m
+            memory: 127M
+        securityContext:
+          readOnlyRootFilesystem: true
+      frontend:
+        # Lightweight idle: static assets, no burst shape to plan for.
+        resources:
+          requests:
+            cpu: 11m
+            memory: 20Mi
+          limits:
+            cpu: 11m
+            memory: 20Mi
+        # Safe with a read-only root: the chart already mounts an emptyDir at /tmp
+        # for nginx's cache/pid paths.
+        securityContext:
+          readOnlyRootFilesystem: true
+      nodeSelector:
+        karpenter.sh/nodepool: critical
+      tolerations:
+        - key: karpenter.sh/workload-class
+          operator: Equal
+          value: critical
+          effect: NoSchedule
+    metrics:
+      # Standard set for the bundled Hubble Grafana dashboard.
+      enabled:
+        - "dns:query;ignoreAAAA"
+        - drop
+        - tcp
+        - flow
+        - icmp
+        - http
+      serviceMonitor:
+        enabled: true
+      dashboards:
+        enabled: true
+        annotations:
+          grafana_folder: Hubble
+
+  prometheus:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      # CI's helm template has no cluster to check against. kube-prometheus-stack provides these CRDs at deploy time.
+      trustCRDsExist: true
+  dashboards:
+    enabled: true
+    annotations:
+      grafana_folder: Cilium
+
+  operator:
+    replicas: 2
+    # Chained CNI still needs a local cilium-agent to build the pod sandbox, and
+    # agents wait on the operator for CRDs: hostNetwork: false can deadlock a
+    # restart. true avoids the chained path, like cilium-agent itself.
+    hostNetwork: true
+    securityContext:
+      readOnlyRootFilesystem: true
+    # gops (started for pprof/debugging) writes its socket file under $HOME on boot;
+    # with a read-only root that write fails and the operator never starts.
+    extraVolumes:
+      - name: gops
+        emptyDir: {}
+    extraVolumeMounts:
+      - name: gops
+        mountPath: /home/gops
+    prometheus:
+      serviceMonitor:
+        enabled: true
+    dashboards:
+      enabled: true
+      annotations:
+        grafana_folder: Cilium
+    nodeSelector:
+      karpenter.sh/nodepool: critical
+    tolerations:
+      - key: karpenter.sh/workload-class
+        operator: Equal
+        value: critical
+        effect: NoSchedule

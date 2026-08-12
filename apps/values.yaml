@@ -34,8 +34,8 @@ applications:
     syncWave: -1
 
   # --- DaemonSets Priority ---
-  # loki, alloy, and kube-prometheus-stack (wave 2) carry the cluster's
-  # DaemonSets: Alloy itself, Loki's lokiCanary, and kube-prometheus-stack's node-exporter.
+  # loki, alloy, kube-prometheus-stack, and cilium carry the cluster's DaemonSets: Alloy
+  # itself, Loki's lokiCanary, kube-prometheus-stack's node-exporter, and cilium-agent.
   # Karpenter only sizes a new node for a DaemonSet it already knows about, so a DaemonSet
   # that syncs after another app has already triggered a node launch can land Pending and
   # rely on daemonset-critical preemption to fit instead. Every app marked "See DaemonSets
@@ -101,6 +101,30 @@ applications:
       helm:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
         releaseName: aws-load-balancer-controller
+
+  # --- Cilium / Hubble ---
+  # CNI chaining mode alongside vpc-cni for Hubble flow visibility, no change to vpc-cni behavior.
+  # No hard dependency: synced as early as possible so cilium-agent (a DaemonSet) is known to
+  # Karpenter before other apps trigger node launches. See DaemonSets Priority above.
+  - name: cilium
+    path: charts/cilium
+    destination:
+      namespace: kube-system
+    syncWave: 0
+    # Chart bundles its own CRDs and needs ServerSideApply for the annotation size limit.
+    syncOptions:
+      - ServerSideApply=true
+  # Depends on:
+  # - gateway-private
+  # - cilium (the hubble-ui backend Service)
+  - name: hubble-ui-httproute
+    path: charts/gateway-api/httproute
+    destination:
+      namespace: kube-system
+    syncWave: 6
+    extraValueFiles:
+      - charts/gateway-api/gateway/private-gateway-values.yaml
+      - charts/gateway-api/httproute/hubble-ui-httproute-values.yaml
 
   # Karpenter (controller, EC2NodeClass, and both NodePools) is entirely Terraform-managed,
   # applied before app-of-apps ever syncs. See units/eks/addons/karpenter in the catalog repo.
