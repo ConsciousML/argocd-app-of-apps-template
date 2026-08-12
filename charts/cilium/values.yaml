@@ -118,6 +118,14 @@ cilium:
     hostNetwork: false
     securityContext:
       readOnlyRootFilesystem: true
+    # gops (started for pprof/debugging) writes its socket file under $HOME on boot;
+    # with a read-only root that write fails and the operator never starts.
+    extraVolumes:
+      - name: gops
+        emptyDir: {}
+    extraVolumeMounts:
+      - name: gops
+        mountPath: /home/gops
     prometheus:
       serviceMonitor:
         enabled: true
