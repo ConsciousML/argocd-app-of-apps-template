@@ -268,3 +268,16 @@ misconfigurations:
       relies on for Hubble TLS. Vendored upstream chart; only removable
       by switching Hubble TLS to an external issuer like cert-manager,
       a real architecture change rather than a config fix.
+  - id: AVD-KSV-0009
+    paths:
+      - "charts/cilium/charts/cilium/templates/cilium-operator/deployment.yaml"
+    statement: >
+      hostNetwork: true avoids a chained-CNI deadlock: the operator would
+      otherwise need a running local cilium-agent for its own pod sandbox,
+      while agents wait on the operator to register CRDs.
+  - id: AVD-KSV-0024
+    paths:
+      - "charts/cilium/charts/cilium/templates/cilium-operator/deployment.yaml"
+    statement: >
+      hostPorts (health, prometheus) are unconditional once hostNetwork
+      is set above. Same rationale as cilium-agent's AVD-KSV-0024 entry.

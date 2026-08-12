@@ -112,10 +112,10 @@ cilium:
 
   operator:
     replicas: 2
-    # Chaining mode: vpc-cni gives the operator pod an IP before Cilium is up,
-    # so the operator doesn't need hostNetwork to bootstrap its own API server
-    # connectivity the way a primary-CNI Cilium deployment would.
-    hostNetwork: false
+    # Chained CNI still needs a local cilium-agent to build the pod sandbox, and
+    # agents wait on the operator for CRDs: hostNetwork: false can deadlock a
+    # restart. true avoids the chained path, like cilium-agent itself.
+    hostNetwork: true
     securityContext:
       readOnlyRootFilesystem: true
     # gops (started for pprof/debugging) writes its socket file under $HOME on boot;
