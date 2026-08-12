@@ -61,6 +61,8 @@ cilium:
           limits:
             cpu: 200m
             memory: 127M
+        securityContext:
+          readOnlyRootFilesystem: true
       frontend:
         # Lightweight idle: static assets, no burst shape to plan for.
         resources:
@@ -70,6 +72,10 @@ cilium:
           limits:
             cpu: 11m
             memory: 20Mi
+        # Safe with a read-only root: the chart already mounts an emptyDir at /tmp
+        # for nginx's cache/pid paths.
+        securityContext:
+          readOnlyRootFilesystem: true
       nodeSelector:
         karpenter.sh/nodepool: critical
       tolerations:
@@ -106,6 +112,12 @@ cilium:
 
   operator:
     replicas: 2
+    # Chaining mode: vpc-cni gives the operator pod an IP before Cilium is up,
+    # so the operator doesn't need hostNetwork to bootstrap its own API server
+    # connectivity the way a primary-CNI Cilium deployment would.
+    hostNetwork: false
+    securityContext:
+      readOnlyRootFilesystem: true
     prometheus:
       serviceMonitor:
         enabled: true

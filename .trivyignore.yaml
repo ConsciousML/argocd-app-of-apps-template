@@ -182,3 +182,89 @@ misconfigurations:
       (get/list). Vendored upstream chart with no values option to scope
       resources below '*' for this apiGroup; inherent to the dashboard's
       function.
+  - id: AVD-KSV-0009
+    paths:
+      - "charts/cilium/charts/cilium/templates/cilium-agent/daemonset.yaml"
+    statement: >
+      hostNetwork: true is hardcoded (not a values toggle) for the
+      cilium-agent DaemonSet. Vendored upstream chart; the agent must run
+      in the host network namespace to program the host's networking
+      stack (iptables, routes, bpf), inherent to its function.
+  - id: AVD-KSV-0024
+    paths:
+      - "charts/cilium/charts/cilium/templates/cilium-agent/daemonset.yaml"
+    statement: >
+      hostPorts (health, hubble peer-service, prometheus, envoy-metrics,
+      hubble-metrics) are unconditional once hostNetwork is set, which
+      is itself hardcoded true for this DaemonSet. Vendored upstream
+      chart; these ports must be reachable on the node IP for
+      hubble-relay and other node-local consumers.
+  - id: AVD-KSV-0005
+    paths:
+      - "charts/cilium/charts/cilium/templates/cilium-agent/daemonset.yaml"
+    statement: >
+      SYS_ADMIN is required by the cilium-agent container and its
+      mount-cgroup, apply-sysctl-overwrites, and clean-cilium-state init
+      containers to mount cgroupv2/bpffs and manage host sysctls.
+      Vendored upstream chart with no values option to drop it; inherent
+      to the agent's function.
+  - id: AVD-KSV-0017
+    paths:
+      - "charts/cilium/charts/cilium/templates/cilium-agent/daemonset.yaml"
+    statement: >
+      The mount-bpf-fs init container needs securityContext.privileged
+      to mount the bpf filesystem at node boot. Vendored upstream chart;
+      inherent to the agent's function.
+  - id: AVD-KSV-0014
+    paths:
+      - "charts/cilium/charts/cilium/templates/cilium-agent/daemonset.yaml"
+    statement: >
+      No readOnlyRootFilesystem toggle is exposed via values for the
+      cilium-agent container or its init containers (unlike hubble-relay
+      and hubble-ui, where upstream deliberately left the option in).
+      Vendored upstream chart; not worth forking for the agent's write
+      paths under /var/run/cilium, /sys/fs/bpf, and host proc mounts.
+  - id: AVD-KSV-0119
+    paths:
+      - "charts/cilium/charts/cilium/templates/cilium-agent/daemonset.yaml"
+    statement: >
+      NET_RAW is required by the cilium-agent container for raw sockets
+      used in health probes and packet handling. Vendored upstream
+      chart; inherent to the agent's function.
+  - id: AVD-KSV-0120
+    paths:
+      - "charts/cilium/charts/cilium/templates/cilium-agent/daemonset.yaml"
+    statement: >
+      SYS_MODULE is required by the cilium-agent container and the
+      clean-cilium-state init container. Upstream's own values.yaml
+      comment notes it is "Used in iptables. Consider removing once we
+      are iptables-free" — the Cilium maintainers already flag it as
+      removable in the future but currently required. Vendored upstream
+      chart; not safe to strip ourselves while the agent still manages
+      iptables rules.
+  - id: AVD-KSV-0121
+    paths:
+      - "charts/cilium/charts/cilium/templates/cilium-agent/daemonset.yaml"
+    statement: >
+      hostPath mounts for /proc (host-proc-sys-net, host-proc-sys-kernel)
+      are required for the agent and its apply-sysctl-overwrites init
+      container to manage host sysctls. Vendored upstream chart; inherent
+      to the agent's function.
+  - id: AVD-KSV-0109
+    paths:
+      - "charts/cilium/charts/cilium/templates/cilium-configmap.yaml"
+    statement: >
+      False positive: enable-policy-secrets-sync,
+      policy-secrets-namespace, and policy-secrets-only-from-secrets-namespace
+      are boolean/namespace config flags for Cilium's policy secrets-sync
+      feature, not actual secret material.
+  - id: AVD-KSV-0041
+    paths:
+      - "charts/cilium/charts/cilium/templates/cilium-operator/clusterrole.yaml"
+    statement: >
+      cilium-operator needs get on secrets cluster-wide to manage
+      Hubble's built-in mTLS CA and relay/server certs (see
+      cilium-ca-secret.yaml and hubble/tls-helm/*), which this deployment
+      relies on for Hubble TLS. Vendored upstream chart; only removable
+      by switching Hubble TLS to an external issuer like cert-manager,
+      a real architecture change rather than a config fix.
