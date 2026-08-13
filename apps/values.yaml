@@ -21,7 +21,7 @@ applications:
 
   # --- Network Policies ---
   - name: network-policies-cluster-wide
-    path: manifests/network-policies/cluster-wide
+    path: charts/cluster-network-policies
     destination:
       namespace: kube-system
     syncWave: -1

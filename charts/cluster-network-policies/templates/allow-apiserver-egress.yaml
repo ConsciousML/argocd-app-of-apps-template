@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.aws/v1alpha1
+kind: ClusterNetworkPolicy
+metadata:
+  name: admin-allow-apiserver-egress
+spec:
+  tier: Admin
+  priority: 12
+  subject:
+    namespaces: {}
+  egress:
+    - action: Accept
+      name: allow-apiserver-egress
+      to:
+        - networks:
+            - {{ .Values.apiServerCidr | quote }}
+      ports:
+        - portNumber:
+            protocol: TCP
+            port: 443
