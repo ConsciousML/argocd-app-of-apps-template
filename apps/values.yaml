@@ -19,19 +19,6 @@ applications:
     syncWave: -1
     preventCascadeDelete: true
 
-  # --- Network Policies ---
-  - name: network-policies-cluster-wide
-    path: charts/cluster-network-policies
-    destination:
-      namespace: kube-system
-    syncWave: -1
-
-  - name: network-policies-namespaces
-    path: manifests/network-policies/namespaces
-    destination:
-      namespace: kube-system
-    syncWave: -1
-
   # --- EBS CSI Driver ---
   - name: storage-class-gp3
     path: manifests/storage-class-gp3

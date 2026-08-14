@@ -1,2 +1,0 @@
-# Overridden at sync time by the catalog's app_of_apps unit via appParams.
-apiServerCidr: ""
