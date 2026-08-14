@@ -85,14 +85,13 @@ cilium:
           value: critical
           effect: NoSchedule
     metrics:
-      # Standard set for the bundled Hubble Grafana dashboard.
+      # L3/4 only: dns and http need the L7 proxy (envoy.enabled: false above),
+      # and L7 visibility is a known limitation of aws-cni chaining mode.
       enabled:
-        - "dns:query;ignoreAAAA"
         - drop
         - tcp
         - flow
         - icmp
-        - http
       serviceMonitor:
         enabled: true
       dashboards:
