@@ -1,13 +1,14 @@
 cilium:
-  # Chaining mode: layers onto vpc-cni instead of replacing it, purely for Hubble flow visibility.
+  # Chaining mode: layers onto vpc-cni instead of replacing it, for Hubble flow visibility and NetworkPolicy enforcement.
   cni:
     chainingMode: aws-cni
     exclusive: false
   routingMode: native
   enableIPv4Masquerade: false
   kubeProxyReplacement: false
-  # Avoids conflicting with vpc-cni's own NetworkPolicy enforcement.
-  policyEnforcementMode: never
+  # Cilium is the sole NetworkPolicy enforcer. vpc-cni's own enforcement stays
+  # disabled (EKS default), so the two don't conflict.
+  policyEnforcementMode: default
   # L7 proxy, unneeded for L3/4 flow visibility, would add another DaemonSet per node.
   envoy:
     enabled: false
@@ -84,14 +85,14 @@ cilium:
           value: critical
           effect: NoSchedule
     metrics:
-      # Standard set for the bundled Hubble Grafana dashboard.
-      enabled:
-        - "dns:query;ignoreAAAA"
-        - drop
-        - tcp
-        - flow
-        - icmp
-        - http
+      # Config lives in templates/dynamic-metrics-configmap.yaml, hot reloads without
+      # a cilium-agent restart.
+      enabled: []
+      dynamic:
+        enabled: true
+        config:
+          configMapName: cilium-dynamic-metrics-config
+          createConfigMap: false
       serviceMonitor:
         enabled: true
       dashboards:
