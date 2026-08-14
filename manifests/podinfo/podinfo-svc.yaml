@@ -9,9 +9,6 @@ spec:
     - name: http
       port: 9898
       targetPort: http
-    - name: http-metrics
-      port: 9797
-      targetPort: http-metrics
     - name: grpc
       port: 9999
       targetPort: grpc
