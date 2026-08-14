@@ -379,6 +379,15 @@ applications:
       - charts/gateway-api/gateway/private-gateway-values.yaml
       - charts/gateway-api/httproute/goldilocks-httproute-values.yaml
 
+  # --- Network Policies ---
+  # Depends on:
+  # - cilium (CiliumNetworkPolicy CRD)
+  - name: network-policies-namespace
+    path: manifests/network-policies/namespace
+    destination:
+      namespace: kube-system
+    syncWave: 1
+
   # --- Podinfo ---
   # Depends on:
   # - See DaemonSets Priority above.

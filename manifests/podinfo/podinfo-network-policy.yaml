@@ -1,0 +1,36 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: podinfo
+spec:
+  endpointSelector:
+    matchLabels:
+      app: podinfo
+  ingress:
+    # Public ALB (targetType: ip), forwarding traffic and health checks straight to the pod
+    # IP. Its ENIs aren't a Cilium identity, so this is "world". The node SG already limits
+    # inbound 3000-9898/tcp to the ALB's own SG (verified live), but that SG is shared across
+    # every ALB-fronted app on the node, this rule is what narrows it to podinfo.
+    - fromEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "9898"
+              protocol: TCP
+    # kubelet probes, sourced from the node. Cilium has no identity finer than "host": any
+    # hostNetwork pod on the node (kube-system/monitoring, both PSA privileged) matches too.
+    - fromEntities:
+        - host
+      toPorts:
+        - ports:
+            - port: "9898"
+              protocol: TCP
+    # kube-prometheus-stack scraping /metrics (ServiceMonitor).
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: monitoring
+            app.kubernetes.io/name: prometheus
+      toPorts:
+        - ports:
+            - port: "9898"
+              protocol: TCP
