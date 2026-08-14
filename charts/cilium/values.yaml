@@ -85,13 +85,14 @@ cilium:
           value: critical
           effect: NoSchedule
     metrics:
-      # L3/4 only: dns and http need the L7 proxy (envoy.enabled: false above),
-      # and L7 visibility is a known limitation of aws-cni chaining mode.
-      enabled:
-        - drop
-        - tcp
-        - flow
-        - icmp
+      # Config lives in templates/dynamic-metrics-configmap.yaml, hot reloads without
+      # a cilium-agent restart.
+      enabled: []
+      dynamic:
+        enabled: true
+        config:
+          configMapName: cilium-dynamic-metrics-config
+          createConfigMap: false
       serviceMonitor:
         enabled: true
       dashboards:
