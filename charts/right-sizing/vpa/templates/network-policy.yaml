@@ -16,6 +16,15 @@ spec:
         - ports:
             - port: "8942"
               protocol: TCP
+    # kube-prometheus-stack scraping /metrics (PodMonitor).
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: monitoring
+            app.kubernetes.io/name: prometheus
+      toPorts:
+        - ports:
+            - port: "8942"
+              protocol: TCP
   egress:
     # --storage=prometheus history backfill, see values.yaml extraArgs.prometheus-address.
     - toEndpoints:
