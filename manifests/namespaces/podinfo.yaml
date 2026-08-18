@@ -6,5 +6,3 @@ metadata:
     pod-security.kubernetes.io/enforce: baseline
     pod-security.kubernetes.io/warn: restricted
     pod-security.kubernetes.io/audit: restricted
-    # opt-in to manifests/network-policies/cluster-wide
-    network-policy.default-deny: "true"

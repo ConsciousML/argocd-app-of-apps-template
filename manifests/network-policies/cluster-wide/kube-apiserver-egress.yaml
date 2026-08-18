@@ -4,8 +4,12 @@ metadata:
   name: kube-apiserver-egress
 spec:
   endpointSelector:
-    matchLabels:
-      k8s:io.kubernetes.pod.namespace.labels.network-policy.kube-apiserver-egress: "true"
+    matchExpressions:
+      - key: io.kubernetes.pod.namespace
+        operator: In
+        # add a namespace name here to opt it in
+        values:
+          - vpa
   egress:
     - toEntities:
         - kube-apiserver

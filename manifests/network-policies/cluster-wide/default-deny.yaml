@@ -4,8 +4,17 @@ metadata:
   name: default-deny
 spec:
   endpointSelector:
-    matchLabels:
-      k8s:io.kubernetes.pod.namespace.labels.network-policy.default-deny: "true"
+    matchExpressions:
+      - key: io.kubernetes.pod.namespace
+        operator: In
+        # add a namespace name here to opt it in
+        values:
+          - podinfo
+          - vpa
   enableDefaultDeny:
     ingress: true
     egress: true
+  ingress:
+    - {}
+  egress:
+    - {}

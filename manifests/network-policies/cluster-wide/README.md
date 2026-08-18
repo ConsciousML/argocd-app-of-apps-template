@@ -1,11 +1,23 @@
 # network-policies/cluster-wide
 
-`CiliumClusterwideNetworkPolicy`, one file per concern. Each is matched by its own `network-policy.<name>: "true"` label on the target Namespace (see `manifests/namespaces`), not one shared label, so a namespace opts into exactly what it needs.
+`CiliumClusterwideNetworkPolicy`, one file per concern, each `endpointSelector` listing the namespaces it applies to directly:
 
-Cilium mirrors Namespace labels onto every pod's identity as `k8s:io.kubernetes.pod.namespace.labels.<key>`, so `endpointSelector` can match on it without touching any chart's `podLabels`.
+```yaml
+endpointSelector:
+  matchExpressions:
+    - key: io.kubernetes.pod.namespace
+      operator: In
+      values:
+        - <namespace_name_1>
+        - <namespace_name_2>
+```
 
-`default-deny` sets `enableDefaultDeny` for both directions with no rule lists. It replaces per-namespace default-deny `CiliumNetworkPolicy` files.
+Onboarding a namespace means adding it to the relevant file's `values` list.
 
-`kube-apiserver-egress` and `kube-dns-egress` cover the egress a default-deny namespace needs if it talks to the API server or resolves DNS. Not every namespace does. `podinfo` is pure inbound, so it only carries `default-deny`.
+## What's Inside
 
-Ingress from `host` (kubelet probes) stays out of here on purpose. It's scoped per workload to the actual probe port instead of granting the `host` entity blanket access to every port, since no port is shared across components.
+- **[default-deny.yaml](default-deny.yaml)**: `enableDefaultDeny` for both directions, replacing the per-namespace default-deny `CiliumNetworkPolicy` files
+- **[kube-apiserver-egress.yaml](kube-apiserver-egress.yaml)**: egress to the API server, for namespaces that talk to it
+- **[kube-dns-egress.yaml](kube-dns-egress.yaml)**: egress to `kube-dns`, for namespaces that resolve DNS
+
+Only `default-deny.yaml` is universal, the other two are listed only where needed.
