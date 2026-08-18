@@ -9,11 +9,11 @@ config:
 appParams: {}
 
 applications:
-  # --- Namespace Pod Security Admission ---
+  # --- Namespaces ---
   # Owns Namespace resources: pruning or cascade-deleting this app must never delete one,
   # that would wipe out everything inside it, including argocd's own namespace.
-  - name: namespace-pod-security-admission
-    path: manifests/namespace-pod-security-admission
+  - name: namespaces
+    path: manifests/namespaces
     destination:
       namespace: kube-system
     syncWave: -1
@@ -382,8 +382,8 @@ applications:
   # --- Network Policies ---
   # Depends on:
   # - cilium (CiliumNetworkPolicy CRD)
-  - name: network-policies-namespace
-    path: manifests/network-policies/namespace
+  - name: network-policies-cluster-wide
+    path: manifests/network-policies/cluster-wide
     destination:
       namespace: kube-system
     syncWave: 1

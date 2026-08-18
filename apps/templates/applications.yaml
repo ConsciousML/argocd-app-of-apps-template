@@ -67,7 +67,7 @@ spec:
   {{- end }}
   syncPolicy:
     syncOptions:
-      # Namespaces are created explicitly by namespace-pod-security-admission, with PSA
+      # Namespaces are created explicitly by the namespaces app, with PSA
       # labels. A missing one should fail sync loudly instead of getting silently created
       # unlabeled (and therefore privileged) here.
       - CreateNamespace=false
