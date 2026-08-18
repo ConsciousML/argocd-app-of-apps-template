@@ -17,6 +17,15 @@ spec:
         - ports:
             - port: "8080"
               protocol: TCP
+  egress:
+    # EKS Pod Identity credential endpoint (eks.amazonaws.com/pod-identity),
+    # used to fetch AWS creds for the Secrets Manager provider.
+    - toEntities:
+        - host
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
 ---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
