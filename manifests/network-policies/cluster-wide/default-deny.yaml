@@ -11,6 +11,7 @@ spec:
         values:
           - podinfo
           - vpa
+          - goldilocks
   enableDefaultDeny:
     ingress: true
     egress: true
