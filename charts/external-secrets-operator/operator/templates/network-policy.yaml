@@ -26,6 +26,14 @@ spec:
         - ports:
             - port: "80"
               protocol: TCP
+    # secretsmanager.<region>.amazonaws.com, no VPC endpoint configured so
+    # this egresses through the NAT gateway to public AWS IPs ("world").
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
 ---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
