@@ -15,6 +15,7 @@ spec:
           - vpa
           - goldilocks
           - cilium-secrets
+          - external-secrets
           - default
           - gateway
   enableDefaultDeny:
