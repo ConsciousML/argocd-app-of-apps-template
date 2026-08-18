@@ -19,5 +19,6 @@ Onboarding a namespace means adding it to the relevant file's `values` list.
 - **[default-deny.yaml](default-deny.yaml)**: `enableDefaultDeny` for both directions, replacing the per-namespace default-deny `CiliumNetworkPolicy` files
 - **[kube-apiserver-egress.yaml](kube-apiserver-egress.yaml)**: egress to the API server, for namespaces that talk to it
 - **[kube-dns-egress.yaml](kube-dns-egress.yaml)**: egress to `kube-dns`, for namespaces that resolve DNS
+- **[eks-pod-identity-egress.yaml](eks-pod-identity-egress.yaml)**: egress to the EKS Pod Identity credential endpoint, for namespaces with pods using an EKS Pod Identity association
 
-Only `default-deny.yaml` is universal, the other two are listed only where needed.
+Only `default-deny.yaml` is universal, the others are listed only where needed.

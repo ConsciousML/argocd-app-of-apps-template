@@ -1,0 +1,23 @@
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: eks-pod-identity-egress
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: io.kubernetes.pod.namespace
+        operator: In
+        # add a namespace name here to opt it in
+        values:
+          - external-secrets
+  egress:
+    # EKS Pod Identity credential endpoint, documented at
+    # https://docs.aws.amazon.com/eks/latest/userguide/pod-id-how-it-works.html
+    # 169.254.170.23 is a host-owned address, so Cilium resolves it to the
+    # reserved "host" identity rather than a CIDR-matched destination.
+    - toEntities:
+        - host
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP

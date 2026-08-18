@@ -18,14 +18,6 @@ spec:
             - port: "8080"
               protocol: TCP
   egress:
-    # EKS Pod Identity credential endpoint (eks.amazonaws.com/pod-identity),
-    # used to fetch AWS creds for the Secrets Manager provider.
-    - toEntities:
-        - host
-      toPorts:
-        - ports:
-            - port: "80"
-              protocol: TCP
     # secretsmanager.<region>.amazonaws.com, no VPC endpoint configured so
     # this egresses through the NAT gateway to public AWS IPs ("world").
     - toEntities:
