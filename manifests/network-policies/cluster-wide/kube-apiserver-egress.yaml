@@ -11,6 +11,7 @@ spec:
         values:
           - vpa
           - goldilocks
+          - external-secrets
   egress:
     - toEntities:
         - kube-apiserver
