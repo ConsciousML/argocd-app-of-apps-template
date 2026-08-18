@@ -10,6 +10,7 @@ spec:
         # add a namespace name here to opt it in
         values:
           - vpa
+          - external-secrets
   egress:
     - toEndpoints:
         - matchLabels:
