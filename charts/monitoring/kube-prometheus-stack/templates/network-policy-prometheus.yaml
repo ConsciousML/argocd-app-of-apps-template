@@ -180,11 +180,11 @@ spec:
         - matchLabels:
             io.kubernetes.pod.namespace: loki
             app.kubernetes.io/name: loki
-            app.kubernetes.io/component: results-cache
+            app.kubernetes.io/component: memcached-results-cache
         - matchLabels:
             io.kubernetes.pod.namespace: loki
             app.kubernetes.io/name: loki
-            app.kubernetes.io/component: chunks-cache
+            app.kubernetes.io/component: memcached-chunks-cache
       toPorts:
         - ports:
             - port: "9150"
