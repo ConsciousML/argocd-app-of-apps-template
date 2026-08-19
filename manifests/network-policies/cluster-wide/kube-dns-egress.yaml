@@ -13,6 +13,7 @@ spec:
           - external-secrets
           - external-dns
           - tailscale
+          - loki
   egress:
     - toEndpoints:
         - matchLabels:
