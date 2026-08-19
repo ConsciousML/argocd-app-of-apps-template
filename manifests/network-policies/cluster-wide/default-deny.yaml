@@ -18,6 +18,7 @@ spec:
           - external-secrets
           - default
           - gateway
+          - external-dns
   enableDefaultDeny:
     ingress: true
     egress: true
