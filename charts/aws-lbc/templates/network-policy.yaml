@@ -14,6 +14,13 @@ spec:
         - ports:
             - port: "61779"
               protocol: TCP
+    # Admission webhook, called by kube-apiserver on Ingress/Gateway create and update.
+    - fromEntities:
+        - kube-apiserver
+      toPorts:
+        - ports:
+            - port: "9443"
+              protocol: TCP
     - fromEndpoints:
         - matchLabels:
             io.kubernetes.pod.namespace: monitoring
