@@ -17,6 +17,7 @@ spec:
           - goldilocks
           - kube-node-lease
           - kube-public
+          - loki
           - podinfo
           - tailscale
           - vpa
