@@ -6,8 +6,7 @@ spec:
   endpointSelector:
     matchLabels:
       app.kubernetes.io/name: argocd-applicationset-controller
-  # No ingress: applicationSet.metrics.enabled and its probes are all false by chart default
-  # and aren't overridden in helm_values, so nothing else in-cluster talks to this pod.
+  # No ingress: metrics and probes are disabled by chart default, not overridden in helm_values.
   egress:
     - toEndpoints:
         - matchLabels:

@@ -8,6 +8,8 @@ spec:
       - key: io.kubernetes.pod.namespace
         operator: In
         # add a namespace name here to opt it in
+        # argocd excluded: has its own copy in network-policies/argocd/, to avoid depending on
+        # this Application syncing for argocd's own network access (lockout risk)
         values:
           - vpa
           - external-secrets
@@ -15,7 +17,6 @@ spec:
           - tailscale
           - loki
           - monitoring
-          - argocd
   egress:
     - toEndpoints:
         - matchLabels:

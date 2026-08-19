@@ -18,10 +18,9 @@ spec:
               protocol: TCP
             - port: "5557"
               protocol: TCP
-  # kube-apiserver egress (dex's cmd-util-dex init container reads the initial argocd-cm/
-  # argocd-secret over the API, confirmed live via hubble observe) is covered by
-  # manifests/network-policies/cluster-wide/kube-apiserver-egress.yaml.
+  # kube-apiserver egress (cmd-util-dex init container reads argocd-cm/argocd-secret at
+  # startup, confirmed via hubble) comes from network-policy-shared-egress.yaml,
+  # alongside this file.
   #
-  # No dex.config connectors are set in helm_values (pipelines/dev/eks/stack/terragrunt.stack.hcl),
-  # so there's no external IdP to reach yet. Add an egress rule here if OIDC connectors get
-  # configured.
+  # No dex.config connectors set in helm_values yet, so no external IdP to reach. Add an
+  # egress rule here if OIDC gets configured.

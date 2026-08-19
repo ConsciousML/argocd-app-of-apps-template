@@ -18,8 +18,8 @@ spec:
             - port: "9001"
               protocol: TCP
   egress:
-    # Notification services (Slack, webhooks, etc). None are configured yet in helm_values, but
-    # this is the addressable pattern once one is.
+    # Notification services (Slack, webhooks, etc), none configured yet, this is the pattern
+    # once one is.
     - toEntities:
         - world
       toPorts:
