@@ -2,7 +2,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: tailscale-connector
-  namespace: tailscale
+  namespace: {{ .Release.Namespace }}
 spec:
   # The subnet router proxy pod is created dynamically by the operator per Connector CR, its
   # `app` label is a random UUID. `tailscale.com/parent-resource-type` is the stable
@@ -11,7 +11,7 @@ spec:
     matchLabels:
       tailscale.com/parent-resource-type: connector
   egress:
-    # Tailscale control plane and DERP relays, see tailscale-operator-network-policy.yaml.
+    # Tailscale control plane and DERP relays, see the tailscale-operator chart's network policy.
     - toEntities:
         - world
       toPorts:

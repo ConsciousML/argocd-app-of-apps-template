@@ -5,6 +5,7 @@ Deploys the [External Secrets Operator](https://external-secrets.io/latest/) con
 ## What's Inside
 
 - **[Chart.yaml](Chart.yaml)**: vendors the upstream chart with no value overrides. See its entry in [`apps/values.yaml`](../../../apps/values.yaml) for the `tool.helm.releaseName` pin
+- **[templates/network-policy-controller.yaml](templates/network-policy-controller.yaml)**, **[templates/network-policy-webhook.yaml](templates/network-policy-webhook.yaml)**, and **[templates/network-policy-cert-controller.yaml](templates/network-policy-cert-controller.yaml)**: one `CiliumNetworkPolicy` per controller
 
 ## Upstream Dependencies
 

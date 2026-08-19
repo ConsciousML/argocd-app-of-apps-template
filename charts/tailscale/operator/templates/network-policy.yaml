@@ -2,7 +2,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: tailscale-operator
-  namespace: tailscale
+  namespace: {{ .Release.Namespace }}
 spec:
   endpointSelector:
     matchLabels:

@@ -278,18 +278,11 @@ applications:
     # Chart bundles its own CRDs; avoids client-side apply's annotation size limit.
     syncOptions:
       - ServerSideApply=true
-  # Depends on tailscale-operator (controller and its CRDs).
+  # Depends on:
+  # - tailscale-operator (controller and its CRDs)
+  # - network-policies-cluster-wide
   - name: tailscale-connector
     path: charts/tailscale/connector
-    destination:
-      namespace: tailscale
-    syncWave: 5
-  # Depends on:
-  # - tailscale-operator (the operator pod)
-  # - tailscale-connector (the subnet router proxy pod)
-  # - network-policies-cluster-wide
-  - name: tailscale-network-policies
-    path: manifests/tailscale
     destination:
       namespace: tailscale
     syncWave: 5

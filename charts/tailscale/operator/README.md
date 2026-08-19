@@ -2,6 +2,10 @@
 
 Deploys the [Tailscale Kubernetes operator](https://tailscale.com/kb/1236/kubernetes-operator) via the upstream `tailscale-operator` chart, unmodified.
 
+## What's Inside
+
+- **[templates/network-policy.yaml](templates/network-policy.yaml)**: the operator's `CiliumNetworkPolicy`
+
 ## Upstream Dependencies
 
 - **[`external_secrets_operator`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/eks/addons/external_secrets_operator)** (catalog): provisions the IAM role ESO's service account assumes, needed before ESO can sync this operator's OAuth credentials
