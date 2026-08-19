@@ -23,3 +23,11 @@ spec:
         - ports:
             - port: "3478"
               protocol: UDP
+    # DERP netcheck HTTP probing (also hits the EC2 instance metadata service, which isn't a
+    # Cilium-managed endpoint so it resolves to "world" here rather than "host").
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP

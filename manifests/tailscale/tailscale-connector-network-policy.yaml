@@ -18,9 +18,8 @@ spec:
         - ports:
             - port: "443"
               protocol: TCP
-    # EC2 instance metadata service. Not a Cilium-managed endpoint, so it resolves to
-    # "world" here (unlike the EKS Pod Identity endpoint at 169.254.170.23, which resolves
-    # to "host").
+    # DERP netcheck HTTP probing (also hits the EC2 instance metadata service, which isn't a
+    # Cilium-managed endpoint so it resolves to "world" here rather than "host").
     - toEntities:
         - world
       toPorts:
