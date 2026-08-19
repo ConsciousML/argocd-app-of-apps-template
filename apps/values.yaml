@@ -177,7 +177,7 @@ applications:
     path: charts/external-secrets-operator/operator
     destination:
       namespace: external-secrets
-    syncWave: 2
+    syncWave: 3
     syncOptions:
       - ServerSideApply=true
     tool:
@@ -192,7 +192,7 @@ applications:
     path: charts/monitoring/loki
     destination:
       namespace: loki
-    syncWave: 2
+    syncWave: 3
     tool:
       helm:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
@@ -209,7 +209,7 @@ applications:
     path: charts/monitoring/alloy
     destination:
       namespace: loki
-    syncWave: 2
+    syncWave: 3
     tool:
       helm:
         releaseName: alloy
@@ -222,20 +222,20 @@ applications:
     path: charts/monitoring/blackbox-exporter
     destination:
       namespace: monitoring
-    syncWave: 2
+    syncWave: 3
 
   # --- Prometheus Rules ---
   - name: prometheus-rules
     path: charts/monitoring/prometheus-rules
     destination:
       namespace: monitoring
-    syncWave: 0
+    syncWave: -1
   # Depends on external-secrets-operator.
   - name: argocd-secrets
     path: charts/external-secrets-operator/secret-sync
     destination:
       namespace: argocd
-    syncWave: 3
+    syncWave: 4
     extraValueFiles:
       - charts/external-secrets-operator/secret-sync/argocd-secrets-values.yaml
   # Depends on:
@@ -244,14 +244,14 @@ applications:
     path: manifests/argocd-server-grpc-service
     destination:
       namespace: argocd
-    syncWave: 6
+    syncWave: 4
   # Depends on:
   # - cilium (CiliumNetworkPolicy CRD)
   - name: argocd-network-policies
     path: manifests/network-policies/argocd
     destination:
       namespace: argocd
-    syncWave: 3
+    syncWave: 1
   # Depends on:
   # - argocd-server-grpc-service (backendRefs must exist first)
   # - gateway-private
@@ -259,7 +259,7 @@ applications:
     path: charts/gateway-api/httproute
     destination:
       namespace: argocd
-    syncWave: 7
+    syncWave: 6
     extraValueFiles:
       - charts/gateway-api/gateway/private-gateway-values.yaml
       - charts/gateway-api/httproute/argocd-httproute-values.yaml
@@ -270,7 +270,7 @@ applications:
     path: charts/external-secrets-operator/secret-sync
     destination:
       namespace: tailscale
-    syncWave: 3
+    syncWave: 4
     extraValueFiles:
       - charts/external-secrets-operator/secret-sync/tailscale-secrets-values.yaml
   # Depends on:
@@ -281,7 +281,7 @@ applications:
     path: charts/tailscale/operator
     destination:
       namespace: tailscale
-    syncWave: 4
+    syncWave: 5
     # Chart bundles its own CRDs; avoids client-side apply's annotation size limit.
     syncOptions:
       - ServerSideApply=true
@@ -292,7 +292,7 @@ applications:
     path: charts/tailscale/connector
     destination:
       namespace: tailscale
-    syncWave: 5
+    syncWave: 6
 
   # --- Prometheus stack ---
   # Depends on external-secrets-operator.
@@ -300,7 +300,7 @@ applications:
     path: charts/external-secrets-operator/secret-sync
     destination:
       namespace: monitoring
-    syncWave: 3
+    syncWave: 4
     extraValueFiles:
       - charts/external-secrets-operator/secret-sync/grafana-secrets-values.yaml
   # Depends on external-secrets-operator.
@@ -308,7 +308,7 @@ applications:
     path: charts/external-secrets-operator/secret-sync
     destination:
       namespace: monitoring
-    syncWave: 3
+    syncWave: 4
     extraValueFiles:
       - charts/external-secrets-operator/secret-sync/alertmanager-secrets-values.yaml
   # Depends on:
@@ -320,7 +320,7 @@ applications:
     path: charts/monitoring/kube-prometheus-stack
     destination:
       namespace: monitoring
-    syncWave: 4
+    syncWave: 5
     # Avoids client-side apply's annotation size limit on this release's larger resources
     # (e.g. the bundled default PrometheusRules).
     syncOptions:
@@ -374,7 +374,7 @@ applications:
     path: charts/right-sizing/vpa
     destination:
       namespace: vpa
-    syncWave: 5
+    syncWave: 6
     # Chart bundles its own CRDs; avoids client-side apply's annotation size limit.
     syncOptions:
       - ServerSideApply=true
@@ -388,7 +388,7 @@ applications:
     path: charts/right-sizing/goldilocks
     destination:
       namespace: goldilocks
-    syncWave: 6
+    syncWave: 7
   # Depends on:
   # - gateway-private
   # - goldilocks (the backend Service)
@@ -396,7 +396,7 @@ applications:
     path: charts/gateway-api/httproute
     destination:
       namespace: goldilocks
-    syncWave: 7
+    syncWave: 8
     extraValueFiles:
       - charts/gateway-api/gateway/private-gateway-values.yaml
       - charts/gateway-api/httproute/goldilocks-httproute-values.yaml
@@ -404,11 +404,14 @@ applications:
   # --- Network Policies ---
   # Depends on:
   # - cilium (CiliumNetworkPolicy CRD)
+  # - argocd-network-policies (default-deny.yaml, kube-apiserver-egress.yaml, and
+  #   kube-dns-egress.yaml list argocd, so those rules only work once the workload
+  #   allow-policies already exist)
   - name: network-policies-cluster-wide
     path: manifests/network-policies/cluster-wide
     destination:
       namespace: kube-system
-    syncWave: 1
+    syncWave: 2
 
   # --- Podinfo ---
   # Depends on:
