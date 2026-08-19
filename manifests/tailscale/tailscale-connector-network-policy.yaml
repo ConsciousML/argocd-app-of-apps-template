@@ -38,3 +38,21 @@ spec:
         - fields:
             - type: EchoRequest
               family: IPv4
+    # Direct WireGuard connections to tailnet peers, once DERP/STUN negotiate one.
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "41641"
+              protocol: UDP
+    # VPC's Amazon-provided DNS resolver, forwarding queries for the private hosted zone from
+    # tailnet peers routed through this subnet router. Not a Cilium-managed endpoint, so it
+    # resolves to "world" here rather than the cluster's own kube-dns-egress policy.
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
