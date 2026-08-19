@@ -1,0 +1,18 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: tailscale-operator
+  namespace: tailscale
+spec:
+  endpointSelector:
+    matchLabels:
+      app: operator
+  egress:
+    # Tailscale control plane (coordination server) and DERP relays: external HTTPS
+    # endpoints outside the VPC, so it's "world" rather than a Cilium identity.
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP

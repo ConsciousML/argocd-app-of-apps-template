@@ -1,0 +1,29 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: tailscale-connector
+  namespace: tailscale
+spec:
+  # The subnet router proxy pod is created dynamically by the operator per Connector CR, its
+  # `app` label is a random UUID. `tailscale.com/parent-resource-type` is the stable
+  # component-level label instead.
+  endpointSelector:
+    matchLabels:
+      tailscale.com/parent-resource-type: connector
+  egress:
+    # Tailscale control plane and DERP relays, see tailscale-operator-network-policy.yaml.
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+    # EC2 instance metadata service. Not a Cilium-managed endpoint, so it resolves to
+    # "world" here (unlike the EKS Pod Identity endpoint at 169.254.170.23, which resolves
+    # to "host").
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP

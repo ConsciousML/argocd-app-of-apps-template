@@ -13,6 +13,7 @@ spec:
           - goldilocks
           - external-secrets
           - external-dns
+          - tailscale
   egress:
     - toEntities:
         - kube-apiserver

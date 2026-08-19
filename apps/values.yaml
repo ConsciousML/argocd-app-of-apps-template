@@ -284,6 +284,15 @@ applications:
     destination:
       namespace: tailscale
     syncWave: 5
+  # Depends on:
+  # - tailscale-operator (the operator pod)
+  # - tailscale-connector (the subnet router proxy pod)
+  # - network-policies-cluster-wide
+  - name: tailscale-network-policies
+    path: manifests/tailscale
+    destination:
+      namespace: tailscale
+    syncWave: 5
 
   # --- Prometheus stack ---
   # Depends on external-secrets-operator.
