@@ -16,3 +16,10 @@ spec:
         - ports:
             - port: "443"
               protocol: TCP
+    # STUN, for NAT traversal / DERP discovery.
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "3478"
+              protocol: UDP
