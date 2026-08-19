@@ -1,0 +1,87 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: loki-single-binary
+  namespace: {{ .Release.Namespace }}
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: loki
+      app.kubernetes.io/component: single-binary
+  ingress:
+    # kubelet liveness/readiness probes.
+    - fromEntities:
+        - host
+      toPorts:
+        - ports:
+            - port: "3100"
+              protocol: TCP
+    # kube-prometheus-stack scraping /metrics (ServiceMonitor).
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: monitoring
+            app.kubernetes.io/name: prometheus
+      toPorts:
+        - ports:
+            - port: "3100"
+              protocol: TCP
+    # loki-gateway proxying reads/writes to the backing instances.
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: loki
+            app.kubernetes.io/component: gateway
+      toPorts:
+        - ports:
+            - port: "3100"
+              protocol: TCP
+    # Ring (gRPC) and memberlist gossip between the other replicas.
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: loki
+            app.kubernetes.io/component: single-binary
+      toPorts:
+        - ports:
+            - port: "9095"
+              protocol: TCP
+            - port: "7946"
+              protocol: TCP
+            - port: "7946"
+              protocol: UDP
+  egress:
+    # Ring (gRPC) and memberlist gossip between the other replicas.
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: loki
+            app.kubernetes.io/component: single-binary
+      toPorts:
+        - ports:
+            - port: "9095"
+              protocol: TCP
+            - port: "7946"
+              protocol: TCP
+            - port: "7946"
+              protocol: UDP
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: loki
+            app.kubernetes.io/component: memcached-chunks-cache
+      toPorts:
+        - ports:
+            - port: "11211"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: loki
+            app.kubernetes.io/component: memcached-results-cache
+      toPorts:
+        - ports:
+            - port: "11211"
+              protocol: TCP
+    # chunks/ruler S3 buckets. No VPC endpoint configured, so this egresses through the
+    # NAT gateway to public AWS IPs ("world").
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP

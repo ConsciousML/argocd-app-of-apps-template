@@ -5,7 +5,7 @@ Deploys [Loki](https://grafana.com/docs/loki/latest/) via the upstream `loki` ch
 ## What's Inside
 
 - **[values.yaml](values.yaml)**: monolithic deployment mode, S3 storage, resource sizing
-- **[templates/network-policy.yaml](templates/network-policy.yaml)**: one `CiliumNetworkPolicy` per component (single-binary, gateway, canary, chunks-cache, results-cache)
+- **`templates/network-policy-*.yaml`**: one `CiliumNetworkPolicy` per component ([single-binary](templates/network-policy-single-binary.yaml), [gateway](templates/network-policy-gateway.yaml), [canary](templates/network-policy-canary.yaml), [chunks-cache](templates/network-policy-chunks-cache.yaml), [results-cache](templates/network-policy-results-cache.yaml))
 
 ## Upstream Dependencies
 
