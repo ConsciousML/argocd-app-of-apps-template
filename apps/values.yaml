@@ -246,6 +246,13 @@ applications:
       namespace: argocd
     syncWave: 6
   # Depends on:
+  # - cilium (CiliumNetworkPolicy CRD)
+  - name: argocd-network-policies
+    path: manifests/network-policies/argocd
+    destination:
+      namespace: argocd
+    syncWave: 3
+  # Depends on:
   # - argocd-server-grpc-service (backendRefs must exist first)
   # - gateway-private
   - name: argocd-httproute

@@ -1,0 +1,25 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: argocd-applicationset-controller
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-applicationset-controller
+  # No ingress: applicationSet.metrics.enabled and its probes are all false by chart default
+  # and aren't overridden in helm_values, so nothing else in-cluster talks to this pod.
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: argocd-repo-server
+      toPorts:
+        - ports:
+            - port: "8081"
+              protocol: TCP
+    # SCM/PR generators calling out to the Git provider's API (e.g. GitHub).
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP

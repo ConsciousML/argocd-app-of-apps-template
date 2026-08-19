@@ -1,0 +1,41 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: argocd-application-controller
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-application-controller
+  ingress:
+    # kubelet readiness probe (no separate probe port, hits the metrics port), sourced from
+    # the node.
+    - fromEntities:
+        - host
+      toPorts:
+        - ports:
+            - port: "8082"
+              protocol: TCP
+    # kube-prometheus-stack scraping /metrics (ServiceMonitor).
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: monitoring
+            app.kubernetes.io/name: prometheus
+      toPorts:
+        - ports:
+            - port: "8082"
+              protocol: TCP
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: argocd-repo-server
+      toPorts:
+        - ports:
+            - port: "8081"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: argocd-redis
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP

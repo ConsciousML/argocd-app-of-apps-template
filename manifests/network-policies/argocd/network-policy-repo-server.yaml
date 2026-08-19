@@ -1,0 +1,53 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: argocd-repo-server
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-repo-server
+  ingress:
+    # kubelet liveness/readiness probes, sourced from the node.
+    - fromEntities:
+        - host
+      toPorts:
+        - ports:
+            - port: "8081"
+              protocol: TCP
+    # GenerateManifest calls from server, controller, applicationset-controller.
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: argocd-server
+        - matchLabels:
+            app.kubernetes.io/name: argocd-application-controller
+        - matchLabels:
+            app.kubernetes.io/name: argocd-applicationset-controller
+      toPorts:
+        - ports:
+            - port: "8081"
+              protocol: TCP
+    # kube-prometheus-stack scraping /metrics (ServiceMonitor).
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: monitoring
+            app.kubernetes.io/name: prometheus
+      toPorts:
+        - ports:
+            - port: "8084"
+              protocol: TCP
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: argocd-redis
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP
+    # Git over HTTPS (repo_url is https://github.com/..., see app_of_apps/terragrunt.hcl in the
+    # catalog repo) and Helm/OCI chart repositories.
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP

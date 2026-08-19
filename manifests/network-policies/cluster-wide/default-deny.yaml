@@ -9,6 +9,7 @@ spec:
         operator: In
         # add a namespace name here to opt it in
         values:
+          - argocd
           - cilium-secrets
           - default
           - external-dns

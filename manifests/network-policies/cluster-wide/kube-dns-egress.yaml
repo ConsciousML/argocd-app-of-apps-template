@@ -15,6 +15,7 @@ spec:
           - tailscale
           - loki
           - monitoring
+          - argocd
   egress:
     - toEndpoints:
         - matchLabels:
