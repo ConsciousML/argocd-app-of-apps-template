@@ -18,6 +18,7 @@ spec:
           - kube-node-lease
           - kube-public
           - loki
+          - monitoring
           - podinfo
           - tailscale
           - vpa
