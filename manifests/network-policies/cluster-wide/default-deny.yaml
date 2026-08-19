@@ -9,16 +9,16 @@ spec:
         operator: In
         # add a namespace name here to opt it in
         values:
-          - kube-public
+          - cilium-secrets
+          - default
+          - external-dns
+          - external-secrets
+          - gateway
+          - goldilocks
           - kube-node-lease
+          - kube-public
           - podinfo
           - vpa
-          - goldilocks
-          - cilium-secrets
-          - external-secrets
-          - default
-          - gateway
-          - external-dns
   enableDefaultDeny:
     ingress: true
     egress: true

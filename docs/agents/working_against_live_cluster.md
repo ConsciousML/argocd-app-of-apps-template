@@ -3,10 +3,14 @@
 When a goal must actually take effect on the live EKS cluster, use this loop instead of
 touching the cluster directly.
 
-## Never apply manifests directly
+## Apply manifests through GitOps only
 
-Never run `kubectl apply`, `create`, `patch`, or `edit` against the cluster. ArgoCD is the
-only path from a file to a live resource here. A live edit outside git gets pruned or drifts.
+Never run `kubectl apply`, `create`, `patch`, or `edit` to change a resource's spec. ArgoCD is
+the only path from a file to a live resource here. A live edit outside git gets pruned or
+drifts.
+
+`kubectl rollout restart` is fine, it doesn't touch git-tracked spec, only triggers a new
+rollout of the current one.
 
 ## Log in to ArgoCD
 

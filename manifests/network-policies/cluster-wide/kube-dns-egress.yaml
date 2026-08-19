@@ -11,6 +11,7 @@ spec:
         values:
           - vpa
           - external-secrets
+          - external-dns
   egress:
     - toEndpoints:
         - matchLabels:

@@ -10,6 +10,7 @@ spec:
         # add a namespace name here to opt it in
         values:
           - external-secrets
+          - external-dns
   egress:
     # EKS Pod Identity credential endpoint, documented at
     # https://docs.aws.amazon.com/eks/latest/userguide/pod-id-how-it-works.html

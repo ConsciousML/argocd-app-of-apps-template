@@ -12,6 +12,7 @@ spec:
           - vpa
           - goldilocks
           - external-secrets
+          - external-dns
   egress:
     - toEntities:
         - kube-apiserver
