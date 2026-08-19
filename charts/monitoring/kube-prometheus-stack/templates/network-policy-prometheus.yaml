@@ -47,8 +47,9 @@ spec:
     # Every entry below is a real scrape target, captured via hubble observe -n monitoring
     # --verdict DROPPED -P. Adding a new addon's ServiceMonitor/PodMonitor needs a new entry here.
 
-    # kubelet cAdvisor, kube-proxy, node-exporter, cilium-agent, hubble-metrics: all hostNetwork,
-    # scraped directly on each node's IP.
+    # kubelet cAdvisor, kube-proxy, node-exporter, cilium-agent, cilium-operator, hubble-metrics:
+    # all hostNetwork, scraped directly on each node's IP (hostNetwork pods share the host's
+    # identity and never get their own CiliumEndpoint).
     - toEntities:
         - host
         - remote-node
@@ -62,6 +63,8 @@ spec:
               protocol: TCP
             - port: "9962"
               protocol: TCP
+            - port: "9963"
+              protocol: TCP
             - port: "9965"
               protocol: TCP
     # coredns (kube-prometheus-stack-coredns ServiceMonitor).
@@ -72,15 +75,6 @@ spec:
       toPorts:
         - ports:
             - port: "9153"
-              protocol: TCP
-    # cilium-operator.
-    - toEndpoints:
-        - matchLabels:
-            io.kubernetes.pod.namespace: kube-system
-            app.kubernetes.io/name: cilium-operator
-      toPorts:
-        - ports:
-            - port: "9963"
               protocol: TCP
     # aws-lbc and karpenter.
     - toEndpoints:
