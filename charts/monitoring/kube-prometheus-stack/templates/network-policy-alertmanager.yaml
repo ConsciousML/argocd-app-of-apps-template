@@ -1,0 +1,65 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: alertmanager
+  namespace: {{ .Release.Namespace }}
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: alertmanager
+      alertmanager: kube-prometheus-stack-alertmanager
+  ingress:
+    # Private ALB (targetType: ip), forwarding traffic straight to the pod IP.
+    - fromEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "9093"
+              protocol: TCP
+    # kubelet liveness/readiness probes, sourced from the node.
+    - fromEntities:
+        - host
+      toPorts:
+        - ports:
+            - port: "9093"
+              protocol: TCP
+    # kube-prometheus-stack scraping the web and config-reloader ports (self-monitor ServiceMonitor).
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: prometheus
+      toPorts:
+        - ports:
+            - port: "9093"
+              protocol: TCP
+            - port: "8080"
+              protocol: TCP
+    # Peer mesh: replicas gossip to sync silences and notification state.
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: alertmanager
+            alertmanager: kube-prometheus-stack-alertmanager
+      toPorts:
+        - ports:
+            - port: "9094"
+              protocol: TCP
+            - port: "9094"
+              protocol: UDP
+  egress:
+    # Peer mesh, the other direction.
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: alertmanager
+            alertmanager: kube-prometheus-stack-alertmanager
+      toPorts:
+        - ports:
+            - port: "9094"
+              protocol: TCP
+            - port: "9094"
+              protocol: UDP
+    # Slack notifications, see config.global.slack_api_url in values.yaml.
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP

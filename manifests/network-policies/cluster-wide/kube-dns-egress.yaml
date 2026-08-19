@@ -14,6 +14,7 @@ spec:
           - external-dns
           - tailscale
           - loki
+          - monitoring
   egress:
     - toEndpoints:
         - matchLabels:

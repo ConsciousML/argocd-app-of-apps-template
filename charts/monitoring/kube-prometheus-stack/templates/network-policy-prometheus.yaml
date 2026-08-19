@@ -1,0 +1,262 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: prometheus
+  namespace: {{ .Release.Namespace }}
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: prometheus
+      operator.prometheus.io/name: kube-prometheus-stack-prometheus
+  ingress:
+    # Private ALB (targetType: ip), forwarding traffic straight to the pod IP.
+    - fromEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "9090"
+              protocol: TCP
+    # kubelet liveness/readiness probes, sourced from the node.
+    - fromEntities:
+        - host
+      toPorts:
+        - ports:
+            - port: "9090"
+              protocol: TCP
+    # Self-monitoring (self-monitor: true ServiceMonitor) and Grafana's Prometheus datasource.
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: prometheus
+        - matchLabels:
+            app.kubernetes.io/name: grafana
+      toPorts:
+        - ports:
+            - port: "9090"
+              protocol: TCP
+    # Self-monitoring scraping the config-reloader sidecar.
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: prometheus
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+  egress:
+    # serviceMonitorSelectorNilUsesHelmValues/podMonitorSelectorNilUsesHelmValues are false (see
+    # docs/monitoring.md), so Prometheus scrapes any ServiceMonitor/PodMonitor in the cluster.
+    # Every entry below is a real scrape target, captured via hubble observe -n monitoring
+    # --verdict DROPPED -P. Adding a new addon's ServiceMonitor/PodMonitor needs a new entry here.
+
+    # kubelet cAdvisor, kube-proxy, node-exporter, cilium-agent, hubble-metrics: all hostNetwork,
+    # scraped directly on each node's IP.
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "10250"
+              protocol: TCP
+            - port: "9100"
+              protocol: TCP
+            - port: "10249"
+              protocol: TCP
+            - port: "9962"
+              protocol: TCP
+            - port: "9965"
+              protocol: TCP
+    # coredns (kube-prometheus-stack-coredns ServiceMonitor).
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "9153"
+              protocol: TCP
+    # cilium-operator.
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            app.kubernetes.io/name: cilium-operator
+      toPorts:
+        - ports:
+            - port: "9963"
+              protocol: TCP
+    # aws-lbc and karpenter.
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            app.kubernetes.io/name: aws-load-balancer-controller
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            app.kubernetes.io/name: karpenter
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    # argocd-application-controller.
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: argocd
+            app.kubernetes.io/name: argocd-application-controller
+      toPorts:
+        - ports:
+            - port: "8082"
+              protocol: TCP
+    # argocd-repo-server.
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: argocd
+            app.kubernetes.io/name: argocd-repo-server
+      toPorts:
+        - ports:
+            - port: "8084"
+              protocol: TCP
+    # argocd-notifications-controller.
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: argocd
+            app.kubernetes.io/name: argocd-notifications-controller
+      toPorts:
+        - ports:
+            - port: "9001"
+              protocol: TCP
+    # external-dns (both private and public releases).
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: external-dns
+            app.kubernetes.io/name: external-dns
+      toPorts:
+        - ports:
+            - port: "7979"
+              protocol: TCP
+    # external-secrets-operator (controller, cert-controller, webhook).
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: external-secrets
+            app.kubernetes.io/name: external-secrets
+        - matchLabels:
+            io.kubernetes.pod.namespace: external-secrets
+            app.kubernetes.io/name: external-secrets-cert-controller
+        - matchLabels:
+            io.kubernetes.pod.namespace: external-secrets
+            app.kubernetes.io/name: external-secrets-webhook
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    # loki (single-binary).
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: loki
+            app.kubernetes.io/name: loki
+            app.kubernetes.io/component: single-binary
+      toPorts:
+        - ports:
+            - port: "3100"
+              protocol: TCP
+    # loki-gateway (nginx exporter).
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: loki
+            app.kubernetes.io/name: loki
+            app.kubernetes.io/component: gateway
+      toPorts:
+        - ports:
+            - port: "4040"
+              protocol: TCP
+    # loki-canary.
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: loki
+            app.kubernetes.io/name: loki
+            app.kubernetes.io/component: canary
+      toPorts:
+        - ports:
+            - port: "3500"
+              protocol: TCP
+    # loki's results-cache and chunks-cache (memcached exporters).
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: loki
+            app.kubernetes.io/name: loki
+            app.kubernetes.io/component: results-cache
+        - matchLabels:
+            io.kubernetes.pod.namespace: loki
+            app.kubernetes.io/name: loki
+            app.kubernetes.io/component: chunks-cache
+      toPorts:
+        - ports:
+            - port: "9150"
+              protocol: TCP
+    # podinfo.
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: podinfo
+            app: podinfo
+      toPorts:
+        - ports:
+            - port: "9898"
+              protocol: TCP
+    # vpa-recommender (PodMonitor).
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: vpa
+            app.kubernetes.io/name: vpa
+            app.kubernetes.io/component: recommender
+      toPorts:
+        - ports:
+            - port: "8942"
+              protocol: TCP
+    # blackbox-exporter.
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: prometheus-blackbox-exporter
+      toPorts:
+        - ports:
+            - port: "9115"
+              protocol: TCP
+    # alertmanager (web and config-reloader).
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: alertmanager
+      toPorts:
+        - ports:
+            - port: "9093"
+              protocol: TCP
+            - port: "8080"
+              protocol: TCP
+    # grafana.
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: grafana
+      toPorts:
+        - ports:
+            - port: "3000"
+              protocol: TCP
+    # kube-state-metrics.
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: kube-state-metrics
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    # prometheus-operator, kube-apiserver ServiceMonitor.
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: kube-prometheus-stack-prometheus-operator
+      toPorts:
+        - ports:
+            - port: "10250"
+              protocol: TCP
+    # Self-monitoring, the peer replica's own web and config-reloader ports.
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: prometheus
+      toPorts:
+        - ports:
+            - port: "9090"
+              protocol: TCP
+            - port: "8080"
+              protocol: TCP

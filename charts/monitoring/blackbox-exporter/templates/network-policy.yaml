@@ -1,0 +1,34 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: blackbox-exporter
+  namespace: {{ .Release.Namespace }}
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: prometheus-blackbox-exporter
+  ingress:
+    # kubelet liveness/readiness probes (/-/healthy), sourced from the node.
+    - fromEntities:
+        - host
+      toPorts:
+        - ports:
+            - port: "9115"
+              protocol: TCP
+    # kube-prometheus-stack scraping /probe (one ServiceMonitor per target, see values.yaml).
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: prometheus
+      toPorts:
+        - ports:
+            - port: "9115"
+              protocol: TCP
+  egress:
+    # Probing each target's private/public ALB over HTTPS (module http_2xx, see values.yaml
+    # serviceMonitor.targets). ALB ENIs aren't a Cilium identity, so this is "world".
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
