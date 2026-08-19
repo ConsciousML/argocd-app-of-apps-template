@@ -12,6 +12,7 @@ spec:
           - external-secrets
           - external-dns
           - loki
+          - kube-system
   egress:
     # EKS Pod Identity credential endpoint, documented at
     # https://docs.aws.amazon.com/eks/latest/userguide/pod-id-how-it-works.html

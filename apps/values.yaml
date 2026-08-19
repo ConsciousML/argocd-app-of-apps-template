@@ -253,6 +253,13 @@ applications:
       namespace: argocd
     syncWave: 1
   # Depends on:
+  # - cilium (CiliumNetworkPolicy CRD)
+  - name: network-policies-kube-system
+    path: manifests/network-policies/kube-system
+    destination:
+      namespace: kube-system
+    syncWave: 1
+  # Depends on:
   # - argocd-server-grpc-service (backendRefs must exist first)
   # - gateway-private
   - name: argocd-httproute
@@ -404,9 +411,9 @@ applications:
   # --- Network Policies ---
   # Depends on:
   # - cilium (CiliumNetworkPolicy CRD)
-  # - argocd-network-policies (default-deny.yaml, kube-apiserver-egress.yaml, and
-  #   kube-dns-egress.yaml list argocd, so those rules only work once the workload
-  #   allow-policies already exist)
+  # - argocd-network-policies, network-policies-kube-system (default-deny.yaml,
+  #   kube-apiserver-egress.yaml, and kube-dns-egress.yaml list argocd and kube-system,
+  #   so those rules only work once the workload allow-policies already exist)
   - name: network-policies-cluster-wide
     path: manifests/network-policies/cluster-wide
     destination:

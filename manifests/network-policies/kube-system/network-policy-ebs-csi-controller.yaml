@@ -1,0 +1,24 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: ebs-csi-controller
+  namespace: kube-system
+spec:
+  endpointSelector:
+    matchLabels:
+      app: ebs-csi-controller
+  ingress:
+    - fromEntities:
+        - host
+      toPorts:
+        - ports:
+            - port: "9808"
+              protocol: TCP
+  egress:
+    # EBS API (CreateVolume, AttachVolume, and so on), reached via NAT as `world`.
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP

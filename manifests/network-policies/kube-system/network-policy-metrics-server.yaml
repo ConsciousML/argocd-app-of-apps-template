@@ -1,0 +1,29 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: metrics-server
+  namespace: kube-system
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: metrics-server
+  ingress:
+    # Kubelet probe and the APIService aggregation layer calling metrics-server's
+    # secure port (this addon serves on 10251, not the upstream default 4443).
+    - fromEntities:
+        - host
+        - remote-node
+        - kube-apiserver
+      toPorts:
+        - ports:
+            - port: "10251"
+              protocol: TCP
+  egress:
+    # Scrapes every node's kubelet for pod and node metrics.
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "10250"
+              protocol: TCP

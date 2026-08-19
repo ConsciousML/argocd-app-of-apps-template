@@ -17,6 +17,7 @@ spec:
           - gateway
           - goldilocks
           - kube-node-lease
+          - kube-system
           - kube-public
           - loki
           - monitoring

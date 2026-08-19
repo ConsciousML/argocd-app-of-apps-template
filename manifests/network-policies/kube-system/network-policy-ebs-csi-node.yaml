@@ -1,0 +1,21 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: ebs-csi-node
+  namespace: kube-system
+spec:
+  endpointSelector:
+    matchLabels:
+      app: ebs-csi-node
+  ingress:
+    # healthz (9808) and healthz-ndr (9809) kubelet probes. No AWS API or DNS egress
+    # needed: the node driver only talks over the CSI unix socket and kube-apiserver
+    # (covered by network-policy-shared-egress.yaml).
+    - fromEntities:
+        - host
+      toPorts:
+        - ports:
+            - port: "9808"
+              protocol: TCP
+            - port: "9809"
+              protocol: TCP
