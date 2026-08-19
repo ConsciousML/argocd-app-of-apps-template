@@ -38,12 +38,15 @@ spec:
         - fields:
             - type: EchoRequest
               family: IPv4
-    # Direct WireGuard connections to tailnet peers, once DERP/STUN negotiate one.
+    # Direct WireGuard connections to tailnet peers, once DERP/STUN negotiate one. The peer's
+    # port depends on its own NAT/socket allocation, not always the 41641 default, so this
+    # allows the full ephemeral range rather than just 41641.
     - toEntities:
         - world
       toPorts:
         - ports:
-            - port: "41641"
+            - port: "1024"
+              endPort: 65535
               protocol: UDP
     # VPC's Amazon-provided DNS resolver, forwarding queries for the private hosted zone from
     # tailnet peers routed through this subnet router. Not a Cilium-managed endpoint, so it
