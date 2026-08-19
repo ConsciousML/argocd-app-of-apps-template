@@ -57,3 +57,11 @@ spec:
         - ports:
             - port: "9093"
               protocol: TCP
+    # download-dashboards init container, fetching from karpenter.sh and grafana.com
+    # (see dashboards in values.yaml).
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
