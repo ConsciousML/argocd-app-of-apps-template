@@ -2,7 +2,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: hubble-relay
-  namespace: {{ .Release.Namespace }}
+  namespace: kube-system
 spec:
   endpointSelector:
     matchLabels:

@@ -62,7 +62,7 @@ applications:
     path: charts/gateway-api/gateway-class
     destination:
       namespace: gateway
-    syncWave: 4
+    syncWave: 5
   # Depends on:
   # - gateway-class
   # - crds-aws-lbc-gateway-api (LoadBalancerConfiguration/TargetGroupConfiguration CRDs)
@@ -72,7 +72,7 @@ applications:
     path: charts/gateway-api/gateway
     destination:
       namespace: gateway
-    syncWave: 5
+    syncWave: 6
     extraValueFiles:
       - charts/gateway-api/gateway-class/values.yaml
       - charts/gateway-api/gateway/public-gateway-values.yaml
@@ -81,7 +81,7 @@ applications:
     path: charts/gateway-api/gateway
     destination:
       namespace: gateway
-    syncWave: 5
+    syncWave: 6
     extraValueFiles:
       - charts/gateway-api/gateway-class/values.yaml
       - charts/gateway-api/gateway/private-gateway-values.yaml
@@ -94,7 +94,7 @@ applications:
     path: charts/aws-lbc
     destination:
       namespace: kube-system
-    syncWave: 3
+    syncWave: 4
     # Chart bundles its own CRDs; avoids client-side apply's annotation size limit.
     syncOptions:
       - ServerSideApply=true
@@ -116,13 +116,21 @@ applications:
     syncOptions:
       - ServerSideApply=true
   # Depends on:
+  # - cilium (cilium-agent must be running and the CiliumEndpoint CRD installed)
+  - name: cilium-restart-job
+    path: manifests/cilium-restart-job
+    destination:
+      namespace: kube-system
+    syncWave: 1
+
+  # Depends on:
   # - gateway-private
   # - cilium (the hubble-ui backend Service)
   - name: hubble-ui-httproute
     path: charts/gateway-api/httproute
     destination:
       namespace: kube-system
-    syncWave: 6
+    syncWave: 7
     extraValueFiles:
       - charts/gateway-api/gateway/private-gateway-values.yaml
       - charts/gateway-api/httproute/hubble-ui-httproute-values.yaml
@@ -139,7 +147,7 @@ applications:
     path: charts/external-dns
     destination:
       namespace: external-dns
-    syncWave: 3
+    syncWave: 4
     syncOptions:
       - ServerSideApply=true
     tool:
@@ -157,7 +165,7 @@ applications:
     path: charts/external-dns
     destination:
       namespace: external-dns
-    syncWave: 3
+    syncWave: 4
     syncOptions:
       - ServerSideApply=true
     tool:
@@ -177,7 +185,7 @@ applications:
     path: charts/external-secrets-operator/operator
     destination:
       namespace: external-secrets
-    syncWave: 3
+    syncWave: 4
     syncOptions:
       - ServerSideApply=true
     tool:
@@ -192,7 +200,7 @@ applications:
     path: charts/monitoring/loki
     destination:
       namespace: loki
-    syncWave: 3
+    syncWave: 4
     tool:
       helm:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
@@ -209,7 +217,7 @@ applications:
     path: charts/monitoring/alloy
     destination:
       namespace: loki
-    syncWave: 3
+    syncWave: 4
     tool:
       helm:
         releaseName: alloy
@@ -222,7 +230,7 @@ applications:
     path: charts/monitoring/blackbox-exporter
     destination:
       namespace: monitoring
-    syncWave: 3
+    syncWave: 4
 
   # --- Prometheus Rules ---
   - name: prometheus-rules
@@ -235,7 +243,7 @@ applications:
     path: charts/external-secrets-operator/secret-sync
     destination:
       namespace: argocd
-    syncWave: 4
+    syncWave: 5
     extraValueFiles:
       - charts/external-secrets-operator/secret-sync/argocd-secrets-values.yaml
   # Depends on:
@@ -244,21 +252,26 @@ applications:
     path: manifests/argocd-server-grpc-service
     destination:
       namespace: argocd
-    syncWave: 4
+    syncWave: 5
   # Depends on:
   # - cilium (CiliumNetworkPolicy CRD)
+  # - cilium-restart-job
   - name: argocd-network-policies
     path: manifests/network-policies/argocd
     destination:
       namespace: argocd
-    syncWave: 1
+    syncWave: 2
   # Depends on:
-  # - cilium (CiliumNetworkPolicy CRD)
+  # - cilium (CiliumNetworkPolicy CRD; also creates the hubble-relay and hubble-ui workloads
+  #   two of this app's policies select). Its own release can't include those two policies:
+  #   the CRD and a CR using it in the same sync fails ArgoCD's pre-sync validation on a fresh
+  #   cluster, so they live here instead, one wave later.
+  # - cilium-restart-job
   - name: network-policies-kube-system
     path: manifests/network-policies/kube-system
     destination:
       namespace: kube-system
-    syncWave: 1
+    syncWave: 2
   # Depends on:
   # - argocd-server-grpc-service (backendRefs must exist first)
   # - gateway-private
@@ -266,7 +279,7 @@ applications:
     path: charts/gateway-api/httproute
     destination:
       namespace: argocd
-    syncWave: 6
+    syncWave: 7
     extraValueFiles:
       - charts/gateway-api/gateway/private-gateway-values.yaml
       - charts/gateway-api/httproute/argocd-httproute-values.yaml
@@ -277,7 +290,7 @@ applications:
     path: charts/external-secrets-operator/secret-sync
     destination:
       namespace: tailscale
-    syncWave: 4
+    syncWave: 5
     extraValueFiles:
       - charts/external-secrets-operator/secret-sync/tailscale-secrets-values.yaml
   # Depends on:
@@ -288,7 +301,7 @@ applications:
     path: charts/tailscale/operator
     destination:
       namespace: tailscale
-    syncWave: 5
+    syncWave: 6
     # Chart bundles its own CRDs; avoids client-side apply's annotation size limit.
     syncOptions:
       - ServerSideApply=true
@@ -299,7 +312,7 @@ applications:
     path: charts/tailscale/connector
     destination:
       namespace: tailscale
-    syncWave: 6
+    syncWave: 7
 
   # --- Prometheus stack ---
   # Depends on external-secrets-operator.
@@ -307,7 +320,7 @@ applications:
     path: charts/external-secrets-operator/secret-sync
     destination:
       namespace: monitoring
-    syncWave: 4
+    syncWave: 5
     extraValueFiles:
       - charts/external-secrets-operator/secret-sync/grafana-secrets-values.yaml
   # Depends on external-secrets-operator.
@@ -315,7 +328,7 @@ applications:
     path: charts/external-secrets-operator/secret-sync
     destination:
       namespace: monitoring
-    syncWave: 4
+    syncWave: 5
     extraValueFiles:
       - charts/external-secrets-operator/secret-sync/alertmanager-secrets-values.yaml
   # Depends on:
@@ -327,7 +340,7 @@ applications:
     path: charts/monitoring/kube-prometheus-stack
     destination:
       namespace: monitoring
-    syncWave: 5
+    syncWave: 6
     # Avoids client-side apply's annotation size limit on this release's larger resources
     # (e.g. the bundled default PrometheusRules).
     syncOptions:
@@ -349,7 +362,7 @@ applications:
     path: charts/gateway-api/httproute
     destination:
       namespace: monitoring
-    syncWave: 6
+    syncWave: 7
     extraValueFiles:
       - charts/gateway-api/gateway/private-gateway-values.yaml
       - charts/gateway-api/httproute/grafana-httproute-values.yaml
@@ -358,7 +371,7 @@ applications:
     path: charts/gateway-api/httproute
     destination:
       namespace: monitoring
-    syncWave: 6
+    syncWave: 7
     extraValueFiles:
       - charts/gateway-api/gateway/private-gateway-values.yaml
       - charts/gateway-api/httproute/prometheus-httproute-values.yaml
@@ -367,7 +380,7 @@ applications:
     path: charts/gateway-api/httproute
     destination:
       namespace: monitoring
-    syncWave: 6
+    syncWave: 7
     extraValueFiles:
       - charts/gateway-api/gateway/private-gateway-values.yaml
       - charts/gateway-api/httproute/alertmanager-httproute-values.yaml
@@ -381,7 +394,7 @@ applications:
     path: charts/right-sizing/vpa
     destination:
       namespace: vpa
-    syncWave: 6
+    syncWave: 7
     # Chart bundles its own CRDs; avoids client-side apply's annotation size limit.
     syncOptions:
       - ServerSideApply=true
@@ -395,7 +408,7 @@ applications:
     path: charts/right-sizing/goldilocks
     destination:
       namespace: goldilocks
-    syncWave: 7
+    syncWave: 8
   # Depends on:
   # - gateway-private
   # - goldilocks (the backend Service)
@@ -403,7 +416,7 @@ applications:
     path: charts/gateway-api/httproute
     destination:
       namespace: goldilocks
-    syncWave: 8
+    syncWave: 9
     extraValueFiles:
       - charts/gateway-api/gateway/private-gateway-values.yaml
       - charts/gateway-api/httproute/goldilocks-httproute-values.yaml
@@ -418,7 +431,7 @@ applications:
     path: manifests/network-policies/cluster-wide
     destination:
       namespace: kube-system
-    syncWave: 2
+    syncWave: 3
 
   # --- Podinfo ---
   # Depends on:
@@ -428,7 +441,7 @@ applications:
     path: manifests/podinfo
     destination:
       namespace: podinfo
-    syncWave: 3
+    syncWave: 4
   # Depends on:
   # - gateway-public
   # - podinfo (the backend Service)
@@ -436,7 +449,7 @@ applications:
     path: charts/gateway-api/httproute
     destination:
       namespace: podinfo
-    syncWave: 6
+    syncWave: 7
     extraValueFiles:
       - charts/gateway-api/gateway/public-gateway-values.yaml
       - charts/gateway-api/httproute/podinfo-httproute-values.yaml
