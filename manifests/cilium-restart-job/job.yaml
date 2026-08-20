@@ -26,15 +26,34 @@ spec:
           operator: Equal
           value: critical
           effect: NoSchedule
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: restart-missing-ceps
           image: alpine/k8s:1.30.0
           command: ["sh", "/scripts/restart-missing-ceps.sh"]
+          # kubectl caches discovery/HTTP data under $HOME/.kube by default, which needs
+          # somewhere writable now that the root filesystem is read-only.
+          env:
+            - name: HOME
+              value: /tmp
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
           volumeMounts:
             - name: script
               mountPath: /scripts
+            - name: tmp
+              mountPath: /tmp
       volumes:
         - name: script
           configMap:
             name: cilium-cep-restart-script
             defaultMode: 0555
+        - name: tmp
+          emptyDir: {}
