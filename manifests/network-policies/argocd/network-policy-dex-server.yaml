@@ -1,0 +1,26 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: argocd-dex-server
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-dex-server
+  ingress:
+    # Server proxies /api/dex (login flow) over http and calls the grpc API directly.
+    # No kubelet probe ingress: dex.livenessProbe/readinessProbe are disabled by chart default.
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: argocd-server
+      toPorts:
+        - ports:
+            - port: "5556"
+              protocol: TCP
+            - port: "5557"
+              protocol: TCP
+  # kube-apiserver egress (cmd-util-dex init container reads argocd-cm/argocd-secret at
+  # startup, confirmed via hubble) comes from network-policy-shared-egress.yaml,
+  # alongside this file.
+  #
+  # No dex.config connectors set in helm_values yet, so no external IdP to reach. Add an
+  # egress rule here if OIDC gets configured.

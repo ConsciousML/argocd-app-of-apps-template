@@ -22,6 +22,8 @@ vpa:
       metric-for-pod-labels: kube_pod_info{job="kube-state-metrics"}[8d]
       pod-namespace-label: namespace
       pod-name-label: pod
+    podMonitor:
+      enabled: true
     resources:
       requests:
         cpu: 15m

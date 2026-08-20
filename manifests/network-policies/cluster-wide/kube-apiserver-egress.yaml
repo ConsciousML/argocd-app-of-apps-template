@@ -1,0 +1,28 @@
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: kube-apiserver-egress
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: io.kubernetes.pod.namespace
+        operator: In
+        # add a namespace name here to opt it in
+        # argocd and kube-system excluded: each has its own copy (network-policies/argocd/,
+        # network-policies/kube-system/), to avoid depending on this Application syncing for
+        # their own network access (lockout risk)
+        values:
+          - vpa
+          - goldilocks
+          - external-secrets
+          - external-dns
+          - tailscale
+          - loki
+          - monitoring
+  egress:
+    - toEntities:
+        - kube-apiserver
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP

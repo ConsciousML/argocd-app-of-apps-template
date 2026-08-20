@@ -6,6 +6,7 @@
 
 - **[values.yaml](values.yaml)**: disables the bundled `vpa` and `metrics-server` subcharts (installed separately, see Upstream Dependencies), enables the controller in `on-by-default` mode and the dashboard
 - **`goldilocks-httproute`** (app-of-apps): an instance of the generic [`httproute`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/charts/gateway-api/httproute) chart, exposes the dashboard
+- **[templates/network-policy.yaml](templates/network-policy.yaml)**: the dashboard's `CiliumNetworkPolicy`
 
 ## Upstream Dependencies
 

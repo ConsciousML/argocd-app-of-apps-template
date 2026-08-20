@@ -5,6 +5,7 @@ Recommender-only install of the Kubernetes [Vertical Pod Autoscaler](https://git
 ## What's Inside
 
 - **[values.yaml](values.yaml)**: enables the recommender only, disables the updater, the admission controller, and the bundled metrics-server subchart
+- **[templates/network-policy.yaml](templates/network-policy.yaml)**: the recommender's `CiliumNetworkPolicy`
 
 ## Upstream Dependencies
 

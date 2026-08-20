@@ -1,0 +1,36 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: external-dns
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  ingress:
+    # Kubelet liveness and readiness probes.
+    - fromEntities:
+        - host
+      toPorts:
+        - ports:
+            - port: "7979"
+              protocol: TCP
+    # kube-prometheus-stack scraping /metrics (ServiceMonitor).
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: monitoring
+            app.kubernetes.io/name: prometheus
+      toPorts:
+        - ports:
+            - port: "7979"
+              protocol: TCP
+  egress:
+    # AWS Route53 API: a global (non-regional) HTTPS endpoint outside the VPC, so it's "world"
+    # rather than a Cilium identity.
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP

@@ -1,0 +1,24 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: argocd-redis
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-redis
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: argocd-server
+        - matchLabels:
+            app.kubernetes.io/name: argocd-repo-server
+        - matchLabels:
+            app.kubernetes.io/name: argocd-application-controller
+        - matchLabels:
+            app.kubernetes.io/name: argocd-applicationset-controller
+        - matchLabels:
+            app.kubernetes.io/name: argocd-notifications-controller
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP

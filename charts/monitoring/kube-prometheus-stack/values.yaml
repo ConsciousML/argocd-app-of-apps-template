@@ -174,9 +174,9 @@ kube-prometheus-stack:
       resources:
         requests:
           cpu: 93m
-          memory: 1039M
+          memory: 1560M
         limits:
-          memory: 1039M
+          memory: 1560M
 
       nodeSelector:
         karpenter.sh/nodepool: critical

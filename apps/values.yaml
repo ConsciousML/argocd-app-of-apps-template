@@ -9,11 +9,11 @@ config:
 appParams: {}
 
 applications:
-  # --- Namespace Pod Security Admission ---
+  # --- Namespaces ---
   # Owns Namespace resources: pruning or cascade-deleting this app must never delete one,
   # that would wipe out everything inside it, including argocd's own namespace.
-  - name: namespace-pod-security-admission
-    path: manifests/namespace-pod-security-admission
+  - name: namespaces
+    path: manifests/namespaces
     destination:
       namespace: kube-system
     syncWave: -1
@@ -88,6 +88,7 @@ applications:
 
   # --- AWS Load Balancer Controller ---
   # Depends on:
+  # - network-policies-cluster-wide
   # - See DaemonSets Priority above.
   - name: aws-lbc
     path: charts/aws-lbc
@@ -132,6 +133,7 @@ applications:
   # --- ExternalDNS ---
   # Depends on:
   # - crds-gateway-api (watches gateway-httproute sources)
+  # - network-policies-cluster-wide
   # - See DaemonSets Priority above.
   - name: external-dns-private
     path: charts/external-dns
@@ -169,11 +171,13 @@ applications:
       - pre-delete-finalizer.argocd.argoproj.io/cleanup
 
   # --- External Secrets Operator ---
+  # Depends on:
+  # - network-policies-cluster-wide
   - name: external-secrets-operator
     path: charts/external-secrets-operator/operator
     destination:
       namespace: external-secrets
-    syncWave: 0
+    syncWave: 3
     syncOptions:
       - ServerSideApply=true
     tool:
@@ -182,11 +186,13 @@ applications:
         releaseName: external-secrets
 
   # --- Loki ---
+  # Depends on:
+  # - network-policies-cluster-wide
   - name: loki
     path: charts/monitoring/loki
     destination:
       namespace: loki
-    syncWave: 0
+    syncWave: 3
     tool:
       helm:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
@@ -197,36 +203,39 @@ applications:
   # write failure, so it doesn't need Loki up first. Synced in the same wave as Loki so both
   # DaemonSets (Alloy itself, Loki's lokiCanary) exist as early as possible. See DaemonSets
   # Priority above.
+  # Depends on:
+  # - network-policies-cluster-wide
   - name: alloy
     path: charts/monitoring/alloy
     destination:
       namespace: loki
-    syncWave: 0
+    syncWave: 3
     tool:
       helm:
         releaseName: alloy
 
   # --- Blackbox Exporter ---
-  # No hard dependency: ServiceMonitor/PrometheusRule CRDs are Terraform-managed, applied
-  # before ArgoCD ever syncs.
+  # ServiceMonitor/PrometheusRule CRDs are Terraform-managed, applied before ArgoCD ever syncs.
+  # Depends on:
+  # - network-policies-cluster-wide
   - name: blackbox-exporter
     path: charts/monitoring/blackbox-exporter
     destination:
       namespace: monitoring
-    syncWave: 2
+    syncWave: 3
 
   # --- Prometheus Rules ---
   - name: prometheus-rules
     path: charts/monitoring/prometheus-rules
     destination:
       namespace: monitoring
-    syncWave: 0
+    syncWave: -1
   # Depends on external-secrets-operator.
   - name: argocd-secrets
     path: charts/external-secrets-operator/secret-sync
     destination:
       namespace: argocd
-    syncWave: 1
+    syncWave: 4
     extraValueFiles:
       - charts/external-secrets-operator/secret-sync/argocd-secrets-values.yaml
   # Depends on:
@@ -235,7 +244,21 @@ applications:
     path: manifests/argocd-server-grpc-service
     destination:
       namespace: argocd
-    syncWave: 6
+    syncWave: 4
+  # Depends on:
+  # - cilium (CiliumNetworkPolicy CRD)
+  - name: argocd-network-policies
+    path: manifests/network-policies/argocd
+    destination:
+      namespace: argocd
+    syncWave: 1
+  # Depends on:
+  # - cilium (CiliumNetworkPolicy CRD)
+  - name: network-policies-kube-system
+    path: manifests/network-policies/kube-system
+    destination:
+      namespace: kube-system
+    syncWave: 1
   # Depends on:
   # - argocd-server-grpc-service (backendRefs must exist first)
   # - gateway-private
@@ -243,7 +266,7 @@ applications:
     path: charts/gateway-api/httproute
     destination:
       namespace: argocd
-    syncWave: 7
+    syncWave: 6
     extraValueFiles:
       - charts/gateway-api/gateway/private-gateway-values.yaml
       - charts/gateway-api/httproute/argocd-httproute-values.yaml
@@ -254,26 +277,29 @@ applications:
     path: charts/external-secrets-operator/secret-sync
     destination:
       namespace: tailscale
-    syncWave: 1
+    syncWave: 4
     extraValueFiles:
       - charts/external-secrets-operator/secret-sync/tailscale-secrets-values.yaml
   # Depends on:
   # - tailscale-secrets (needs the oauth secret before it can register with Tailscale)
+  # - network-policies-cluster-wide
   # - See DaemonSets Priority above.
   - name: tailscale-operator
     path: charts/tailscale/operator
     destination:
       namespace: tailscale
-    syncWave: 3
+    syncWave: 5
     # Chart bundles its own CRDs; avoids client-side apply's annotation size limit.
     syncOptions:
       - ServerSideApply=true
-  # Depends on tailscale-operator (controller and its CRDs).
+  # Depends on:
+  # - tailscale-operator (controller and its CRDs)
+  # - network-policies-cluster-wide
   - name: tailscale-connector
     path: charts/tailscale/connector
     destination:
       namespace: tailscale
-    syncWave: 4
+    syncWave: 6
 
   # --- Prometheus stack ---
   # Depends on external-secrets-operator.
@@ -281,7 +307,7 @@ applications:
     path: charts/external-secrets-operator/secret-sync
     destination:
       namespace: monitoring
-    syncWave: 1
+    syncWave: 4
     extraValueFiles:
       - charts/external-secrets-operator/secret-sync/grafana-secrets-values.yaml
   # Depends on external-secrets-operator.
@@ -289,18 +315,19 @@ applications:
     path: charts/external-secrets-operator/secret-sync
     destination:
       namespace: monitoring
-    syncWave: 1
+    syncWave: 4
     extraValueFiles:
       - charts/external-secrets-operator/secret-sync/alertmanager-secrets-values.yaml
   # Depends on:
   # - grafana-secrets (needs the admin secret before Grafana's first boot)
   # - alertmanager-secrets (Alertmanager mounts it via alertmanagerSpec.secrets, so it must
   #   exist before the pod can start)
+  # - network-policies-cluster-wide
   - name: kube-prometheus-stack
     path: charts/monitoring/kube-prometheus-stack
     destination:
       namespace: monitoring
-    syncWave: 2
+    syncWave: 5
     # Avoids client-side apply's annotation size limit on this release's larger resources
     # (e.g. the bundled default PrometheusRules).
     syncOptions:
@@ -347,13 +374,14 @@ applications:
 
   # --- VPA (recommender only) ---
   # Depends on:
-  # - See DaemonSets Priority above.
   # - kube-prometheus-stack (startup history backfill, non-fatal if not ready yet)
+  # - network-policies-cluster-wide
+  # - See DaemonSets Priority above.
   - name: vpa
     path: charts/right-sizing/vpa
     destination:
       namespace: vpa
-    syncWave: 3
+    syncWave: 6
     # Chart bundles its own CRDs; avoids client-side apply's annotation size limit.
     syncOptions:
       - ServerSideApply=true
@@ -361,12 +389,13 @@ applications:
   # --- Goldilocks ---
   # Depends on:
   # - vpa (recommender + VPA CRD)
+  # - network-policies-cluster-wide
   # - See DaemonSets Priority above.
   - name: goldilocks
     path: charts/right-sizing/goldilocks
     destination:
       namespace: goldilocks
-    syncWave: 4
+    syncWave: 7
   # Depends on:
   # - gateway-private
   # - goldilocks (the backend Service)
@@ -374,7 +403,7 @@ applications:
     path: charts/gateway-api/httproute
     destination:
       namespace: goldilocks
-    syncWave: 6
+    syncWave: 8
     extraValueFiles:
       - charts/gateway-api/gateway/private-gateway-values.yaml
       - charts/gateway-api/httproute/goldilocks-httproute-values.yaml
@@ -382,14 +411,18 @@ applications:
   # --- Network Policies ---
   # Depends on:
   # - cilium (CiliumNetworkPolicy CRD)
-  - name: network-policies-namespace
-    path: manifests/network-policies/namespace
+  # - argocd-network-policies, network-policies-kube-system (default-deny.yaml,
+  #   kube-apiserver-egress.yaml, and kube-dns-egress.yaml list argocd and kube-system,
+  #   so those rules only work once the workload allow-policies already exist)
+  - name: network-policies-cluster-wide
+    path: manifests/network-policies/cluster-wide
     destination:
       namespace: kube-system
-    syncWave: 1
+    syncWave: 2
 
   # --- Podinfo ---
   # Depends on:
+  # - network-policies-cluster-wide
   # - See DaemonSets Priority above.
   - name: podinfo
     path: manifests/podinfo

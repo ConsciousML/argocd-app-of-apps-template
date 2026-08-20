@@ -1,0 +1,33 @@
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: default-deny
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: io.kubernetes.pod.namespace
+        operator: In
+        # add a namespace name here to opt it in
+        values:
+          - argocd
+          - cilium-secrets
+          - default
+          - external-dns
+          - external-secrets
+          - gateway
+          - goldilocks
+          - kube-node-lease
+          - kube-system
+          - kube-public
+          - loki
+          - monitoring
+          - podinfo
+          - tailscale
+          - vpa
+  enableDefaultDeny:
+    ingress: true
+    egress: true
+  ingress:
+    - {}
+  egress:
+    - {}

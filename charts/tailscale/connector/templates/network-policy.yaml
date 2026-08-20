@@ -1,0 +1,61 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: tailscale-connector
+  namespace: {{ .Release.Namespace }}
+spec:
+  # The subnet router proxy pod is created dynamically by the operator per Connector CR, its
+  # `app` label is a random UUID. `tailscale.com/parent-resource-type` is the stable
+  # component-level label instead.
+  endpointSelector:
+    matchLabels:
+      tailscale.com/parent-resource-type: connector
+  egress:
+    # Tailscale control plane and DERP relays, see the tailscale-operator chart's network policy.
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+    # DERP netcheck HTTP probing (also hits the EC2 instance metadata service, which isn't a
+    # Cilium-managed endpoint so it resolves to "world" here rather than "host").
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+    # STUN, for NAT traversal / DERP discovery.
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "3478"
+              protocol: UDP
+    # Ping to peers/relays, for connectivity checks (netcheck).
+    - icmps:
+        - fields:
+            - type: EchoRequest
+              family: IPv4
+    # Direct WireGuard connections to tailnet peers, once DERP/STUN negotiate one. The peer's
+    # port depends on its own NAT/socket allocation, not always the 41641 default, so this
+    # allows the full ephemeral range rather than just 41641.
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "1024"
+              endPort: 65535
+              protocol: UDP
+    # VPC's Amazon-provided DNS resolver, forwarding queries for the private hosted zone from
+    # tailnet peers routed through this subnet router. Not a Cilium-managed endpoint, so it
+    # resolves to "world" here rather than the cluster's own kube-dns-egress policy.
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP

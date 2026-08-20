@@ -1,0 +1,26 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: goldilocks-dashboard
+  namespace: {{ .Release.Namespace }}
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: goldilocks
+      app.kubernetes.io/component: dashboard
+  ingress:
+    # Private ALB (targetType: ip), forwarding traffic straight to the pod IP. Its ENIs
+    # aren't a Cilium identity, so this is "world".
+    - fromEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    # kubelet liveness/readiness probes, sourced from the node.
+    - fromEntities:
+        - host
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP

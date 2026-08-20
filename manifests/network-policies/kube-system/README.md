@@ -1,0 +1,27 @@
+# network-policies/kube-system
+
+Plain manifests (no Helm), one `CiliumNetworkPolicy` per component with no ArgoCD-owned chart
+to colocate a `templates/network-policy.yaml` in. `coredns`, `metrics-server`, `karpenter`,
+`ebs-csi-controller`, and `ebs-csi-node` are all Terraform or EKS-addon managed, so they land
+here as flat YAML.
+
+`network-policy-shared-egress.yaml` is namespace-wide: kube-apiserver and coredns egress for
+every component in this namespace, including `aws-load-balancer-controller` and `hubble-relay`
+and `hubble-ui`, which are deployed by other charts (`charts/aws-lbc`, `charts/cilium`). Cilium
+enforces by pod labels and namespace, not by which Application created the resource, so one
+file covers all of them.
+
+This Application syncs at an earlier wave than `network-policies-cluster-wide`, so these allow
+rules exist before `kube-system` (already in [`default-deny.yaml`](../cluster-wide/default-deny.yaml)'s
+namespace list) gets denied, the same reasoning as [`../argocd`](../argocd/README.md)'s own
+copy. kube-system just can't colocate everything in a single chart the way argocd does, since
+most of its components have none.
+
+`aws-node`, `kube-proxy`, `cilium`, `cilium-operator`, and `eks-pod-identity-agent` have no
+policy here. They're all `hostNetwork: true`, which Cilium collapses into the single per-node
+`reserved:host` identity when host firewall isn't enabled. There's no distinct endpoint to
+attach a `CiliumNetworkPolicy` to, and `default-deny.yaml`'s namespace-scoped selector can't
+reach `reserved:host` either. Confirmed empirically: restarting each of them produced zero
+Hubble-visible flows.
+
+See [`docs/network-policies.md`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/docs/network-policies.md) in the catalog repo for how `CiliumNetworkPolicy` enforcement works.

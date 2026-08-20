@@ -1,0 +1,51 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: prometheus
+  namespace: {{ .Release.Namespace }}
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: prometheus
+      operator.prometheus.io/name: kube-prometheus-stack-prometheus
+  ingress:
+    # Private ALB (targetType: ip), forwarding traffic straight to the pod IP.
+    - fromEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "9090"
+              protocol: TCP
+    # kubelet liveness/readiness probes, sourced from the node.
+    - fromEntities:
+        - host
+      toPorts:
+        - ports:
+            - port: "9090"
+              protocol: TCP
+    # Self-monitoring (self-monitor: true ServiceMonitor) and Grafana's Prometheus datasource.
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: prometheus
+        - matchLabels:
+            app.kubernetes.io/name: grafana
+      toPorts:
+        - ports:
+            - port: "9090"
+              protocol: TCP
+    # Self-monitoring scraping the config-reloader sidecar.
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: prometheus
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+  egress:
+    # serviceMonitorSelectorNilUsesHelmValues/podMonitorSelectorNilUsesHelmValues are false (see
+    # docs/monitoring.md), so Prometheus scrapes any ServiceMonitor/PodMonitor in the cluster,
+    # on any port, in any namespace. Enumerating every target here doesn't scale (every new
+    # addon's ServiceMonitor needed a new entry), so this allows all in-cluster destinations
+    # instead. Still blocks egress to `world`, so no exfiltration path out of the cluster.
+    - toEntities:
+        - cluster

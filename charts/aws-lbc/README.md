@@ -6,6 +6,7 @@ Deploys the [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws
 
 - **[Chart.yaml](Chart.yaml)**: dependency version must stay in sync with `local.version_aws_lbc` in the catalog's `terragrunt.stack.hcl`
 - **[values.yaml](values.yaml)**: `clusterName`, `region`, and `vpcId` are placeholders. The catalog's [`app_of_apps` unit](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl) injects the real values via `appParams.aws-lbc` at sync time
+- **[templates/network-policy.yaml](templates/network-policy.yaml)**: `CiliumNetworkPolicy` for the controller
 
 The chart bundles its own copy of the Gateway API CRDs. [`crds-aws-lbc-gateway-api`](../../manifests/crds/aws-lbc-gateway-api) installs them again separately so dependents can target the CRDs without depending on this controller.
 

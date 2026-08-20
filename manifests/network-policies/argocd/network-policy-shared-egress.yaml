@@ -1,0 +1,30 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: argocd-shared-egress
+  namespace: argocd
+spec:
+  # Lives here, not cluster-wide/, so argocd never depends on network-policies-cluster-wide for
+  # DNS/API access. ArgoCD manages that Application too: a dependency risks a lockout it can't
+  # sync itself out of.
+  endpointSelector: {}
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+    # Also covers argocd-redis-secret-init (a pre-install/pre-upgrade Job, no Deployment/
+    # StatefulSet to get its own policy file): it only creates the redis auth Secret via
+    # the API, no other traffic.
+    - toEntities:
+        - kube-apiserver
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
