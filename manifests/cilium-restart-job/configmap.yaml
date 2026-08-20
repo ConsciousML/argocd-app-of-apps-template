@@ -33,6 +33,17 @@ data:
       done | sort -u
     }
 
+    restartable_targets() {
+      while IFS=/ read -r ns kind name; do
+        [ -z "$ns" ] && continue
+        case "$kind" in
+          Deployment | StatefulSet | DaemonSet) ;;
+          *) continue ;;
+        esac
+        echo "${ns}/${kind}/${name}"
+      done
+    }
+
     log_info "Scanning for pods missing a CiliumEndpoint"
     missing=$(find_missing)
 
@@ -45,14 +56,15 @@ data:
       log_info "Missing CiliumEndpoint: $line"
     done
 
-    targets=$(printf '%s\n' "$missing" | while IFS=/ read -r ns kind name; do
+    targets=$(printf '%s\n' "$missing" | restartable_targets)
+
+    printf '%s\n' "$missing" | while IFS=/ read -r ns kind name; do
       [ -z "$ns" ] && continue
-      if [ -z "$kind" ] || [ "$kind" = "Pod" ]; then
-        log_info "Skipping $ns/$name: bare pod, no controller to roll out"
-        continue
-      fi
-      echo "${ns}/${kind}/${name}"
-    done)
+      case "$kind" in
+        Deployment | StatefulSet | DaemonSet) ;;
+        *) log_info "Skipping $ns/${name:-?}: $kind is not something rollout restart can roll" ;;
+      esac
+    done
 
     printf '%s\n' "$targets" | while IFS=/ read -r ns kind name; do
       [ -z "$ns" ] && continue
@@ -70,11 +82,17 @@ data:
 
     log_info "Re-checking for pods still missing a CiliumEndpoint"
     still_missing=$(find_missing)
+    still_missing_targets=$(printf '%s\n' "$still_missing" | restartable_targets)
 
-    if [ -n "$still_missing" ]; then
-      printf '%s\n' "$still_missing" | while IFS= read -r line; do
-        log_error "Still missing CiliumEndpoint: $line"
-      done
+    printf '%s\n' "$still_missing" | while IFS=/ read -r ns kind name; do
+      [ -z "$ns" ] && continue
+      case "$kind" in
+        Deployment | StatefulSet | DaemonSet) log_error "Still missing CiliumEndpoint: $ns/$kind/$name" ;;
+        *) log_info "Still missing CiliumEndpoint (not actionable): $ns/$kind/${name:-?}" ;;
+      esac
+    done
+
+    if [ -n "$still_missing_targets" ]; then
       log_error "Restart did not resolve all missing CiliumEndpoints"
       exit 1
     fi

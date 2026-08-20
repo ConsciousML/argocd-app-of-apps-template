@@ -21,3 +21,13 @@ spec:
               protocol: UDP
             - port: "53"
               protocol: TCP
+    # EKS Pod Identity credential endpoint, a host-owned address Cilium resolves to the
+    # reserved "host" identity. Granted here rather than relying on the cluster-wide
+    # eks-pod-identity-egress CCNP, which depends on this app already existing and so can
+    # never land before it.
+    - toEntities:
+        - host
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
