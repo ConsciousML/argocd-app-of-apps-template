@@ -253,7 +253,10 @@ applications:
       namespace: argocd
     syncWave: 1
   # Depends on:
-  # - cilium (CiliumNetworkPolicy CRD)
+  # - cilium (CiliumNetworkPolicy CRD; also creates the hubble-relay and hubble-ui workloads
+  #   two of this app's policies select). Its own release can't include those two policies:
+  #   the CRD and a CR using it in the same sync fails ArgoCD's pre-sync validation on a fresh
+  #   cluster, so they live here instead, one wave later.
   - name: network-policies-kube-system
     path: manifests/network-policies/kube-system
     destination:
