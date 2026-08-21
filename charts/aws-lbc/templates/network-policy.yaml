@@ -30,9 +30,11 @@ spec:
             - port: "8080"
               protocol: TCP
   egress:
-    # ELBv2 and EC2 API, reached via NAT as `world`.
-    - toEntities:
-        - world
+    # ELBv2 and EC2 API, via the VPC interface endpoints.
+    - toCIDR:
+        {{- range (concat .Values.vpcEndpointCidrs.ec2 .Values.vpcEndpointCidrs.elasticloadbalancing) }}
+        - {{ . }}/32
+        {{- end }}
       toPorts:
         - ports:
             - port: "443"

@@ -268,7 +268,7 @@ applications:
   #   cluster, so they live here instead, one wave later.
   # - cilium-restart-job
   - name: network-policies-kube-system
-    path: manifests/network-policies/kube-system
+    path: charts/network-policies/kube-system
     destination:
       namespace: kube-system
     syncWave: 2

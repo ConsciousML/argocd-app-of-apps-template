@@ -1,3 +1,6 @@
+vpcEndpointCidrs:
+  route53: []
+
 external-dns:
   provider:
     name: aws

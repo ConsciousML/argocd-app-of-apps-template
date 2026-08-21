@@ -8,7 +8,7 @@
 - **[templates/dynamic-metrics-configmap.yaml](templates/dynamic-metrics-configmap.yaml)**: Hubble metrics via the dynamic exporter (`hubble.metrics.dynamic.*` in `values.yaml`), so metric changes hot reload without a `cilium-agent` restart. `dns` and `http` are excluded. Both need the L7 proxy, which is off (`envoy.enabled: false`), and L7 visibility is a known limitation of `aws-cni` chaining mode
 - **`hubble-ui-httproute`** (app-of-apps): an instance of the generic [`httproute`](https://github.com/ConsciousML/argocd-app-of-apps-template/tree/main/charts/gateway-api/httproute) chart, exposes the Hubble UI
 
-`CiliumNetworkPolicy` for `hubble-relay` and `hubble-ui` live in [`../../manifests/network-policies/kube-system`](../../manifests/network-policies/kube-system) instead of here. This chart's release creates the `CiliumNetworkPolicy` CRD itself, so a `CiliumNetworkPolicy` resource in the same release fails ArgoCD's pre-sync validation on a fresh cluster (the CRD isn't registered yet when the CR is checked). Keeping them in a later-wave Application avoids the race.
+`CiliumNetworkPolicy` for `hubble-relay` and `hubble-ui` live in [`../network-policies/kube-system`](../network-policies/kube-system) instead of here. This chart's release creates the `CiliumNetworkPolicy` CRD itself, so a `CiliumNetworkPolicy` resource in the same release fails ArgoCD's pre-sync validation on a fresh cluster (the CRD isn't registered yet when the CR is checked). Keeping them in a later-wave Application avoids the race.
 
 ## Querying Hubble Metrics
 

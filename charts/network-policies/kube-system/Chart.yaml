@@ -1,0 +1,5 @@
+apiVersion: v2
+name: network-policies-kube-system
+description: CiliumNetworkPolicy rules for kube-system addons (coredns, ebs-csi, karpenter, hubble, metrics-server)
+type: application
+version: 0.1.0

@@ -1,3 +1,6 @@
+vpcEndpointCidrs:
+  secretsmanager: []
+
 external-secrets:
   serviceMonitor:
     enabled: true

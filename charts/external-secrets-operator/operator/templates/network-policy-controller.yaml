@@ -18,10 +18,11 @@ spec:
             - port: "8080"
               protocol: TCP
   egress:
-    # secretsmanager.<region>.amazonaws.com, no VPC endpoint configured so
-    # this egresses through the NAT gateway to public AWS IPs ("world").
-    - toEntities:
-        - world
+    # secretsmanager.<region>.amazonaws.com, via the VPC interface endpoint.
+    - toCIDR:
+        {{- range .Values.vpcEndpointCidrs.secretsmanager }}
+        - {{ . }}/32
+        {{- end }}
       toPorts:
         - ports:
             - port: "443"
