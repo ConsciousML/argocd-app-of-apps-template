@@ -30,10 +30,11 @@ spec:
             - port: "8080"
               protocol: TCP
   egress:
-    # ELBv2, EC2, and ResourceGroupsTaggingAPI (tag-based resource discovery on every
-    # reconcile), via the VPC interface endpoints.
+    # ELBv2, EC2, ResourceGroupsTaggingAPI (tag-based resource discovery on every
+    # reconcile), Shield (GetSubscriptionState before attaching Shield/WAF protection),
+    # and ACM (certificateArn lookups), via the VPC interface endpoints.
     - toCIDR:
-        {{- range (concat .Values.vpcEndpointCidrs.ec2 .Values.vpcEndpointCidrs.elasticloadbalancing .Values.vpcEndpointCidrs.tagging) }}
+        {{- range (concat .Values.vpcEndpointCidrs.ec2 .Values.vpcEndpointCidrs.elasticloadbalancing .Values.vpcEndpointCidrs.tagging .Values.vpcEndpointCidrs.shield .Values.vpcEndpointCidrs.acm) }}
         - {{ . }}/32
         {{- end }}
       toPorts:

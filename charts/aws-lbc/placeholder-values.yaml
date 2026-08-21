@@ -6,6 +6,8 @@ vpcEndpointCidrs:
   ec2: ["10.0.0.10"]
   elasticloadbalancing: ["10.0.0.11"]
   tagging: ["10.0.0.12"]
+  shield: ["10.0.0.13"]
+  acm: ["10.0.0.14"]
 
 aws-load-balancer-controller:
   clusterName: "placeholder-cluster"
