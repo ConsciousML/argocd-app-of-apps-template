@@ -2,6 +2,11 @@
 
 `CiliumNetworkPolicy` rules for kube-system addons. `coredns`, `metrics-server`, `karpenter`, `ebs-csi-controller`, and `ebs-csi-node` are all Terraform or EKS-addon managed, with no other ArgoCD-owned chart to colocate a `templates/network-policy.yaml` in, so their policies live here.
 
+## What's Inside
+
+- **[values.yaml](values.yaml)**: `vpcEndpointCidrs` (`ec2`, `sqs`, `iam`) are placeholders. The catalog's [`app_of_apps` unit](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl) injects the real pinned VPC interface endpoint IPs via `appParams.network-policies-kube-system` at sync time
+- **[templates/](templates/)**: one `CiliumNetworkPolicy` per component, listed below. `ebs-csi-controller`'s EBS-API egress and `karpenter`'s EC2 Fleet/SQS/IAM egress are scoped via `toCIDR` to `vpcEndpointCidrs`, not `toEntities: world`
+
 `hubble-relay` and `hubble-ui` do have an ArgoCD-owned chart (`charts/cilium`), but their policies still live here instead of there: that chart's release also creates the `CiliumNetworkPolicy` CRD, and a `CiliumNetworkPolicy` resource in the same release fails ArgoCD's pre-sync validation on a fresh cluster (the CRD isn't registered yet when the CR is checked). This app syncs at a later wave than `cilium`, so the CRD is already established by the time these apply. See [`charts/cilium`](../../cilium)'s README.
 
 `network-policy-shared-egress.yaml` is namespace-wide: kube-apiserver and coredns egress for every component in this namespace, including `aws-load-balancer-controller`, `hubble-relay`, and `hubble-ui`, which are deployed by other charts (`charts/aws-lbc`, `charts/cilium`). Cilium enforces by pod labels and namespace, not by which Application created the resource, so one file covers all of them.
