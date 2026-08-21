@@ -3,6 +3,7 @@
 vpcEndpointCidrs:
   ec2: []
   elasticloadbalancing: []
+  tagging: []
 
 aws-load-balancer-controller:
   # Injected by the catalog (terragrunt-template-catalog-eks) via appParams, from the EKS
