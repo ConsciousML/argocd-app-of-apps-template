@@ -1,3 +1,5 @@
+# Injected by the catalog (terragrunt-template-catalog-eks) via appParams, pinned VPC
+# interface endpoint IPs. See units/eks/addons/argocd/app_of_apps in that repo.
 vpcEndpointCidrs:
   route53: []
 
