@@ -30,9 +30,13 @@ spec:
             - port: "8080"
               protocol: TCP
   egress:
-    # ELBv2 and EC2 API, reached via NAT as `world`.
-    - toEntities:
-        - world
+    # ELBv2, EC2, ResourceGroupsTaggingAPI (tag-based resource discovery on every
+    # reconcile), Shield (GetSubscriptionState before attaching Shield/WAF protection),
+    # and ACM (certificateArn lookups), via the VPC interface endpoints.
+    - toCIDR:
+        {{- range (concat .Values.vpcEndpointCidrs.ec2 .Values.vpcEndpointCidrs.elasticloadbalancing .Values.vpcEndpointCidrs.tagging .Values.vpcEndpointCidrs.shield .Values.vpcEndpointCidrs.acm) }}
+        - {{ . }}/32
+        {{- end }}
       toPorts:
         - ports:
             - port: "443"

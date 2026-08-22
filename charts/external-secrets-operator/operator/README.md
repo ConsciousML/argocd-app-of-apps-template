@@ -1,11 +1,12 @@
 # external-secrets-operator
 
-Deploys the [External Secrets Operator](https://external-secrets.io/latest/) controller and CRDs (`SecretStore`, `ExternalSecret`) via the upstream `external-secrets` chart, unmodified.
+Deploys the [External Secrets Operator](https://external-secrets.io/latest/) controller and CRDs (`SecretStore`, `ExternalSecret`) via the upstream `external-secrets` chart.
 
 ## What's Inside
 
-- **[Chart.yaml](Chart.yaml)**: vendors the upstream chart with no value overrides. See its entry in [`apps/values.yaml`](../../../apps/values.yaml) for the `tool.helm.releaseName` pin
-- **[templates/network-policy-controller.yaml](templates/network-policy-controller.yaml)**, **[templates/network-policy-webhook.yaml](templates/network-policy-webhook.yaml)**, and **[templates/network-policy-cert-controller.yaml](templates/network-policy-cert-controller.yaml)**: one `CiliumNetworkPolicy` per controller
+- **[Chart.yaml](Chart.yaml)**: vendors the upstream chart. See its entry in [`apps/values.yaml`](../../../apps/values.yaml) for the `tool.helm.releaseName` pin
+- **[values.yaml](values.yaml)**: enables the controller's `serviceMonitor`; `vpcEndpointCidrs.secretsmanager` is a placeholder injected by the catalog's `app_of_apps` unit via `appParams.external-secrets-operator`
+- **[templates/network-policy-controller.yaml](templates/network-policy-controller.yaml)**, **[templates/network-policy-webhook.yaml](templates/network-policy-webhook.yaml)**, and **[templates/network-policy-cert-controller.yaml](templates/network-policy-cert-controller.yaml)**: one `CiliumNetworkPolicy` per controller. The controller's egress to the Secrets Manager API is scoped via `toCIDR` to the pinned VPC interface endpoint IPs in `vpcEndpointCidrs.secretsmanager`, not `toEntities: world`
 
 ## Upstream Dependencies
 

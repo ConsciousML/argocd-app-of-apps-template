@@ -4,10 +4,10 @@ Generic [ExternalDNS](https://kubernetes-sigs.github.io/external-dns/) chart, re
 
 ## What's Inside
 
-- **[values.yaml](values.yaml)**: placeholders, see inline comments for what overrides each and when
+- **[values.yaml](values.yaml)**: placeholders, see inline comments for what overrides each and when. `vpcEndpointCidrs.route53` is injected per-instance by the catalog's `app_of_apps` unit via `appParams.external-dns-private`/`external-dns-public`
 - **[external-dns-private-values.yaml](external-dns-private-values.yaml)** and **[external-dns-public-values.yaml](external-dns-public-values.yaml)**: per-instance overrides, loaded via `extraValueFiles` in [`apps/values.yaml`](../../apps/values.yaml)
 - **[templates/predelete-hook.yaml](templates/predelete-hook.yaml)**: a `PreDelete` hook that delays an instance's teardown, giving ExternalDNS time to notice a just-removed `Ingress` or `HTTPRoute` and clean up its Route53 records first
-- **[templates/network-policy.yaml](templates/network-policy.yaml)**: this instance's `CiliumNetworkPolicy`
+- **[templates/network-policy.yaml](templates/network-policy.yaml)**: this instance's `CiliumNetworkPolicy`. Egress to the Route53 API is scoped via `toCIDR` to the pinned VPC interface endpoint IPs in `vpcEndpointCidrs.route53`, not `toEntities: world`
 
 ## Upstream Dependencies
 

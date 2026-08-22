@@ -26,10 +26,11 @@ spec:
             - port: "7979"
               protocol: TCP
   egress:
-    # AWS Route53 API: a global (non-regional) HTTPS endpoint outside the VPC, so it's "world"
-    # rather than a Cilium identity.
-    - toEntities:
-        - world
+    # AWS Route53 API, via the VPC interface endpoint.
+    - toCIDR:
+        {{- range .Values.vpcEndpointCidrs.route53 }}
+        - {{ . }}/32
+        {{- end }}
       toPorts:
         - ports:
             - port: "443"

@@ -15,9 +15,11 @@ spec:
             - port: "9808"
               protocol: TCP
   egress:
-    # EBS API (CreateVolume, AttachVolume, and so on), reached via NAT as `world`.
-    - toEntities:
-        - world
+    # EBS API (CreateVolume, AttachVolume, and so on), via the VPC interface endpoint.
+    - toCIDR:
+        {{- range .Values.vpcEndpointCidrs.ec2 }}
+        - {{ . }}/32
+        {{- end }}
       toPorts:
         - ports:
             - port: "443"

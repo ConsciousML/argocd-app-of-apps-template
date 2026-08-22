@@ -23,9 +23,12 @@ spec:
             - port: "8080"
               protocol: TCP
   egress:
-    # EC2 Fleet API and the SQS interruption queue, both reached via NAT as `world`.
-    - toEntities:
-        - world
+    # EC2 Fleet API, the SQS interruption queue, and IAM (GetInstanceProfile, called by
+    # the EC2NodeClass reconciler), via the VPC interface endpoints.
+    - toCIDR:
+        {{- range (concat .Values.vpcEndpointCidrs.ec2 .Values.vpcEndpointCidrs.sqs .Values.vpcEndpointCidrs.iam) }}
+        - {{ . }}/32
+        {{- end }}
       toPorts:
         - ports:
             - port: "443"

@@ -77,8 +77,9 @@ spec:
         - ports:
             - port: "11211"
               protocol: TCP
-    # chunks/ruler S3 buckets. No VPC endpoint configured, so this egresses through the
-    # NAT gateway to public AWS IPs ("world").
+    # chunks/ruler S3 buckets, via the VPC's S3 gateway endpoint. A gateway endpoint has
+    # no ENI/IP to scope a toCIDR rule to (it's a route table prefix-list entry), so this
+    # still shows as "world" to Cilium even though the traffic never hits the NAT gateway.
     - toEntities:
         - world
       toPorts:
