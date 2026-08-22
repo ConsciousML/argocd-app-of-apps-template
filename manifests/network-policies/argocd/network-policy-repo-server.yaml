@@ -26,6 +26,13 @@ spec:
         - ports:
             - port: "8081"
               protocol: TCP
+    # kubelet liveness/readiness probes: they target the metrics port, not 8081.
+    - fromEntities:
+        - host
+      toPorts:
+        - ports:
+            - port: "8084"
+              protocol: TCP
     # kube-prometheus-stack scraping /metrics (ServiceMonitor).
     - fromEndpoints:
         - matchLabels:
