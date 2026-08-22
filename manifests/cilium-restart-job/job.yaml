@@ -6,9 +6,11 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "1"
 spec:
-  # 1 retry: the whole run is idempotent (re-restarting an already-restarted workload is a
-  # no-op risk-wise), so one retry absorbs a transient failure without masking a real one.
-  backoffLimit: 1
+  # The whole run is idempotent (re-restarting an already-restarted workload is a no-op
+  # risk-wise), so retries absorb transient failures without masking a real one. Raised from
+  # 1: a wave-0 Application can report Healthy before its DaemonSet pods are actually Ready
+  # (aggregated health lags real pod state), racing this job's restart against cilium startup.
+  backoffLimit: 4
   # Each target gets up to 10m for its own rollout status wait; this is a safety net for
   # the whole run across every target found, not a per-target timeout.
   activeDeadlineSeconds: 3600
