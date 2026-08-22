@@ -3,6 +3,9 @@ cilium:
   cni:
     chainingMode: aws-cni
     exclusive: false
+    # Chained mode: vpc-cni immediately takes over once the conflist is gone, so
+    # removing it on agent shutdown/uninstall doesn't leave nodes unmanaged.
+    uninstall: true
   routingMode: native
   enableIPv4Masquerade: false
   kubeProxyReplacement: false
