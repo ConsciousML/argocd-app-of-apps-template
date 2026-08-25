@@ -11,9 +11,7 @@ cilium:
   kubeProxyReplacement: false
   # Cilium is the sole NetworkPolicy enforcer. vpc-cni's own enforcement stays
   # disabled (EKS default), so the two don't conflict.
-  # TEMP: set to "never" to test the podinfo HPA/k6 demo (argocd-app-of-apps-template#87)
-  # without a CiliumNetworkPolicy in place yet. Revert to "default" once that policy is added.
-  policyEnforcementMode: never
+  policyEnforcementMode: default
   # L7 proxy, unneeded for L3/4 flow visibility, would add another DaemonSet per node.
   envoy:
     enabled: false

@@ -4,7 +4,7 @@ How to generate load against a workload in this cluster.
 
 ## Running a Load Test
 
-podinfo has an [HPA on CPU](../manifests/podinfo/podinfo-hpa.yaml) as the default autoscaling pattern for a stateless HTTP service, CPU is a faithful load signal for it.
+podinfo has an [HPA](../manifests/podinfo/podinfo-hpa.yaml) that will scale the deployment on CPU load.
 
 Trigger a run:
 
