@@ -16,3 +16,7 @@ spec:
         target:
           type: Utilization
           averageUtilization: 50
+  # Default scale-down stabilization is 5m, too slow to watch the demo unfold.
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 30
