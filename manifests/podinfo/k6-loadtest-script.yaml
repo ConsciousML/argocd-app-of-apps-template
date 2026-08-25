@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k6-loadtest-script
+data:
+  script.js: |
+    import http from 'k6/http';
+
+    export const options = {
+      scenarios: {
+        gaussian_load: {
+          executor: 'ramping-vus',
+          startVUs: 0,
+          stages: [
+            { duration: '45s', target: 2 },
+            { duration: '45s', target: 8 },
+            { duration: '45s', target: 20 },
+            { duration: '45s', target: 38 },
+            { duration: '45s', target: 50 },
+            { duration: '45s', target: 38 },
+            { duration: '45s', target: 20 },
+            { duration: '45s', target: 8 },
+            { duration: '45s', target: 2 },
+          ],
+          gracefulRampDown: '15s',
+        },
+      },
+    };
+
+    export default function () {
+      http.get('http://podinfo.podinfo.svc.cluster.local:9898/');
+    }
