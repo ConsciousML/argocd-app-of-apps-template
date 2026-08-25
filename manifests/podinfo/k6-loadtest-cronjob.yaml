@@ -17,6 +17,13 @@ spec:
             app.kubernetes.io/name: k6-loadtest
         spec:
           restartPolicy: Never
+          nodeSelector:
+            karpenter.sh/nodepool: elastic
+          tolerations:
+            - key: "karpenter.sh/workload-class"
+              operator: "Equal"
+              value: "elastic"
+              effect: "NoSchedule"
           securityContext:
             runAsNonRoot: true
             runAsUser: 1000
