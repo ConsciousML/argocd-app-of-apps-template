@@ -3,7 +3,8 @@ kind: Deployment
 metadata:
   name: podinfo
 spec:
-  replicas: 1
+  # No replicas set: the HPA owns this field. Setting it here would fight ArgoCD's
+  # selfHeal, which reverts spec.replicas back to whatever git declares on every sync.
   revisionHistoryLimit: 3
   selector:
     matchLabels:
@@ -51,8 +52,8 @@ spec:
               port: http
           resources:
             requests:
-              cpu: 11m
+              cpu: 50m
               memory: 35M
             limits:
-              cpu: 11m
+              cpu: 50m
               memory: 35M

@@ -34,3 +34,11 @@ spec:
         - ports:
             - port: "9898"
               protocol: TCP
+    # k6-loadtest generating load for the HPA demo, see docs/load-testing.md.
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: k6-loadtest
+      toPorts:
+        - ports:
+            - port: "9898"
+              protocol: TCP

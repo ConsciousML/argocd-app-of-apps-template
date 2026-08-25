@@ -11,6 +11,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6.0.2
 
+      - name: Fail on leftover TEMP markers
+        run: |
+          if grep -rn "TEMP:" --exclude-dir=.git --exclude=ci.yaml .; then
+            echo "Found leftover TEMP: marker(s), revert before merging." >&2
+            exit 1
+          fi
+
       - name: Install mise
         uses: jdx/mise-action@v4.0.1
         with:
