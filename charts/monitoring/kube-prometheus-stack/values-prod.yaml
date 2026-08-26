@@ -1,13 +1,14 @@
 # Retains Prometheus and Alertmanager PVCs on StatefulSet delete, unlike dev and staging.
 
-prometheus:
-  prometheusSpec:
-    persistentVolumeClaimRetentionPolicy:
-      whenDeleted: Retain
-      whenScaled: Retain
+kube-prometheus-stack:
+  prometheus:
+    prometheusSpec:
+      persistentVolumeClaimRetentionPolicy:
+        whenDeleted: Retain
+        whenScaled: Retain
 
-alertmanager:
-  alertmanagerSpec:
-    persistentVolumeClaimRetentionPolicy:
-      whenDeleted: Retain
-      whenScaled: Retain
+  alertmanager:
+    alertmanagerSpec:
+      persistentVolumeClaimRetentionPolicy:
+        whenDeleted: Retain
+        whenScaled: Retain
