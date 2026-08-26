@@ -8,6 +8,13 @@ config:
 
 appParams: {}
 
+# environment has no real default, the catalog sets it (global.environment) when
+# deploying. values.schema.json requires it non-empty, so a bare `helm template` fails
+# loudly instead of silently pointing extraValueFiles at a nonexistent values-.yaml. Use
+# placeholder-values.yaml for local testing.
+global:
+  environment: ""
+
 applications:
   # --- Namespaces ---
   # Owns Namespace resources: pruning or cascade-deleting this app must never delete one,
@@ -201,6 +208,8 @@ applications:
     destination:
       namespace: loki
     syncWave: 4
+    extraValueFiles:
+      - charts/monitoring/loki/values-{{ .Values.global.environment }}.yaml
     tool:
       helm:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
@@ -355,6 +364,7 @@ applications:
         releaseName: kube-prometheus-stack
     extraValueFiles:
       - charts/external-secrets-operator/secret-sync/grafana-secrets-values.yaml
+      - charts/monitoring/kube-prometheus-stack/values-{{ .Values.global.environment }}.yaml
   # Depends on:
   # - gateway-private
   # - kube-prometheus-stack (the backend Service)

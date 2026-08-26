@@ -1,0 +1,15 @@
+# Reclaims Prometheus and Alertmanager PVCs when the StatefulSet is deleted, for cost
+# savings. Scale-down still retains them. Dev and staging only, must not carry to prod.
+
+kube-prometheus-stack:
+  prometheus:
+    prometheusSpec:
+      persistentVolumeClaimRetentionPolicy:
+        whenDeleted: Delete
+        whenScaled: Retain
+
+  alertmanager:
+    alertmanagerSpec:
+      persistentVolumeClaimRetentionPolicy:
+        whenDeleted: Delete
+        whenScaled: Retain

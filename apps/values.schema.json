@@ -3,6 +3,14 @@
   "title": "Values",
   "type": "object",
   "properties": {
+    "global": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["environment"],
+      "properties": {
+        "environment": { "type": "string", "minLength": 1 }
+      }
+    },
     "appParams": {
       "type": "object",
       "additionalProperties": false,

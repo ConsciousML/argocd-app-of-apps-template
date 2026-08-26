@@ -1,0 +1,7 @@
+# Reclaims the singleBinary StatefulSet's PVCs on both delete and scale-down, for cost
+# savings. Dev and staging only, must not carry to prod.
+
+loki:
+  singleBinary:
+    persistence:
+      enableStatefulSetAutoDeletePVC: true

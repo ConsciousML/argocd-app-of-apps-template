@@ -6,9 +6,9 @@ Deploys [kube-prometheus-stack](https://github.com/prometheus-community/helm-cha
 
 Grafana's admin credentials come from `grafana-secrets`, an instance of [`secret-sync`](../../external-secrets-operator/secret-sync). This app loads `secret-sync/grafana-secrets-values.yaml` directly via `extraValueFiles` in [`apps/values.yaml`](../../../apps/values.yaml), on top of its own `values.yaml`, so `admin.existingSecret` and `passwordKey` here stay in sync with `targetSecretName` and `secretKey` over there without duplicating the string.
 
-`fullnameOverride` only pins this chart's own resources, the `prometheus`, `alertmanager`, and operator objects. Grafana, `kube-state-metrics`, and `node-exporter` are bundled subcharts that derive their own resource names from the Helm release name instead. Anything that references those names, like a `httproute` `backendRef`, must match `tool.helm.releaseName` in `apps/values.yaml` or it silently points at the wrong Service.
+**[values-dev.yaml](values-dev.yaml)**, **[values-staging.yaml](values-staging.yaml)**, and **[values-prod.yaml](values-prod.yaml)** hold per-environment overrides, same `extraValueFiles` mechanism. See [`docs/environment-divergence.md`](../../../docs/environment-divergence.md)
 
-> **Note**: several settings here are dev-only. `defaultRules.disabled.KubeCPUOvercommit` is turned off because this node group intentionally runs 2 nodes and the rule can't tell EKS has no control-plane node label. `persistentVolumeClaimRetentionPolicy.whenDeleted: Delete` reclaims volumes for cost savings. Neither should carry over to staging or prod.
+`fullnameOverride` only pins this chart's own resources, the `prometheus`, `alertmanager`, and operator objects. Grafana, `kube-state-metrics`, and `node-exporter` are bundled subcharts that derive their own resource names from the Helm release name instead. Anything that references those names, like a `httproute` `backendRef`, must match `tool.helm.releaseName` in `apps/values.yaml` or it silently points at the wrong Service.
 
 ## Upstream Dependencies
 
