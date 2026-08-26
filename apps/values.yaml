@@ -8,8 +8,10 @@ config:
 
 appParams: {}
 
-# environment defaults empty so a bare `helm template` still renders without erroring;
-# the catalog sets it (global.environment) when deploying.
+# environment has no real default, the catalog sets it (global.environment) when
+# deploying. values.schema.json requires it non-empty, so a bare `helm template` fails
+# loudly instead of silently pointing extraValueFiles at a nonexistent values-.yaml. Use
+# placeholder-values.yaml for local testing.
 global:
   environment: ""
 

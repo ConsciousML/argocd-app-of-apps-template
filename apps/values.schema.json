@@ -6,8 +6,9 @@
     "global": {
       "type": "object",
       "additionalProperties": false,
+      "required": ["environment"],
       "properties": {
-        "environment": { "type": "string" }
+        "environment": { "type": "string", "minLength": 1 }
       }
     },
     "appParams": {
