@@ -21,8 +21,9 @@ Access the ArgoCD UI and verify the `podinfo` app has been deployed.
 2. Add a `Namespace` manifest for your app's target namespace to [`manifests/namespaces`](manifests/namespaces) or sync fails. `privileged` unblocks local testing, but switch to `baseline` before merging unless its functions inherently break the baseline rules. See the [Pod Security Admission docs](https://kubernetes.io/docs/concepts/security/pod-security-admission/).
 3. In [`apps/values.yaml`](apps/values.yaml), under `applications`, add one entry with the app's `name`, `path`, and target namespace.
 4. For Helm chart apps that require runtime values, pass them via `spec.source.helm.values` on the app-of-apps Application CR. The `appParams.<app-name>` map is injected as a Helm values file into the child Application at sync time. See the catalog's [App of Apps integration guide](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/docs/app-of-apps-integration.md) for the catalog-side steps to wire a new app's values.
-5. If the app's config needs to differ across dev, staging, or prod, see [`docs/environment-divergence.md`](docs/environment-divergence.md).
-6. Review [`manifests/network-policies/cluster-wide`](manifests/network-policies/cluster-wide) and add the namespace to `default-deny.yaml`'s `values` list, plus any other policy it needs. Ensure it works.
+5. If you added an `appParams.<app-name>` key in the previous step, add it to [`apps/values.schema.json`](apps/values.schema.json) too. That schema whitelists `appParams` keys, so a typo'd app name there fails loud at lint time instead of silently injecting values nothing reads.
+6. If the app's config needs to differ across dev, staging, or prod, see [`docs/environment-divergence.md`](docs/environment-divergence.md).
+7. Review [`manifests/network-policies/cluster-wide`](manifests/network-policies/cluster-wide) and add the namespace to `default-deny.yaml`'s `values` list, plus any other policy it needs. Ensure it works.
 
 ## Pre-commit Setup (recommended)
 We use a more efficient framework than [pre-commit](https://github.com/pre-commit/pre-commit) called [prek](https://github.com/j178/prek).
