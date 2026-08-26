@@ -1,13 +1,13 @@
-# Working Against the Live Cluster
-
-When a goal must actually take effect on the live EKS cluster, use this loop instead of
-touching the cluster directly.
+---
+name: working-against-live-cluster
+description: Loop for changes that must take effect on the live EKS cluster (edit, sync via ArgoCD, verify). Use whenever a goal requires actually applying a change to the live cluster, not just editing or planning source.
+---
 
 ## Apply manifests through GitOps only
 
-Never run `kubectl apply`, `create`, `patch`, or `edit` to change a resource's spec. ArgoCD is
-the only path from a file to a live resource here. A live edit outside git gets pruned or
-drifts.
+Never run `kubectl apply`, `create`, `patch`, or `edit` to change a resource's spec, unless the
+user explicitly instructs it. ArgoCD is the only path from a file to a live resource here. A
+live edit outside git gets pruned or drifts.
 
 `kubectl rollout restart` is fine, it doesn't touch git-tracked spec, only triggers a new
 rollout of the current one.
@@ -30,4 +30,3 @@ in the catalog repo's README.
 4. `argocd app list`, then sync only the affected app: `argocd app sync <app-name>`.
 5. Verify against the live cluster not against the rendered manifest.
 6. If verification fails, fix the file and resync.
-
