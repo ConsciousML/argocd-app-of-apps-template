@@ -8,8 +8,6 @@ Grafana's admin credentials come from `grafana-secrets`, an instance of [`secret
 
 `fullnameOverride` only pins this chart's own resources, the `prometheus`, `alertmanager`, and operator objects. Grafana, `kube-state-metrics`, and `node-exporter` are bundled subcharts that derive their own resource names from the Helm release name instead. Anything that references those names, like a `httproute` `backendRef`, must match `tool.helm.releaseName` in `apps/values.yaml` or it silently points at the wrong Service.
 
-> **Note**: several settings here are dev-only. `defaultRules.disabled.KubeCPUOvercommit` is turned off because this node group intentionally runs 2 nodes and the rule can't tell EKS has no control-plane node label. `persistentVolumeClaimRetentionPolicy.whenDeleted: Delete` reclaims volumes for cost savings. Neither should carry over to staging or prod.
-
 ## Upstream Dependencies
 
 - **[`prometheus_stack`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/eks/addons/prometheus_stack)** (catalog): `grafana/aws_secret_password` generates the admin password that `grafana-secrets` syncs in

@@ -31,7 +31,7 @@ spec:
       helm:
         valueFiles:
           {{- range .extraValueFiles }}
-          - $values/{{ . }}
+          - $values/{{ tpl . $ }}
           {{- end }}
         {{- with $toolHelm }}
         {{- toYaml . | nindent 8 }}

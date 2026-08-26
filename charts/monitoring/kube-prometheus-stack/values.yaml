@@ -194,11 +194,6 @@ kube-prometheus-stack:
             resources:
               requests:
                 storage: 50Gi
-      # DEV: reclaim volumes for cost savings, do not enable this on prod. See
-      # https://github.com/ConsciousML/terragrunt-template-live-eks/issues/38 for details.
-      persistentVolumeClaimRetentionPolicy:
-        whenDeleted: Delete
-        whenScaled: Retain
 
   alertmanager:
     alertmanagerSpec:
@@ -248,11 +243,6 @@ kube-prometheus-stack:
             resources:
               requests:
                 storage: 10Gi
-      # DEV: reclaim volumes for cost savings, do not enable this on prod. See
-      # https://github.com/ConsciousML/terragrunt-template-live-eks/issues/38 for details.
-      persistentVolumeClaimRetentionPolicy:
-        whenDeleted: Delete
-        whenScaled: Retain
 
       # Name must match targetSecretName in helm-eso-secret-sync/alertmanager-secrets-values.yaml.
       # The Prometheus Operator mounts each key of this Secret as a file under

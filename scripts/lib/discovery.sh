@@ -20,6 +20,7 @@ PLAIN_MANIFEST_IGNORE_PATTERNS=(
   '(^|/)\.github/'
   '(^|/)Chart\.yaml$'
   'values\.yaml$'
+  '(^|/)values-[^/]+\.yaml$'
   '(^|/)templates/'
 )
 

@@ -104,14 +104,9 @@ loki:
         effect: NoSchedule
     persistence:
       size: 30Gi
-      # DEV: reclaim volumes for cost savings, do not enable this on prod. See
-      # https://github.com/ConsciousML/terragrunt-template-live-eks/issues/38 for details.
-      enableStatefulSetAutoDeletePVC: true
 
-  # Chart default (8192, ~9.6Gi pod memory) is sized for a large production cluster and
-  # doesn't fit this dev cluster's nodes, tune for prod.
-  # If queries are slow or S3 GET cost increases, bumping the RAM
-  # Otherwise read the following to speed up queries:
+  # Right-sized from observed usage (chart default 8192, ~9.6Gi pod memory, is oversized
+  # here). Same across environments. Monitor query latency and S3 GET cost. Bump if needed.
   # https://grafana.com/docs/loki/latest/operations/caching/
   chunksCache:
     allocatedMemory: 1024

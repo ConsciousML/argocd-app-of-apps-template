@@ -1,0 +1,7 @@
+# Retains the singleBinary StatefulSet's PVCs on both delete and scale-down, unlike dev
+# and staging.
+
+loki:
+  singleBinary:
+    persistence:
+      enableStatefulSetAutoDeletePVC: false
