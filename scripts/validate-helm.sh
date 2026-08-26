@@ -28,17 +28,19 @@ for chart_dir in "${HELM_CHARTS[@]}"; do
     continue
   fi
 
-  echo "[INFO] Linting Helm chart: $rel"
-  if ! lint_output="$(helm lint "$chart_dir" 2>&1)"; then
-    echo "[ERROR] helm lint failed for $rel"
-    echo "$lint_output"
-    ERRORS=$((ERRORS + 1))
-  fi
-
   template_args=("$chart_dir")
+  lint_args=("$chart_dir")
   placeholder_values="$(placeholder_values_file "$chart_dir")"
   if [[ -n "$placeholder_values" ]]; then
     template_args+=(-f "$placeholder_values")
+    lint_args+=(-f "$placeholder_values")
+  fi
+
+  echo "[INFO] Linting Helm chart: $rel"
+  if ! lint_output="$(helm lint "${lint_args[@]}" 2>&1)"; then
+    echo "[ERROR] helm lint failed for $rel"
+    echo "$lint_output"
+    ERRORS=$((ERRORS + 1))
   fi
 
   echo "[INFO] Rendering templates: $rel"

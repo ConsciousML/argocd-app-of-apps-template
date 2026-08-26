@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "Values",
+  "type": "object",
+  "required": ["kube-prometheus-stack"],
+  "properties": {
+    "kube-prometheus-stack": {
+      "type": "object",
+      "required": ["fullnameOverride", "environment", "prometheus", "alertmanager"],
+      "properties": {
+        "fullnameOverride": { "type": "string", "minLength": 1 },
+        "environment": { "type": "string", "minLength": 1 },
+        "prometheus": {
+          "type": "object",
+          "required": ["prometheusSpec"],
+          "properties": {
+            "prometheusSpec": {
+              "type": "object",
+              "required": ["externalUrl"],
+              "properties": {
+                "externalUrl": { "type": "string", "minLength": 1 }
+              }
+            }
+          }
+        },
+        "alertmanager": {
+          "type": "object",
+          "required": ["alertmanagerSpec"],
+          "properties": {
+            "alertmanagerSpec": {
+              "type": "object",
+              "required": ["externalUrl"],
+              "properties": {
+                "externalUrl": { "type": "string", "minLength": 1 }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
