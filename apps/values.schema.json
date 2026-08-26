@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "Values",
+  "type": "object",
+  "properties": {
+    "appParams": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "podinfo-httproute": { "type": "object" },
+        "gateway-public": { "type": "object" },
+        "gateway-private": { "type": "object" },
+        "aws-lbc": { "type": "object" },
+        "argocd-httproute": { "type": "object" },
+        "cilium": { "type": "object" },
+        "external-dns-private": { "type": "object" },
+        "external-dns-public": { "type": "object" },
+        "external-secrets-operator": { "type": "object" },
+        "network-policies-kube-system": { "type": "object" },
+        "loki": { "type": "object" },
+        "argocd-secrets": { "type": "object" },
+        "tailscale-secrets": { "type": "object" },
+        "tailscale-connector": { "type": "object" },
+        "grafana-secrets": { "type": "object" },
+        "alertmanager-secrets": { "type": "object" },
+        "kube-prometheus-stack": { "type": "object" },
+        "grafana-httproute": { "type": "object" },
+        "prometheus-httproute": { "type": "object" },
+        "alertmanager-httproute": { "type": "object" },
+        "goldilocks-httproute": { "type": "object" },
+        "hubble-ui-httproute": { "type": "object" },
+        "blackbox-exporter": { "type": "object" }
+      }
+    }
+  }
+}

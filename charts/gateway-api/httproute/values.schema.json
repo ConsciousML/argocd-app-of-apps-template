@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "Values",
+  "type": "object",
+  "required": ["host"],
+  "properties": {
+    "host": { "type": "string", "minLength": 1 },
+    "backendRefs": {
+      "type": "object",
+      "properties": {
+        "default": {
+          "type": "object",
+          "required": ["name"],
+          "properties": {
+            "name": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    }
+  }
+}

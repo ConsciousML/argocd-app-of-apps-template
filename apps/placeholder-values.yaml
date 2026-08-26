@@ -1,0 +1,115 @@
+# Used only by scripts/validate-helm.sh so standalone `helm template` and
+# kubeconform pass. Real values are injected by the catalog
+# (terragrunt-template-catalog-eks) via appParams. See units/eks/addons/argocd/app_of_apps
+# in that repo.
+appParams:
+  podinfo-httproute:
+    host: "placeholder.example.com"
+  gateway-public:
+    certificateArn: "arn:aws:acm:us-east-1:123456789012:certificate/placeholder"
+  gateway-private:
+    certificateArn: "arn:aws:acm:us-east-1:123456789012:certificate/placeholder"
+  aws-lbc:
+    vpcEndpointCidrs:
+      ec2: ["10.0.0.10"]
+      elasticloadbalancing: ["10.0.0.11"]
+      tagging: ["10.0.0.12"]
+      shield: ["10.0.0.13"]
+      acm: ["10.0.0.14"]
+    aws-load-balancer-controller:
+      clusterName: "placeholder-cluster"
+      region: "us-east-1"
+      vpcId: "vpc-placeholder"
+  argocd-httproute:
+    host: "placeholder.example.com"
+  cilium:
+    cilium:
+      k8sServiceHost: "placeholder.example.com"
+      k8sServicePort: "443"
+  external-dns-private:
+    vpcEndpointCidrs:
+      route53: ["10.0.0.10"]
+    external-dns:
+      txtOwnerId: "placeholder-cluster"
+      txtPrefix: "placeholder-external-dns-private-"
+      domainFilters: ["placeholder.example.com"]
+  external-dns-public:
+    vpcEndpointCidrs:
+      route53: ["10.0.0.10"]
+    external-dns:
+      txtOwnerId: "placeholder-cluster"
+      txtPrefix: "placeholder-external-dns-public-"
+      domainFilters: ["placeholder.example.com"]
+  external-secrets-operator:
+    secretStoreName: "placeholder-store"
+    awsRegion: "us-east-1"
+    remoteKey: "placeholder-key"
+  network-policies-kube-system:
+    vpcEndpointCidrs:
+      ec2: ["10.0.0.10"]
+      sqs: ["10.0.0.11"]
+      iam: ["10.0.0.12"]
+  loki:
+    loki:
+      loki:
+        storage:
+          bucketNames:
+            chunks: "placeholder-loki-chunks"
+            ruler: "placeholder-loki-ruler"
+          s3:
+            region: "us-east-1"
+  argocd-secrets:
+    secretStoreName: "placeholder-store"
+    awsRegion: "us-east-1"
+    remoteKey: "placeholder-key"
+  tailscale-secrets:
+    secretStoreName: "placeholder-store"
+    awsRegion: "us-east-1"
+    remoteKey: "placeholder-key"
+  tailscale-connector:
+    name: "placeholder-connector"
+    hostnamePrefix: "placeholder-cluster"
+    advertiseRoutes: ["10.0.0.0/16"]
+  grafana-secrets:
+    secretStoreName: "placeholder-store"
+    awsRegion: "us-east-1"
+    remoteKey: "placeholder-key"
+  alertmanager-secrets:
+    secretStoreName: "placeholder-store"
+    awsRegion: "us-east-1"
+    remoteKey: "placeholder-key"
+  kube-prometheus-stack:
+    kube-prometheus-stack:
+      fullnameOverride: "kube-prometheus-stack"
+      environment: "dev"
+      prometheus:
+        prometheusSpec:
+          externalUrl: "https://placeholder.example.com"
+      alertmanager:
+        alertmanagerSpec:
+          externalUrl: "https://placeholder.example.com"
+  grafana-httproute:
+    host: "placeholder.example.com"
+    backendRefs:
+      default:
+        name: "kube-prometheus-stack-grafana"
+  prometheus-httproute:
+    host: "placeholder.example.com"
+    backendRefs:
+      default:
+        name: "kube-prometheus-stack-prometheus"
+  alertmanager-httproute:
+    host: "placeholder.example.com"
+    backendRefs:
+      default:
+        name: "kube-prometheus-stack-alertmanager"
+  goldilocks-httproute:
+    host: "placeholder.example.com"
+  hubble-ui-httproute:
+    host: "placeholder.example.com"
+  blackbox-exporter:
+    prometheus-blackbox-exporter:
+      serviceMonitor:
+        targets:
+          - name: "placeholder"
+            url: "https://placeholder.example.com"

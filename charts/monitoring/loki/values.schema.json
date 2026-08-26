@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "Values",
+  "type": "object",
+  "required": ["loki"],
+  "properties": {
+    "loki": {
+      "type": "object",
+      "required": ["loki"],
+      "properties": {
+        "loki": {
+          "type": "object",
+          "required": ["storage"],
+          "properties": {
+            "storage": {
+              "type": "object",
+              "required": ["bucketNames", "s3"],
+              "properties": {
+                "bucketNames": {
+                  "type": "object",
+                  "required": ["chunks", "ruler"],
+                  "properties": {
+                    "chunks": { "type": "string", "minLength": 1 },
+                    "ruler": { "type": "string", "minLength": 1 }
+                  }
+                },
+                "s3": {
+                  "type": "object",
+                  "required": ["region"],
+                  "properties": {
+                    "region": { "type": "string", "minLength": 1 }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

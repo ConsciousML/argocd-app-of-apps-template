@@ -2,9 +2,8 @@
 # kubeconform pass. Real values are injected by the catalog
 # (terragrunt-template-catalog-eks) via appParams. See units/eks/addons/argocd/app_of_apps
 # in that repo.
-vpcEndpointCidrs:
-  route53: ["10.0.0.10"]
-external-dns:
-  txtOwnerId: "placeholder-cluster"
-  txtPrefix: "placeholder-external-dns-"
-  domainFilters: ["placeholder.example.com"]
+prometheus-blackbox-exporter:
+  serviceMonitor:
+    targets:
+      - name: "placeholder"
+        url: "https://placeholder.example.com"
