@@ -1,5 +1,5 @@
 ---
-name: wave-sync-order
+name: wave-sync-order-app-of-apps
 description: Assign or recompute the syncWave for an entry in apps/values.yaml. Use when adding a new app-of-apps entry, or when a dependency changes and downstream waves need recomputing.
 ---
 

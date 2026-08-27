@@ -1,5 +1,5 @@
 ---
-name: working-against-live-cluster
+name: working-against-live-cluster-app-of-apps
 description: Loop for changes that must take effect on the live EKS cluster (edit, sync via ArgoCD, verify). Use whenever a goal requires actually applying a change to the live cluster, not just editing or planning source.
 ---
 
