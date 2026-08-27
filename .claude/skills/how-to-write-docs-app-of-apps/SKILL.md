@@ -1,10 +1,10 @@
 ---
-name: how-to-write-docs
+name: how-to-write-docs-app-of-apps
 description: Rules for writing or editing Markdown docs or inline code comments in this repo (README.md, docs/, manifests, chart docs, comments). Use before writing or editing any doc or comment.
 ---
 
-Follow [terragrunt-template-catalog-eks's `how-to-write-docs`
-skill](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/.claude/skills/how-to-write-docs/SKILL.md)
+Follow [terragrunt-template-catalog-eks's `how-to-write-docs-catalog`
+skill](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/.claude/skills/how-to-write-docs-catalog/SKILL.md)
 first, these rules extend it and don't repeat it.
 
 ## Dependency Injection
