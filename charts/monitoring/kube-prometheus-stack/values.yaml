@@ -31,7 +31,7 @@ kube-prometheus-stack:
         memory: 37M
       limits:
         cpu: 55m
-        memory: 37M
+        memory: 100M
     nodeSelector:
       karpenter.sh/nodepool: critical
     tolerations:
