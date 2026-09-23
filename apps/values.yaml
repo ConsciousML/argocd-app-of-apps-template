@@ -41,8 +41,8 @@ applications:
     syncWave: -1
 
   # --- DaemonSets Priority ---
-  # loki, alloy, kube-prometheus-stack, and cilium carry the cluster's DaemonSets: Alloy
-  # itself, Loki's lokiCanary, kube-prometheus-stack's node-exporter, and cilium-agent.
+  # loki, alloy, and kube-prometheus-stack carry the cluster's DaemonSets: Alloy itself,
+  # Loki's lokiCanary, and kube-prometheus-stack's node-exporter.
   # Karpenter only sizes a new node for a DaemonSet it already knows about, so a DaemonSet
   # that syncs after another app has already triggered a node launch can land Pending and
   # rely on daemonset-critical preemption to fit instead. Every app marked "See DaemonSets
@@ -110,29 +110,11 @@ applications:
         # Must match the catalog's Pod Identity association's expected ServiceAccount name.
         releaseName: aws-load-balancer-controller
 
-  # --- Cilium / Hubble ---
-  # CNI chaining mode alongside vpc-cni for Hubble flow visibility, no change to vpc-cni behavior.
-  # No hard dependency: synced as early as possible so cilium-agent (a DaemonSet) is known to
-  # Karpenter before other apps trigger node launches. See DaemonSets Priority above.
-  - name: cilium
-    path: charts/cilium
-    destination:
-      namespace: kube-system
-    syncWave: 0
-    # Chart bundles its own CRDs and needs ServerSideApply for the annotation size limit.
-    syncOptions:
-      - ServerSideApply=true
-  # Depends on:
-  # - cilium (cilium-agent must be running and the CiliumEndpoint CRD installed)
-  - name: cilium-restart-job
-    path: manifests/cilium-restart-job
-    destination:
-      namespace: kube-system
-    syncWave: 1
-
+  # --- Hubble ---
+  # Cilium (and Hubble) is entirely Terraform-managed, applied before app-of-apps ever syncs.
+  # See units/eks/addons/cilium in the catalog repo.
   # Depends on:
   # - gateway-private
-  # - cilium (the hubble-ui backend Service)
   - name: hubble-ui-httproute
     path: charts/gateway-api/httproute
     destination:
@@ -262,20 +244,14 @@ applications:
     destination:
       namespace: argocd
     syncWave: 5
-  # Depends on:
-  # - cilium (CiliumNetworkPolicy CRD)
-  # - cilium-restart-job
+  # CiliumNetworkPolicy CRD is Terraform-managed, applied before ArgoCD ever syncs.
   - name: argocd-network-policies
     path: manifests/network-policies/argocd
     destination:
       namespace: argocd
     syncWave: 2
-  # Depends on:
-  # - cilium (CiliumNetworkPolicy CRD; also creates the hubble-relay and hubble-ui workloads
-  #   two of this app's policies select). Its own release can't include those two policies:
-  #   the CRD and a CR using it in the same sync fails ArgoCD's pre-sync validation on a fresh
-  #   cluster, so they live here instead, one wave later.
-  # - cilium-restart-job
+  # CiliumNetworkPolicy CRD and the hubble-relay and hubble-ui workloads two of this app's
+  # policies select are Terraform-managed, applied before ArgoCD ever syncs.
   - name: network-policies-kube-system
     path: charts/network-policies/kube-system
     destination:
@@ -433,7 +409,6 @@ applications:
 
   # --- Network Policies ---
   # Depends on:
-  # - cilium (CiliumNetworkPolicy CRD)
   # - argocd-network-policies, network-policies-kube-system (default-deny.yaml,
   #   kube-apiserver-egress.yaml, and kube-dns-egress.yaml list argocd and kube-system,
   #   so those rules only work once the workload allow-policies already exist)
