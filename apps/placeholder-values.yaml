@@ -24,10 +24,6 @@ appParams:
       vpcId: "vpc-placeholder"
   argocd-httproute:
     host: "placeholder.example.com"
-  cilium:
-    cilium:
-      k8sServiceHost: "placeholder.example.com"
-      k8sServicePort: "443"
   external-dns-private:
     vpcEndpointCidrs:
       route53: ["10.0.0.10"]

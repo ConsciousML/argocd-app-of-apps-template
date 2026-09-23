@@ -20,7 +20,6 @@
         "gateway-private": { "type": "object" },
         "aws-lbc": { "type": "object" },
         "argocd-httproute": { "type": "object" },
-        "cilium": { "type": "object" },
         "external-dns-private": { "type": "object" },
         "external-dns-public": { "type": "object" },
         "external-secrets-operator": { "type": "object" },
