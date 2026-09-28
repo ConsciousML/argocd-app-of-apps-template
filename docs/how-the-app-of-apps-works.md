@@ -33,7 +33,7 @@ flowchart LR
 
 Terraform creates the root Application, `app-of-apps`, with the rest of the cluster. It points at the [`apps/`](../apps/) Helm chart, which renders one child Application per entry under `applications` in [`apps/values.yaml`](../apps/values.yaml). Each child then deploys the manifests or chart at its entry's `path`.
 
-From then on, ArgoCD deploys every application from the app of apps repository. Adding an application is one entry in `apps/values.yaml`, with no Terraform change unless the application needs AWS resources.
+From then on, ArgoCD deploys every application from the app of apps repository. Adding an application is one entry in `apps/values.yaml`, with no Terraform change unless the application needs AWS resources or a value only Terraform knows.
 
 A child Application is an entry, not a directory. Several entries can share one chart with different values: every `*-httproute` entry deploys [`charts/gateway-api/httproute`](../charts/gateway-api/httproute/), each with its own values file.
 
@@ -44,7 +44,7 @@ Two repositories deploy what runs in your cluster:
 
 This split keeps each change in one place. An application change ships through ArgoCD without a Terraform apply. And values that depend on the deployment, like a certificate ARN or a hostname, never get hardcoded in the app of apps repository: the catalog injects them at deploy time.
 
-The catalog also injects the repository URL and git revision every child Application syncs from. So the catalog's `github.hcl` and the environment's revision are the only places that decide which fork and which version a cluster runs.
+The catalog also injects the repository URL and git revision every child Application syncs from. So `github.hcl` and the environment's revision are the only places that decide which fork and which version a cluster runs. `dev` reads the catalog's `github.hcl`, while `staging` and `prod` read the one in the [live repository](https://github.com/ConsciousML/terragrunt-template-live-eks).
 
 ## `appParams` Injection
 The catalog passes values to child Applications through a single map, `appParams`:
