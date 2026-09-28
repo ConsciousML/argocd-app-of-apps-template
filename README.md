@@ -9,11 +9,7 @@ An ArgoCD template repository implementing the [App of Apps pattern](https://arg
 
 ## Getting Started
 
-1. Click on the `Use this template` > `Create a new repository` button and choose a name for your forked repository.
-2. In [`apps/values.yaml`](apps/values.yaml) set `repoURL` to your forked repository url.
-3. Deploy the app-of-apps Application using the [terragrunt-template-catalog-eks](https://github.com/ConsciousML/terragrunt-template-catalog-eks) catalog. See its [App of Apps integration guide](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/docs/app-of-apps-integration.md) for how the catalog threads Terraform-sourced values into this chart's `appParams`.
-
-Access the ArgoCD UI and verify the `podinfo` app has been deployed.
+Follow the [ArgoCD App of Apps Setup tutorial](https://eks-forge.readthedocs.io/latest/docs/applications/get-started/app-of-apps-setup/).
 
 ### Adding an App
 
