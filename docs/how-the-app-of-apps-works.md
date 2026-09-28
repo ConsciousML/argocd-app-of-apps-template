@@ -1,5 +1,5 @@
 {/* This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/. It is not meant to be read directly in this repository. */}
-# How the App of Apps Works
+# How the App of Apps Repository Works
 
 The [app of apps repository](https://github.com/ConsciousML/argocd-app-of-apps-template) holds everything [ArgoCD](https://argo-cd.readthedocs.io/en/stable/) deploys inside your cluster, from controllers like the AWS Load Balancer Controller to your own applications. This page explains why it's structured the way it is.
 
@@ -73,6 +73,11 @@ appParams = {
 Keying by `name` instead of `path` lets two Applications sharing a chart get different values. [`apps/values.schema.json`](../apps/values.schema.json) lists every allowed key, so a typo fails loudly instead of injecting values that nothing reads.
 
 Only values Terraform owns belong in `appParams`: ones that come from an AWS resource or differ per deployment, like a certificate ARN, a hostname, or a secret name. Everything static stays a default in the app of apps repository, versioned with the chart that reads it.
+
+## Placeholder Values
+A value the catalog injects through `appParams` has no default in its chart, since only the catalog knows it at deploy time. But CI renders every chart on its own, without the catalog, to lint it, validate it, and scan it. A chart missing a required value would fail to render there.
+
+So each chart with such values ships a `placeholder-values.yaml` next to its `values.yaml`, holding a dummy value for each (e.g. [`charts/aws-lbc/placeholder-values.yaml`](../charts/aws-lbc/placeholder-values.yaml)). CI loads it on top of the chart's defaults, while ArgoCD never reads it. The real values still come from `appParams` in every environment.
 
 ## Environment Overlays
 The same app of apps repository deploys the applications of `dev`, `staging`, and `prod`. When an Application needs a different config per environment, it loads an overlay file on top of its chart's `values.yaml`:
