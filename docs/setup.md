@@ -27,6 +27,13 @@ git push origin --tags
 Follow these exact steps instead of GitHub's `Fork` or `Use this template` buttons. `staging` and `prod` pin app of apps versions by git tag, and these steps guarantee your repository has them.
 :::
 
+## Install the CLI Tools
+From the root of your app of apps fork, install the tools pinned in [`mise.toml`](../mise.toml):
+```bash
+mise trust
+mise install
+```
+
 ## Point the Catalog at Your Fork
 From the root of your [catalog fork](/docs/quickstart/installation/#fork-the-eks-forge-catalog), set these two values in [`pipelines/github.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/pipelines/github.hcl) and leave the others as is:
 ```hcl
