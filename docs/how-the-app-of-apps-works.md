@@ -109,6 +109,13 @@ The root Application syncs its children one [sync wave](https://argo-cd.readthed
 
 For example, if `namespaces` is at wave `0` and `podinfo` at wave `1`, ArgoCD syncs `namespaces`, waits for it to be healthy, then syncs `podinfo`.
 
+### DaemonSets Priority
+Some dependencies don't show up in any manifest. Several Applications ship a [DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/), one pod per node, such as Alloy, Loki's canary, and kube-prometheus-stack's node exporter.
+
+When a pod can't fit on the existing nodes, [Karpenter](https://karpenter.sh/) launches a new one, sized for that pod plus the DaemonSets it already knows about. If an application syncs before a DaemonSet exists, Karpenter can launch a node with no room left for it. The DaemonSet's pod then stays `Pending`, until its priority class evicts another pod to make room.
+
+So every Application that runs pods is held to wave `3` or later, even without a real dependency on the DaemonSets. The `DaemonSets Priority` comment in [`apps/values.yaml`](../apps/values.yaml) marks the entries this rule applies to.
+
 ## Namespaces
 [`apps/templates/applications.yaml`](../apps/templates/applications.yaml) sets `CreateNamespace=false` on every child Application, so none of them can create its own namespace. Instead, the `namespaces` Application creates them all from [`manifests/namespaces`](../manifests/namespaces/), each with its [security](/docs/security/) labels.
 

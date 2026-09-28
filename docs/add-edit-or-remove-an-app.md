@@ -14,9 +14,10 @@ git checkout -b <branch>
 git push -u origin <branch>
 ```
 
-If your change also touches your catalog fork, because your app needs a value from Terraform, a secret, a hostname, or an AWS resource, or you remove an app that receives Terraform values, create a branch from the root of your catalog fork too:
+If your change also touches your catalog fork, because your app needs a value from Terraform, a secret, a hostname, or an AWS resource, or you remove an app that receives Terraform values, create a branch from the root of your catalog fork too. Units fetch the catalog's modules from git at your current branch, so the apply below fails until the branch exists on your fork:
 ```bash
 git checkout -b <branch>
+git push -u origin <branch>
 ```
 
 Then, in the `.env` of your catalog fork, set [`APP_OF_APPS_BRANCH`](/docs/reference/environment_variable/#app_of_apps_branch) to your branch, so ArgoCD syncs `dev` from it instead of `main`:
@@ -72,7 +73,7 @@ metadata:
 
 Put the app's files in a new directory, as either:
 - **Plain manifests** under `manifests/<name>/`, one [Kubernetes manifest](https://kubernetes.io/docs/concepts/overview/working-with-objects/) per resource (e.g. [`manifests/podinfo`](../manifests/podinfo/)).
-- **A Helm chart** under `charts/<group>/<chart>/`, [written](https://helm.sh/docs/topics/charts/) from scratch or wrapping an upstream chart as a dependency (e.g. [`charts/monitoring/blackbox-exporter`](../charts/monitoring/blackbox-exporter/)).
+- **A Helm chart** under `charts/<chart>/` or `charts/<group>/<chart>/`, [written](https://helm.sh/docs/topics/charts/) from scratch or wrapping an upstream chart as a dependency (e.g. [`charts/monitoring/blackbox-exporter`](../charts/monitoring/blackbox-exporter/)).
 
 Add a `nodeSelector` and `tolerations` to the app's pods by following [How to Schedule Pods](/docs/compute/schedule-pods/).
 
@@ -105,7 +106,13 @@ For the other fields, such as `tool.helm.releaseName` or `syncOptions`, see the 
 
 ### Set the Sync Wave
 
-The `syncWave` sets when ArgoCD [syncs the app](/docs/applications/how-the-app-of-apps-works/#sync-waves), relative to the other entries. List the entries your app needs running before it starts in a `# Depends on:` comment above its entry, then set its `syncWave` to the highest `syncWave` among them, plus one. For example, podinfo only depends on `network-policies-cluster-wide`, at wave `3`, so its `syncWave` is `3 + 1 = 4`:
+The `syncWave` sets when ArgoCD [syncs the app](/docs/applications/how-the-app-of-apps-works/#sync-waves), relative to the other entries. List the entries your app needs running before it starts in a `# Depends on:` comment above its entry, then set its `syncWave` to the highest `syncWave` among them, plus one.
+
+Take into account these implicit dependencies when computing it:
+- **`network-policies-cluster-wide`**, at wave `3`.
+- **The DaemonSets**: if your app runs pods, at wave `3` or later (see [DaemonSets Priority](/docs/applications/how-the-app-of-apps-works/#daemonsets-priority)).
+
+For example, podinfo only depends on `network-policies-cluster-wide`, at wave `3`, so its `syncWave` is `3 + 1 = 4`:
 ```yaml
   # Depends on:
   # - network-policies-cluster-wide
@@ -114,7 +121,7 @@ The `syncWave` sets when ArgoCD [syncs the app](/docs/applications/how-the-app-o
     syncWave: 4
 ```
 
-If your app depends on no other entry, set its `syncWave` to `0`, or to `-1` if it deploys no workload, only resources others need, such as CRDs.
+If your app deploys no workload, only resources others need, such as CRDs, and depends on no other entry, set its `syncWave` to `-1`.
 
 ### Extra Steps
 
@@ -137,7 +144,8 @@ Delete:
 - The app's directory under `manifests/` or `charts/`. Skip it if another entry shares it (e.g. `charts/gateway-api/httproute`), and delete only the app's own values file instead.
 - The app's entry in [`apps/values.yaml`](../apps/values.yaml). Drop it from the `# Depends on:` comment of every entry that listed it, and [recompute their `syncWave`](#set-the-sync-wave).
 - The app's namespace from [`manifests/namespaces/`](../manifests/namespaces/) and [`manifests/network-policies/cluster-wide/`](../manifests/network-policies/cluster-wide/), if no other app runs in it.
-- The app's key in [`apps/values.schema.json`](../apps/values.schema.json), if it receives [Terraform values](/docs/applications/pass-terraform-values-to-an-app/). Also delete its entry under `appParams` in the catalog's [`argocd_app_of_apps` unit](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl), and merge that catalog change first (see [Merge](#merge)).
+- The app's key in [`apps/values.schema.json`](../apps/values.schema.json) and under `appParams` in [`apps/placeholder-values.yaml`](../apps/placeholder-values.yaml), if it receives [Terraform values](/docs/applications/pass-terraform-values-to-an-app/). Also delete its entry under `appParams` in the catalog's [`argocd_app_of_apps` unit](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl), and merge that catalog change first (see [Merge](#merge)).
+- Any other reference to the app in the catalog's `argocd_app_of_apps` unit, such as its hostname in `locals` or its target under the `blackbox-exporter` entry of `appParams`.
 
 Once ArgoCD syncs the removal, it deletes the app's resources, but [never its namespace](/docs/applications/how-the-app-of-apps-works/#deletion-safety). If you deleted the namespace's file, delete the namespace by hand in each environment the removal reaches. This also deletes what's left inside it, such as the volumes of a `StatefulSet`:
 ```bash
