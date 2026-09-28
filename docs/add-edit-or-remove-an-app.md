@@ -1,6 +1,6 @@
 {/* This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/. It is not meant to be read directly in this repository. */}
 
-# Add, Edit, or Remove an App
+# How to Add, Edit, or Remove an App
 
 This guide shows you how to add, edit, or remove an [application](/docs/applications/how-the-app-of-apps-works/#the-root-app-and-its-children) in your [app of apps fork](/docs/applications/get-started/app-of-apps-setup/#fork-the-app-of-apps-repository), test it in [`dev`](/docs/iac/#dev), and merge it. It assumes you've already [pointed your catalog at your fork](/docs/applications/get-started/app-of-apps-setup/#point-the-catalog-at-your-fork).
 
@@ -14,7 +14,7 @@ git checkout -b <branch>
 git push -u origin <branch>
 ```
 
-If your change also touches your catalog fork, because your app needs a value from Terraform, a secret, a hostname, or an AWS resource, or you remove an app that receives Terraform values, create a branch from the root of your catalog fork too. Units fetch the catalog's modules from git at your current branch, so the apply below fails until the branch exists on your fork:
+If your change needs one of the [Extra Steps](#extra-steps) other than a different config per environment, or removes an app that receives Terraform values, it also touches your catalog fork. Create a branch from the root of your catalog fork too:
 ```bash
 git checkout -b <branch>
 git push -u origin <branch>
@@ -34,8 +34,6 @@ terragrunt stack generate
 cd .terragrunt-stack/eks/addons/argocd/app_of_apps
 terragrunt apply
 ```
-
-For a guided walkthrough of this loop, see [Deploy an App Change to Dev](/docs/applications/get-started/deployment/).
 
 ## Add an App
 
@@ -144,13 +142,8 @@ Delete:
 - The app's directory under `manifests/` or `charts/`. Skip it if another entry shares it (e.g. `charts/gateway-api/httproute`), and delete only the app's own values file instead.
 - The app's entry in [`apps/values.yaml`](../apps/values.yaml). Drop it from the `# Depends on:` comment of every entry that listed it, and [recompute their `syncWave`](#set-the-sync-wave).
 - The app's namespace from [`manifests/namespaces/`](../manifests/namespaces/) and [`manifests/network-policies/cluster-wide/`](../manifests/network-policies/cluster-wide/), if no other app runs in it.
-- The app's key in [`apps/values.schema.json`](../apps/values.schema.json) and under `appParams` in [`apps/placeholder-values.yaml`](../apps/placeholder-values.yaml), if it receives [Terraform values](/docs/applications/pass-terraform-values-to-an-app/). Also delete its entry under `appParams` in the catalog's [`argocd_app_of_apps` unit](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl), and merge that catalog change first (see [Merge](#merge)).
+- The app's key in [`apps/values.schema.json`](../apps/values.schema.json) and under `appParams` in [`apps/placeholder-values.yaml`](../apps/placeholder-values.yaml), if it receives [Terraform values](/docs/applications/pass-terraform-values-to-an-app/). Also delete its entry under `appParams` in the catalog's [`argocd_app_of_apps` unit](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl).
 - Any other reference to the app in the catalog's `argocd_app_of_apps` unit, such as its hostname in `locals` or its target under the `blackbox-exporter` entry of `appParams`.
-
-Once ArgoCD syncs the removal, it deletes the app's resources, but [never its namespace](/docs/applications/how-the-app-of-apps-works/#deletion-safety). If you deleted the namespace's file, delete the namespace by hand in each environment the removal reaches. This also deletes what's left inside it, such as the volumes of a `StatefulSet`:
-```bash
-kubectl delete namespace <namespace>
-```
 
 ## Test in Dev
 
@@ -168,7 +161,7 @@ From the root of your catalog fork, log in with the `argocd` CLI as in the [Log 
 argocd app sync --project default
 ```
 
-Check that your app's Application is `Healthy` and `Synced`, and that its pods are running:
+If you added or edited an app, check that its Application is `Healthy` and `Synced`, and that its pods are running:
 ```bash
 argocd app get <app>
 kubectl get pods -n <namespace>
@@ -185,9 +178,22 @@ hubble observe --verdict DROPPED -P | grep -v "Unsupported L3"
 If it shows drops to or from your app, see [How to Control an App's Network Traffic](/docs/security/control-an-app-network-traffic/).
 :::
 
+If you removed an app, check that its Application is no longer listed, and that its resources are gone:
+```bash
+argocd app list
+kubectl get all -n <namespace>
+```
+
+ArgoCD [never deletes a namespace](/docs/applications/how-the-app-of-apps-works/#deletion-safety). If you deleted the namespace's file, delete the namespace by hand. This also deletes what's left inside it, such as the volumes of a `StatefulSet`:
+```bash
+kubectl delete namespace <namespace>
+```
+
+Once you release the removal, do the same in `staging` and `prod`.
+
 ## Restrict the App's Traffic
 
-If you added an app in a new namespace, its traffic isn't restricted yet. Deny all its traffic by default, then allow only what it needs, by following [How to Control an App's Network Traffic](/docs/security/control-an-app-network-traffic/). Then [test it in dev](#test-in-dev) again.
+Once your app works in `dev`, restrict its traffic. If you added it in a new namespace, no network policy applies to it yet. Deny all its traffic by default, then allow only what it needs, by following [How to Control an App's Network Traffic](/docs/security/control-an-app-network-traffic/). Then [test it in dev](#test-in-dev) again, to catch any traffic you forgot to allow.
 
 ## Open a Pull Request
 
