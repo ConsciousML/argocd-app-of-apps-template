@@ -3,7 +3,8 @@ config:
     destination:
       server: https://kubernetes.default.svc
     source:
-      repoURL: https://github.com/ConsciousML/argocd-app-of-apps-template
+      # Set by the catalog from github.hcl. Schema rejects empty.
+      repoURL: ""
       targetRevision: main
 
 appParams: {}
