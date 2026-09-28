@@ -97,3 +97,6 @@ Git is the source of truth. To change an application, commit to your app of apps
 Destroy the `dev` environment by following the [Destroy the Infrastructure](/docs/quickstart/deployment/#destroy-the-infrastructure) step of the dev deployment.
 
 Finally, remove the `APP_OF_APPS_BRANCH` line from the `.env` of your catalog fork, so your next `dev` deployment syncs from `main` again.
+
+## What's Next
+Learn [how to add, edit, or remove an app](/docs/applications/add-edit-or-remove-an-app/) in your fork, then test it in `dev` the same way.
