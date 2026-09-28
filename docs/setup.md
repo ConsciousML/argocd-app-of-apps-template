@@ -24,7 +24,7 @@ git push origin --tags
 ```
 
 :::warning
-Follow these exact steps instead of GitHub's `Fork` or `Use this template` buttons. `staging` and `prod` pin app of apps versions by git tag, and these steps guarantee your repository has them.
+Follow these exact steps instead of GitHub's `Fork` or `Use this template` buttons, so your repository gets the [version tags](/docs/applications/how-the-app-of-apps-works/#versioning-per-environment).
 :::
 
 ## Install the CLI Tools
