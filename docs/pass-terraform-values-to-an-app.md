@@ -5,11 +5,11 @@ import TabItem from '@theme/TabItem';
 
 # How to Pass Terraform Values to an App
 
-This guide shows you how to pass a value from the catalog to an app, through [`appParams`](/docs/applications/how-the-app-of-apps-works/#appparams-injection). You need it when your app reads a value that comes from an AWS resource or the catalog's configuration (e.g. an S3 bucket name, a certificate ARN, or the region). For a value that only differs per environment, see [How to Configure an App per Environment](/docs/applications/configure-an-app-per-environment/) instead.
+This guide shows you how to pass a value from the catalog to an app, through [`appParams`](/docs/applications/how-the-app-of-apps-works/#appparams-injection). You need it when your app reads a value that comes from an AWS resource or the catalog's configuration (e.g. an S3 bucket name, a certificate ARN, or the region). For a value that only differs per environment, see [Configure an App per Environment](/docs/applications/configure-an-app-per-environment/) instead.
 
-It's an extra step of [adding](/docs/applications/add-edit-or-remove-an-app/#extra-steps) or [editing](/docs/applications/add-edit-or-remove-an-app/#edit-an-app) an app, and assumes you've created a branch in both forks, as in [Point Dev at Your Branch](/docs/applications/add-edit-or-remove-an-app/#point-dev-at-your-branch).
+It's one of the [Extra Steps](/docs/applications/add-edit-or-remove-an-app/#extra-steps) of adding or editing an app, and assumes you've created a branch in both forks, as in [Point Dev at Your Branch](/docs/applications/add-edit-or-remove-an-app/#point-dev-at-your-branch).
 
-For a hostname, see [How to Expose an App](/docs/applications/expose-an-app/). For a secret, see [How to Pass a Secret to an App](/docs/applications/pass-a-secret-to-an-app/).
+For a hostname, see [Expose an App](/docs/applications/expose-an-app/). For a secret, see [Pass a Secret to an App](/docs/applications/pass-a-secret-to-an-app/).
 
 ## In Your App of Apps Fork
 
@@ -189,11 +189,11 @@ appParams:
 
 ### Read the Value
 
-Open the [`argocd_app_of_apps` unit](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl). Depending on where the value comes from:
-- **Shared configuration** (e.g. the region): find the file that holds it in the [HCL configuration reference](/docs/reference/hcl_configuration/), and read it as in [Read Shared Config](/docs/iac/add-a-unit/#read-shared-config).
+Open the `argocd_app_of_apps` unit, [`units/eks/addons/argocd/app_of_apps/terragrunt.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl). Depending on where the value comes from:
+- **Shared configuration** (e.g. the region): find the file that holds it in the [HCL Configuration](/docs/reference/hcl_configuration/) reference, and read it as in [Read Shared Config](/docs/iac/add-a-unit/#read-shared-config).
 - **An output of a unit the file already reads outputs from** (e.g. `vpc`): skip to [Add the `appParams` Entry](#add-the-appparams-entry).
 - **An output of any other unit**: read it as in [Read Other Units' Outputs](/docs/iac/add-a-unit/#read-other-units-outputs).
-- **A resource no unit creates yet**: add it first by following [How to Add, Edit, or Remove a Unit](/docs/iac/add-a-unit/), then come back.
+- **A resource no unit creates yet**: add it first by following [Add a Unit](/docs/iac/add-a-unit/), then come back.
 
 ### Add the `appParams` Entry
 

@@ -2,7 +2,7 @@
 
 # How to Add, Edit, or Remove an App
 
-This guide shows you how to add, edit, or remove an [application](/docs/applications/how-the-app-of-apps-works/#the-root-app-and-its-children) in your [app of apps fork](/docs/applications/get-started/app-of-apps-setup/#fork-the-app-of-apps-repository), test it in [`dev`](/docs/iac/#dev), and merge it. It assumes you've already [pointed your catalog at your fork](/docs/applications/get-started/app-of-apps-setup/#point-the-catalog-at-your-fork).
+This guide shows you how to add, edit, or remove an [application](/docs/applications/how-the-app-of-apps-works/#the-root-app-and-its-children) in your [app of apps fork](/docs/applications/get-started/app-of-apps-setup/#fork-the-app-of-apps-repository), test it in [`dev`](/docs/iac/#dev), and merge it. It assumes you've already followed [Point the Catalog at Your Fork](/docs/applications/get-started/app-of-apps-setup/#point-the-catalog-at-your-fork).
 
 To ship a merged change to `staging` and `prod`, see [Release an App Change](/docs/applications/release-an-app-change/) instead.
 
@@ -39,7 +39,7 @@ terragrunt apply
 
 ### Create the Namespace
 
-If your app will run in a new namespace, add it to [`manifests/namespaces/`](../manifests/namespaces/). Otherwise, its sync fails, since [no Application can create its own namespace](/docs/applications/how-the-app-of-apps-works/#namespaces).
+If your app will run in a new namespace, add it to [`manifests/namespaces/`](../manifests/namespaces/). Otherwise, its sync fails, since no Application can create its own [namespace](/docs/applications/how-the-app-of-apps-works/#namespaces).
 
 Label it with a [Pod Security Admission](https://kubernetes.io/docs/concepts/security/pod-security-admission/) level. By default, enforce `baseline`, like [`manifests/namespaces/podinfo.yaml`](../manifests/namespaces/podinfo.yaml):
 ```yaml
@@ -71,9 +71,9 @@ metadata:
 
 Put the app's files in a new directory, as either:
 - **Plain manifests** under `manifests/<name>/`, one [Kubernetes manifest](https://kubernetes.io/docs/concepts/overview/working-with-objects/) per resource (e.g. [`manifests/podinfo`](../manifests/podinfo/)).
-- **A Helm chart** under `charts/<chart>/` or `charts/<group>/<chart>/`, [written](https://helm.sh/docs/topics/charts/) from scratch or wrapping an upstream chart as a dependency (e.g. [`charts/monitoring/blackbox-exporter`](../charts/monitoring/blackbox-exporter/)).
+- **A [Helm chart](https://helm.sh/docs/topics/charts/)** under `charts/<chart>/` or `charts/<group>/<chart>/`, written from scratch or wrapping an upstream chart as a dependency (e.g. [`charts/monitoring/blackbox-exporter`](../charts/monitoring/blackbox-exporter/)).
 
-Add a `nodeSelector` and `tolerations` to the app's pods by following [How to Schedule Pods](/docs/compute/schedule-pods/).
+Add a `nodeSelector` and `tolerations` to the app's pods by following [Schedule Pods](/docs/compute/schedule-pods/).
 
 ### Declare the Application
 
@@ -86,11 +86,11 @@ Add an entry under `applications` in [`apps/values.yaml`](../apps/values.yaml), 
     syncWave: 4
 ```
 
-For the other fields, such as `tool.helm.releaseName` or `syncOptions`, see the [App of Apps reference](/docs/reference/applications/app_of_apps/).
+For the other fields, such as `tool.helm.releaseName` or `syncOptions`, see the [App of Apps](/docs/reference/applications/app_of_apps/) reference.
 
 ### Set the Sync Wave
 
-The `syncWave` sets when ArgoCD [syncs the app](/docs/applications/how-the-app-of-apps-works/#sync-waves), relative to the other entries. List the entries your app needs running before it starts in a `# Depends on:` comment above its entry, then set its `syncWave` to the highest `syncWave` among them, plus one.
+The [`syncWave`](/docs/applications/how-the-app-of-apps-works/#sync-waves) sets when ArgoCD syncs the app, relative to the other entries. List the entries your app needs running before it starts in a `# Depends on:` comment above its entry, then set its `syncWave` to the highest `syncWave` among them, plus one.
 
 Take into account these implicit dependencies when computing it:
 - **`network-policies-cluster-wide`**, at wave `3`.
@@ -110,22 +110,22 @@ If your app deploys no workload, only resources others need, such as CRDs, and d
 ### Extra Steps
 
 Depending on what your app needs, also follow:
-- **A value from Terraform** (e.g. a bucket name or a certificate ARN): [How to Pass Terraform Values to an App](/docs/applications/pass-terraform-values-to-an-app/).
-- **A secret** (e.g. a password): [How to Pass a Secret to an App](/docs/applications/pass-a-secret-to-an-app/).
-- **A hostname**: [How to Expose an App](/docs/applications/expose-an-app/).
-- **A different config per environment**: [How to Configure an App per Environment](/docs/applications/configure-an-app-per-environment/).
-- **An AWS resource** (e.g. an S3 bucket or an IAM role): [How to Add, Edit, or Remove a Unit](/docs/iac/add-a-unit/).
+- **A value from Terraform** (e.g. a bucket name or a certificate ARN): [Pass Terraform Values to an App](/docs/applications/pass-terraform-values-to-an-app/).
+- **A secret** (e.g. a password): [Pass a Secret to an App](/docs/applications/pass-a-secret-to-an-app/).
+- **A hostname**: [Expose an App](/docs/applications/expose-an-app/).
+- **A different config per environment**: [Configure an App per Environment](/docs/applications/configure-an-app-per-environment/).
+- **An AWS resource** (e.g. an S3 bucket or an IAM role): [Add a Unit](/docs/iac/add-a-unit/).
 
 ## Edit an App
 
 Change the app's files, or its entry in [`apps/values.yaml`](../apps/values.yaml). For a change that needs one of the [Extra Steps](#extra-steps), follow its guide.
-If the app's dependencies change, update its `# Depends on:` comment and [recompute its `syncWave`](#set-the-sync-wave). Then recompute the `syncWave` of every entry that depends on it, since a shifted wave cascades downstream.
+If the app's dependencies change, update its `# Depends on:` comment and recompute its `syncWave` (see [Set the Sync Wave](#set-the-sync-wave)). Then recompute the `syncWave` of every entry that depends on it, since a shifted wave cascades downstream.
 
 ## Remove an App
 
 Delete:
 - The app's directory under `manifests/` or `charts/`. Skip it if another entry shares it (e.g. `charts/gateway-api/httproute`), and delete only the app's own values file instead.
-- The app's entry in [`apps/values.yaml`](../apps/values.yaml). Drop it from the `# Depends on:` comment of every entry that listed it, and [recompute their `syncWave`](#set-the-sync-wave).
+- The app's entry in [`apps/values.yaml`](../apps/values.yaml). Drop it from the `# Depends on:` comment of every entry that listed it, and recompute their `syncWave` (see [Set the Sync Wave](#set-the-sync-wave)).
 - The app's namespace from [`manifests/namespaces/`](../manifests/namespaces/) and [`manifests/network-policies/cluster-wide/`](../manifests/network-policies/cluster-wide/), if no other app runs in it.
 - The app's key in [`apps/values.schema.json`](../apps/values.schema.json) and under `appParams` in [`apps/placeholder-values.yaml`](../apps/placeholder-values.yaml), if it receives [Terraform values](/docs/applications/pass-terraform-values-to-an-app/). Also delete its entry under `appParams` in the catalog's [`argocd_app_of_apps` unit](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl).
 - Any other reference to the app in the catalog's `argocd_app_of_apps` unit, such as its hostname in `locals` or its target under the `blackbox-exporter` entry of `appParams`.
@@ -160,7 +160,7 @@ A [network policy](https://docs.cilium.io/en/stable/security/policy/) can silent
 hubble observe --verdict DROPPED -P | grep -v "Unsupported L3"
 ```
 
-If it shows drops to or from your app, see [How to Control an App's Network Traffic](/docs/security/control-an-app-network-traffic/).
+If it shows drops to or from your app, see [Control an App's Network Traffic](/docs/security/control-an-app-network-traffic/).
 :::
 
 If you removed an app, check that its Application is no longer listed, and that its resources are gone:
@@ -169,7 +169,7 @@ argocd app list
 kubectl get all -n <namespace>
 ```
 
-ArgoCD [never deletes a namespace](/docs/applications/how-the-app-of-apps-works/#deletion-safety). If you deleted the namespace's file, delete the namespace by hand. This also deletes what's left inside it, such as the volumes of a `StatefulSet`:
+ArgoCD never deletes a namespace (see [Deletion Safety](/docs/applications/how-the-app-of-apps-works/#deletion-safety)). If you deleted the namespace's file, delete the namespace by hand. This also deletes what's left inside it, such as the volumes of a `StatefulSet`:
 ```bash
 kubectl delete namespace <namespace>
 ```
@@ -178,7 +178,7 @@ Once you release the removal, do the same in `staging` and `prod`.
 
 ## Restrict the App's Traffic
 
-Once your app works in `dev`, restrict its traffic. If you added it in a new namespace, no network policy applies to it yet. Deny all its traffic by default, then allow only what it needs, by following [How to Control an App's Network Traffic](/docs/security/control-an-app-network-traffic/). Then [test it in dev](#test-in-dev) again, to catch any traffic you forgot to allow.
+Once your app works in `dev`, restrict its traffic. If you added it in a new namespace, no network policy applies to it yet. Deny all its traffic by default, then allow only what it needs, by following [Control an App's Network Traffic](/docs/security/control-an-app-network-traffic/). Then repeat [Test in Dev](#test-in-dev), to catch any traffic you forgot to allow.
 
 ## Open a Pull Request
 

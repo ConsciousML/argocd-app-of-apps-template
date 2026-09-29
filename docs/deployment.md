@@ -1,7 +1,7 @@
 {/* This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/. It is not meant to be read directly in this repository. */}
 # Deploy an App Change to Dev
 
-Now that you've [forked](/docs/applications/get-started/app-of-apps-setup/#fork-the-app-of-apps-repository) the app of apps repository and [pointed your catalog at it](/docs/applications/get-started/app-of-apps-setup/#point-the-catalog-at-your-fork), you'll deploy the EKS stack in the [`dev` environment](/docs/iac/#dev), push a change to [podinfo](https://github.com/stefanprodan/podinfo), and watch ArgoCD sync it to your cluster.
+Now that you've completed [ArgoCD App of Apps Setup](/docs/applications/get-started/app-of-apps-setup/), you'll deploy the EKS stack in the [`dev` environment](/docs/iac/#dev), push a change to [podinfo](https://github.com/stefanprodan/podinfo), and watch ArgoCD sync it to your cluster.
 
 ## Create a Branch
 From the root of your app of apps fork, create a branch and push it:
@@ -45,7 +45,7 @@ At the top of the page, two statuses summarize the Application:
 Click on `to refs/heads/podinfo-message (<commit-sha>)` under **SYNC STATUS**. It opens the exact commit ArgoCD deployed on GitHub.
 
 ## Check Podinfo
-Open `https://podinfo.public.dev.<base_domain>` in your browser (replace `<base_domain>` with the [value from `pipelines/dns.hcl`](/docs/quickstart/bootstrap/setup_dns/)). You should see the default `greetings from podinfo v6.14.1` message.
+Open `https://podinfo.public.dev.<base_domain>` in your browser (replace `<base_domain>` with the `base_domain` you set in `pipelines/dns.hcl` during [DNS Bootstrap](/docs/quickstart/bootstrap/setup_dns/)). You should see the default `greetings from podinfo v6.14.1` message.
 
 ## Change Podinfo
 From the root of your app of apps fork, open [`manifests/podinfo/podinfo-deployment.yaml`](../manifests/podinfo/podinfo-deployment.yaml) and add an `env` field to the `podinfo` container:
@@ -99,4 +99,4 @@ Destroy the `dev` environment by following the [Destroy the Infrastructure](/doc
 Finally, remove the `APP_OF_APPS_BRANCH` line from the `.env` of your catalog fork, so your next `dev` deployment syncs from `main` again.
 
 ## What's Next
-Learn [how to add, edit, or remove an app](/docs/applications/add-edit-or-remove-an-app/) in your fork, then test it in `dev` the same way.
+Next, see [Add an App](/docs/applications/add-edit-or-remove-an-app/) to add your own app to your fork, then test it in `dev` the same way.

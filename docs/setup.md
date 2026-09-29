@@ -6,7 +6,7 @@ In this tutorial, you'll fork the [ArgoCD app of apps repository](https://github
 ## Fork the App of Apps Repository
 The app of apps repository holds the [Helm charts](https://helm.sh/docs/topics/charts/) and manifests that [ArgoCD](https://argo-cd.readthedocs.io/en/stable/) syncs into your cluster. Like the catalog and live repositories, it's meant to be forked and extended.
 
-First, [create an empty repository](https://github.com/new) on GitHub. Make it public, since ArgoCD reads it without credentials. Leave the README, `.gitignore`, and license options unset.
+First, create an empty repository from [GitHub's new repository page](https://github.com/new). Make it public, since ArgoCD reads it without credentials. Leave the README, `.gitignore`, and license options unset.
 
 Then, set your GitHub owner (user or organization) and the name of the repository you created, by replacing the `<...>`:
 ```bash

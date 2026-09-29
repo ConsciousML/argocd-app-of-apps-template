@@ -128,7 +128,7 @@ Namespaces are the exception. Deleting one deletes everything inside it, ArgoCD'
 
 ## Versioning per Environment
 Each environment decides which version of the app of apps repository it runs:
-- `dev` follows a branch, `main` by default. You can point it at your own branch to try a change before merging it, as in the [app change tutorial](/docs/applications/get-started/deployment/).
+- `dev` follows a branch, `main` by default. You can point it at your own branch to try a change before merging it, as in [Deploy an App Change to Dev](/docs/applications/get-started/deployment/).
 - `staging` and `prod` pin a git tag in the [live repository](https://github.com/ConsciousML/terragrunt-template-live-eks), so they only run versions you released and tested.
 
 This tag is separate from the catalog's version. An application change ships without a new catalog release, and a catalog change ships without touching the applications. The trade-off is that both versions must stay compatible: every `appParams` key the catalog sends must exist in the app of apps version it deploys.
