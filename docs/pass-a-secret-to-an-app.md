@@ -18,17 +18,19 @@ The [`secret-sync`](../charts/external-secrets-operator/secret-sync/) chart copi
 - `targetSecretName`: the name of the Kubernetes `Secret` ESO writes to, the one your app reads.
 - `targetCreationPolicy`: how ESO creates that `Secret`, usually `Owner`. See ESO's [Creation Policy](https://external-secrets.io/latest/guides/ownership-deletion-policy/#creation-policy).
 - `refreshPolicy`: when ESO syncs the value again, `CreatedOnce` for a value that never changes, or `Periodic` if it can be rotated. See ESO's [Refresh Policy](https://external-secrets.io/latest/guides/ownership-deletion-policy/#refresh-policy).
-- `data`: one entry per key to copy, with `remoteProperty` the key in the AWS secret (`plaintext` or `bcrypt_hash` for a generated password, otherwise a key you set in `secret_data`, see [Create the Secret](#create-the-secret)), and `secretKey` its key in the Kubernetes `Secret`.
+- `data`: one entry per key to copy, with `secretKey` its key in the Kubernetes `Secret`, and `remoteProperty` its key in the AWS secret.
 
-For example, Grafana's admin password, in [`grafana-secrets-values.yaml`](../charts/external-secrets-operator/secret-sync/grafana-secrets-values.yaml):
+For a generated password, `remoteProperty` is `plaintext` or `bcrypt_hash`. Otherwise, it's a key you set in `secret_data` (see [Create the Secret](#create-the-secret)).
+
+For example, the Slack bot token Alertmanager reads, in [`alertmanager-secrets-values.yaml`](../charts/external-secrets-operator/secret-sync/alertmanager-secrets-values.yaml):
 ```yaml
-name: grafana-admin-password
-targetSecretName: grafana-admin-credentials
+name: alertmanager-slack-bot
+targetSecretName: alertmanager-slack-bot
 targetCreationPolicy: Owner
-refreshPolicy: CreatedOnce
+refreshPolicy: Periodic
 data:
-  - secretKey: admin-password
-    remoteProperty: plaintext
+  - secretKey: bot_token
+    remoteProperty: bot_token
 ```
 
 ### Declare the Secret Entry
@@ -39,26 +41,39 @@ Add a `<app>-secrets` entry under `applications` in [`apps/values.yaml`](../apps
 - `syncWave`: `5`, since it depends on `external-secrets-operator`, at wave `4` (see [Set the Sync Wave](/docs/applications/add-edit-or-remove-an-app/#set-the-sync-wave)).
 - `extraValueFiles`: your secret values file.
 
-For example, Grafana's entry:
+For example, Alertmanager's entry:
 ```yaml
   # Depends on:
   # - external-secrets-operator
-  - name: grafana-secrets
+  - name: alertmanager-secrets
     path: charts/external-secrets-operator/secret-sync
     destination:
       namespace: monitoring
     syncWave: 5
     extraValueFiles:
-      - charts/external-secrets-operator/secret-sync/grafana-secrets-values.yaml
+      - charts/external-secrets-operator/secret-sync/alertmanager-secrets-values.yaml
 ```
 
 ### Allow the Key in the Apps Chart
 
-The catalog injects the rest of the `secret-sync` values, `secretStoreName`, `awsRegion`, and `remoteKey`, through [`appParams`](/docs/applications/how-the-app-of-apps-works/#appparams-injection). Allow your `<app>-secrets` key and add its placeholders to the apps chart, by following [Allow the Key in the Apps Chart](/docs/applications/pass-terraform-values-to-an-app/#allow-the-key-in-the-apps-chart) and [Add Placeholders to the Apps Chart](/docs/applications/pass-terraform-values-to-an-app/#add-placeholders-to-the-apps-chart). For example, Grafana's placeholders in [`apps/placeholder-values.yaml`](../apps/placeholder-values.yaml):
+The catalog injects the rest of the `secret-sync` values, `secretStoreName`, `awsRegion`, and `remoteKey`, through [`appParams`](/docs/applications/how-the-app-of-apps-works/#appparams-injection). Allow your `<app>-secrets` key in the apps chart, by following [Allow the Key in the Apps Chart](/docs/applications/pass-terraform-values-to-an-app/#allow-the-key-in-the-apps-chart). For example, Alertmanager's key in [`apps/values.schema.json`](../apps/values.schema.json):
+```json
+"appParams": {
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    ...
+    "alertmanager-secrets": { "type": "object" },
+    ...
+  }
+}
+```
+
+Then add its placeholders, by following [Add Placeholders to the Apps Chart](/docs/applications/pass-terraform-values-to-an-app/#add-placeholders-to-the-apps-chart). For example, Alertmanager's placeholders in [`apps/placeholder-values.yaml`](../apps/placeholder-values.yaml):
 ```yaml
 appParams:
   ...
-  grafana-secrets:
+  alertmanager-secrets:
     secretStoreName: "placeholder-store"
     awsRegion: "us-east-1"
     remoteKey: "placeholder-key"
@@ -66,38 +81,22 @@ appParams:
 
 ### Read the Secret in Your App
 
-Your app's chart reads the `Secret` through its own values (often named `existingSecret`). Set them in your [secret values file](#add-a-secret-values-file), so the `Secret`'s name and key are written only once:
-- Mark `targetSecretName` and `secretKey` with a [YAML anchor](https://yaml.org/spec/1.2.2/#692-node-anchors) (`&<anchor>`).
-- At the end of the file, add your app's values, pointing at the anchors with aliases (`*<anchor>`). The `secret-sync` chart ignores them.
-
-For example, `kube-prometheus-stack` reads Grafana's admin password from `grafana.admin.existingSecret` and `grafana.admin.passwordKey`, in [`grafana-secrets-values.yaml`](../charts/external-secrets-operator/secret-sync/grafana-secrets-values.yaml):
+In your app's chart, point your app at the `Secret`, using the `targetSecretName` and `secretKey` from your [secret values file](#add-a-secret-values-file). For example, Alertmanager mounts the Slack bot token's `Secret`, in [`charts/monitoring/kube-prometheus-stack/values.yaml`](../charts/monitoring/kube-prometheus-stack/values.yaml):
 ```yaml
-...
-targetSecretName: &secretName grafana-admin-credentials
-...
-data:
-  - secretKey: &secretKey admin-password
-    remoteProperty: plaintext
-
 kube-prometheus-stack:
-  grafana:
-    admin:
-      existingSecret: *secretName
-      passwordKey: *secretKey
+  ...
+  alertmanager:
+    alertmanagerSpec:
+      ...
+      secrets:
+        - alertmanager-slack-bot
 ```
 
-Then add your secret values file to your app's `extraValueFiles` in [`apps/values.yaml`](../apps/values.yaml), so your app reads these values too. For example, `kube-prometheus-stack`'s entry:
-```yaml
-  - name: kube-prometheus-stack
-    ...
-    extraValueFiles:
-      - charts/external-secrets-operator/secret-sync/grafana-secrets-values.yaml
-```
-
-If your app needs the `Secret` before it starts (e.g. to set a password on first boot), add `<app>-secrets` to its `# Depends on:` comment in [`apps/values.yaml`](../apps/values.yaml), and recompute its `syncWave` (see [Set the Sync Wave](/docs/applications/add-edit-or-remove-an-app/#set-the-sync-wave)). For example, `kube-prometheus-stack` runs after `grafana-secrets` (wave `5`), at wave `6`:
+If your app needs the `Secret` before it starts (e.g. to mount it or to set a password on first boot), add `<app>-secrets` to its `# Depends on:` comment in [`apps/values.yaml`](../apps/values.yaml), and recompute its `syncWave` (see [Set the Sync Wave](/docs/applications/add-edit-or-remove-an-app/#set-the-sync-wave)). For example, `kube-prometheus-stack` runs after `alertmanager-secrets` (wave `5`), at wave `6`:
 ```yaml
   # Depends on:
-  # - grafana-secrets (needs the admin secret before Grafana's first boot)
+  # - alertmanager-secrets (Alertmanager mounts it via alertmanagerSpec.secrets, so it must
+  #   exist before the pod can start)
   # ...
   - name: kube-prometheus-stack
     ...
@@ -163,12 +162,12 @@ Then:
 
 ### Pass the Secret to ESO
 
-In the `argocd_app_of_apps` unit, [`units/eks/addons/argocd/app_of_apps/terragrunt.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl), read your unit's `secret_name` output, as in [Read Other Units' Outputs](/docs/iac/add-a-unit/#read-other-units-outputs). For example, for Grafana:
+In the `argocd_app_of_apps` unit, [`units/eks/addons/argocd/app_of_apps/terragrunt.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl), read your unit's `secret_name` output, as in [Read Other Units' Outputs](/docs/iac/add-a-unit/#read-other-units-outputs). For example, for Alertmanager:
 ```hcl
-dependency "grafana_password" {
-  config_path = "../../prometheus_stack/grafana/aws_secret_password"
+dependency "alertmanager_slack_bot_secret" {
+  config_path = "../../prometheus_stack/alertmanager/aws_secret_slack_bot"
   mock_outputs = {
-    secret_name = "mock-grafana-password"
+    secret_name = "mock-alertmanager-slack-bot"
   }
   mock_outputs_allowed_terraform_commands = ["init", "plan", "validate", "graph", "destroy"]
 }
@@ -179,14 +178,14 @@ Then, under `inputs.helm_values.appParams`, add your `<app>-secrets` key (see [A
 - `awsRegion`: `include.root.locals.aws_region`.
 - `remoteKey`: your unit's `secret_name` output.
 
-For example, for Grafana:
+For example, for Alertmanager:
 ```hcl
 appParams = {
   ...
-  "grafana-secrets" = {
-    secretStoreName = "${include.root.locals.environment}-aws-secrets-manager-grafana"
+  "alertmanager-secrets" = {
+    secretStoreName = "${include.root.locals.environment}-aws-secrets-manager-alertmanager"
     awsRegion       = include.root.locals.aws_region
-    remoteKey       = dependency.grafana_password.outputs.secret_name
+    remoteKey       = dependency.alertmanager_slack_bot_secret.outputs.secret_name
   }
 }
 ```
