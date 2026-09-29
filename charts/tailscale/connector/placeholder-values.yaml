@@ -3,6 +3,6 @@
 # (terragrunt-template-catalog-eks) via appParams, from the EKS cluster name
 # and VPC CIDR. See units/eks/addons/argocd/app_of_apps in that repo.
 name: "placeholder-connector"
-hostnamePrefix: "placeholder"
+hostnamePrefix: "placeholder-cluster"
 advertiseRoutes:
   - "10.0.0.0/16"

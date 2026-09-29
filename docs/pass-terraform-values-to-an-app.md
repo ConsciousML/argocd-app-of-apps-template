@@ -5,11 +5,9 @@ import TabItem from '@theme/TabItem';
 
 # How to Pass Terraform Values to an App
 
-This guide shows you how to pass a value from the catalog to an app, through [`appParams`](/docs/applications/how-the-app-of-apps-works/#appparams-injection). You need it when your app reads a value that comes from an AWS resource or the catalog's configuration (e.g. an S3 bucket name, a certificate ARN, or the region). For a value that only differs per environment, see [Configure an App per Environment](/docs/applications/configure-an-app-per-environment/) instead.
+This guide shows you how to pass a value from the catalog to an app, through [`appParams`](/docs/applications/how-the-app-of-apps-works/#appparams-injection). You need it when your app reads a value that comes from an AWS resource or the catalog's configuration (e.g. an S3 bucket name, a certificate ARN, or the region). It's one of the [Extra Steps](/docs/applications/add-edit-or-remove-an-app/#extra-steps) of adding or editing an app, and assumes you've created a branch in both forks, as in [Point Dev at Your Branch](/docs/applications/add-edit-or-remove-an-app/#point-dev-at-your-branch).
 
-It's one of the [Extra Steps](/docs/applications/add-edit-or-remove-an-app/#extra-steps) of adding or editing an app, and assumes you've created a branch in both forks, as in [Point Dev at Your Branch](/docs/applications/add-edit-or-remove-an-app/#point-dev-at-your-branch).
-
-For a hostname, see [Expose an App](/docs/applications/expose-an-app/). For a secret, see [Pass a Secret to an App](/docs/applications/pass-a-secret-to-an-app/).
+For a value that only differs per environment, see [Configure an App per Environment](/docs/applications/configure-an-app-per-environment/) instead. For a hostname, see [Expose an App](/docs/applications/expose-an-app/). For a secret, see [Pass a Secret to an App](/docs/applications/pass-a-secret-to-an-app/).
 
 ## In Your App of Apps Fork
 
@@ -51,7 +49,7 @@ aws-load-balancer-controller:
 
 ### Require the Value in the Chart Schema
 
-In your chart's `values.schema.json`, list the value under `required`, and reject an empty one with `minLength: 1` for a string or `minItems: 1` for an array. A missing value then fails the render instead of deploying empty. If your chart has no schema yet, create one.
+In your chart's `values.schema.json` (create it if your chart has none), list the value under `required`, and reject an empty one with `minLength: 1` for a string or `minItems: 1` for an array. A missing value then fails the render instead of deploying empty.
 
 <Tabs groupId="chart-type">
 <TabItem value="own" label="Own chart">
@@ -113,7 +111,7 @@ For example, [`charts/tailscale/connector/placeholder-values.yaml`](../charts/ta
 # (terragrunt-template-catalog-eks) via appParams, from the EKS cluster name
 # and VPC CIDR. See units/eks/addons/argocd/app_of_apps in that repo.
 name: "placeholder-connector"
-hostnamePrefix: "placeholder"
+hostnamePrefix: "placeholder-cluster"
 advertiseRoutes:
   - "10.0.0.0/16"
 ```
@@ -154,7 +152,9 @@ If your app has no `appParams` key yet, add one under `appParams` in [`apps/valu
 }
 ```
 
-Then add your placeholders under your app's key in [`apps/placeholder-values.yaml`](../apps/placeholder-values.yaml).
+### Add Placeholders to the Apps Chart
+
+Add your placeholders under your app's key in [`apps/placeholder-values.yaml`](../apps/placeholder-values.yaml), so CI can render the apps chart without the catalog, as it does your chart.
 
 <Tabs groupId="chart-type">
 <TabItem value="own" label="Own chart">
@@ -191,7 +191,7 @@ appParams:
 
 Open the `argocd_app_of_apps` unit, [`units/eks/addons/argocd/app_of_apps/terragrunt.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl). Depending on where the value comes from:
 - **Shared configuration** (e.g. the region): find the file that holds it in the [HCL Configuration](/docs/reference/hcl_configuration/) reference, and read it as in [Read Shared Config](/docs/iac/add-a-unit/#read-shared-config).
-- **An output of a unit the file already reads outputs from** (e.g. `vpc`): skip to [Add the `appParams` Entry](#add-the-appparams-entry).
+- **An output of a unit the file already reads outputs from** (e.g. `vpc`): you already have it, go on to [Add the `appParams` Entry](#add-the-appparams-entry).
 - **An output of any other unit**: read it as in [Read Other Units' Outputs](/docs/iac/add-a-unit/#read-other-units-outputs).
 - **A resource no unit creates yet**: add it first by following [Add a Unit](/docs/iac/add-a-unit/), then come back.
 
