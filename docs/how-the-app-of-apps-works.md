@@ -33,13 +33,13 @@ flowchart LR
 
 Terraform creates the root Application, `app-of-apps`, with the rest of the cluster. It points at the [`apps/`](../apps/) Helm chart, which renders one child Application per entry under `applications` in [`apps/values.yaml`](../apps/values.yaml). Each child then deploys the manifests or chart at its entry's `path`.
 
-From then on, ArgoCD deploys every application from the app of apps repository. Adding an application is one entry in `apps/values.yaml`, with no Terraform change unless the application needs AWS resources or a value only Terraform knows.
+From then on, ArgoCD deploys every application from the app of apps repository. Adding an application is one entry in `apps/values.yaml`, with no Terraform change unless the application needs AWS resources or a value from a Terraform module.
 
 A child Application is an entry, not a directory. Several entries can share one chart with different values: every `*-httproute` entry deploys [`charts/gateway-api/httproute`](../charts/gateway-api/httproute/), each with its own values file.
 
 ## Who Owns What
 Two repositories deploy what runs in your cluster:
-- The [catalog](https://github.com/ConsciousML/terragrunt-template-catalog-eks) owns the AWS resources (IAM roles, Pod Identity associations, secrets, certificates, etc.), the root Application, and every value only Terraform knows.
+- The [catalog](https://github.com/ConsciousML/terragrunt-template-catalog-eks) owns the AWS resources (IAM roles, Pod Identity associations, secrets, certificates, etc.), the root Application, and every value from a Terraform module.
 - The app of apps repository owns the charts, the manifests, the list of Applications, and their default values.
 
 This split keeps each change in one place. An application change ships through ArgoCD without a Terraform apply. And values that depend on the deployment, like a certificate ARN or a hostname, never get hardcoded in the app of apps repository: the catalog injects them at deploy time.
@@ -72,7 +72,7 @@ appParams = {
 
 Keying by `name` instead of `path` lets two Applications sharing a chart get different values. [`apps/values.schema.json`](../apps/values.schema.json) lists every allowed key, so a typo fails loudly instead of injecting values that nothing reads.
 
-Only values Terraform owns belong in `appParams`: ones that come from an AWS resource or differ per deployment, like a certificate ARN, a hostname, or a secret name. Everything static stays a default in the app of apps repository, versioned with the chart that reads it.
+Only values from the catalog belong in `appParams`: ones that come from an AWS resource or differ per deployment, like a certificate ARN, a hostname, or a secret name. Everything static stays a default in the app of apps repository, versioned with the chart that reads it.
 
 ## Placeholder Values
 A value the catalog injects through `appParams` has no default in its chart, since only the catalog knows it at deploy time. But CI renders every chart on its own, without the catalog, to lint it, validate it, and scan it. A chart missing a required value would fail to render there.
