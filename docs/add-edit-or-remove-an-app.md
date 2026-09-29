@@ -75,20 +75,6 @@ Put the app's files in a new directory, as either:
 
 Add a `nodeSelector` and `tolerations` to the app's pods by following [How to Schedule Pods](/docs/compute/schedule-pods/).
 
-### Add Placeholder Values
-
-If your chart reads a value passed from Terraform, leave it empty in its `values.yaml`, with a comment saying where it comes from. Then add a `placeholder-values.yaml` next to it with a dummy value, so CI can render the chart (see [Placeholder Values](/docs/applications/how-the-app-of-apps-works/#placeholder-values)). For example, the `host` of [`charts/gateway-api/httproute`](../charts/gateway-api/httproute/):
-```yaml
-# values.yaml
-# Injected per instance by the catalog via appParams.
-host: ""
-```
-
-```yaml
-# placeholder-values.yaml
-host: "placeholder"
-```
-
 ### Declare the Application
 
 Add an entry under `applications` in [`apps/values.yaml`](../apps/values.yaml), with the app's `name`, the `path` of its files, its `destination.namespace`, and its `syncWave` (see [Set the Sync Wave](#set-the-sync-wave)). For example, podinfo's entry:
@@ -132,8 +118,7 @@ Depending on what your app needs, also follow:
 
 ## Edit an App
 
-Change the app's files, or its entry in [`apps/values.yaml`](../apps/values.yaml). For a change that needs one of the [Extra Steps](#extra-steps), follow its guide. If you add a value passed from Terraform, give it a placeholder too, as in [Add Placeholder Values](#add-placeholder-values).
-
+Change the app's files, or its entry in [`apps/values.yaml`](../apps/values.yaml). For a change that needs one of the [Extra Steps](#extra-steps), follow its guide.
 If the app's dependencies change, update its `# Depends on:` comment and [recompute its `syncWave`](#set-the-sync-wave). Then recompute the `syncWave` of every entry that depends on it, since a shifted wave cascades downstream.
 
 ## Remove an App
