@@ -1,8 +1,12 @@
+# Injected per instance by the catalog (terragrunt-template-catalog-eks) via appParams, from
+# the environment, the region, and the secret_name output of the unit creating the AWS
+# secret. See units/eks/addons/argocd/app_of_apps in that repo. No instance sets these itself.
 secretStoreName: ""
 awsRegion: ""
+remoteKey: ""
+
 name: ""
 targetSecretName: ""
 targetCreationPolicy: ""
 refreshPolicy: ""
-remoteKey: ""
 data: []
