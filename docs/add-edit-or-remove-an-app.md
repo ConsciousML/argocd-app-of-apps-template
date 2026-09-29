@@ -139,7 +139,7 @@ git commit -m "<message>" # e.g. "feat: add my-app"
 git push
 ```
 
-If you also changed your catalog fork, commit your change on its branch and push it, since units fetch the catalog's modules from git. Then redeploy the `dev` stack as in [Deploy the Dev Stack](/docs/applications/get-started/deployment/#deploy-the-dev-stack), so every unit you added or changed is applied.
+If you also changed your catalog fork, commit your change on its branch and push it, since units fetch the catalog's modules from git. Then redeploy the `dev` stack as in [Deploy the Dev Stack](/docs/applications/get-started/deployment/#deploy-the-dev-stack), so every unit you added or changed is applied. If you added a unit, commit its lock file by following [Commit the Lock File](/docs/iac/add-a-unit/#commit-the-lock-file).
 
 From the root of your catalog fork, log in with the `argocd` CLI as in the [Log In to ArgoCD](/docs/quickstart/deployment/#log-in-to-argocd) step of the dev deployment, then sync every Application:
 ```bash
