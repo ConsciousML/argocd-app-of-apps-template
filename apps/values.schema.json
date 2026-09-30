@@ -3,6 +3,25 @@
   "title": "Values",
   "type": "object",
   "properties": {
+    "config": {
+      "type": "object",
+      "required": ["spec"],
+      "properties": {
+        "spec": {
+          "type": "object",
+          "required": ["source"],
+          "properties": {
+            "source": {
+              "type": "object",
+              "required": ["repoURL"],
+              "properties": {
+                "repoURL": { "type": "string", "minLength": 1 }
+              }
+            }
+          }
+        }
+      }
+    },
     "global": {
       "type": "object",
       "additionalProperties": false,
