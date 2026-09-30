@@ -161,54 +161,99 @@ For the rest of the policy, see [Control an App's Network Traffic](/docs/securit
 
 ### Add the Hostname
 
-In [`pipelines/dns.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/pipelines/dns.hcl), add your app's subdomain. Keep it a single label (no dot), since the wildcard certificate only covers one level. For example:
+In [`pipelines/dns.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/pipelines/dns.hcl), add your app's subdomain. Keep it a single label (no dot), since the wildcard certificate only covers one level. For example, for podinfo:
 ```hcl
 locals {
   ...
-  subdomain_podinfo    = "podinfo"
-  subdomain_goldilocks = "goldilocks"
+  subdomain_podinfo = "podinfo"
 }
 ```
 
-Then, in [`pipelines/dev/eks/domains.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/pipelines/dev/eks/domains.hcl), build the full hostname under your gateway's domain, `domain_env_public` or `domain_env_private`:
+Then, in [`pipelines/dev/eks/domains.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/pipelines/dev/eks/domains.hcl), build the full hostname under your gateway's domain:
+
+<Tabs groupId="gateway">
+<TabItem value="public" label="Public">
+
 ```hcl
 locals {
   ...
-  domain_public_podinfo     = "${local.dns.subdomain_podinfo}.${local.domain_env_public}"
+  domain_public_podinfo = "${local.dns.subdomain_podinfo}.${local.domain_env_public}"
+}
+```
+
+</TabItem>
+<TabItem value="private" label="Private">
+
+```hcl
+locals {
+  ...
   domain_private_goldilocks = "${local.dns.subdomain_goldilocks}.${local.domain_env_private}"
 }
 ```
+
+</TabItem>
+</Tabs>
 
 See the [HCL Configuration](/docs/reference/hcl_configuration/#domainshcl) reference for what each file sets.
 
 ### Inject the Hostname
 
-In the `argocd_app_of_apps` unit, [`units/eks/addons/argocd/app_of_apps/terragrunt.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl), read your hostname from `domains.hcl` in `locals`:
+In the `argocd_app_of_apps` unit, [`units/eks/addons/argocd/app_of_apps/terragrunt.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl), read your hostname from `domains.hcl` in `locals`. Then, under `inputs.helm_values.appParams`, set it as the `host` of your `<app>-httproute` key (see [Add the `appParams` Entry](/docs/applications/pass-terraform-values-to-an-app/#add-the-appparams-entry)):
+
+<Tabs groupId="gateway">
+<TabItem value="public" label="Public">
+
+```hcl
+locals {
+  domains_hcl           = find_in_parent_folders("domains.hcl")
+  domain_public_podinfo = read_terragrunt_config(local.domains_hcl).locals.domain_public_podinfo
+  ...
+}
+
+inputs = {
+  helm_values = {
+    appParams = {
+      ...
+      "podinfo-httproute" = {
+        host = local.domain_public_podinfo
+      }
+    }
+  }
+}
+```
+
+</TabItem>
+<TabItem value="private" label="Private">
+
 ```hcl
 locals {
   domains_hcl               = find_in_parent_folders("domains.hcl")
-  domain_public_podinfo     = read_terragrunt_config(local.domains_hcl).locals.domain_public_podinfo
   domain_private_goldilocks = read_terragrunt_config(local.domains_hcl).locals.domain_private_goldilocks
   ...
 }
-```
 
-Then, under `inputs.helm_values.appParams`, set it as the `host` of your `<app>-httproute` key (see [Add the `appParams` Entry](/docs/applications/pass-terraform-values-to-an-app/#add-the-appparams-entry)):
-```hcl
-appParams = {
-  ...
-  "podinfo-httproute" = {
-    host = local.domain_public_podinfo
-  }
-  "goldilocks-httproute" = {
-    host = local.domain_private_goldilocks
+inputs = {
+  helm_values = {
+    appParams = {
+      ...
+      "goldilocks-httproute" = {
+        host = local.domain_private_goldilocks
+      }
+    }
   }
 }
 ```
 
+</TabItem>
+</Tabs>
+
 ### Probe the Hostname
 
-The [blackbox exporter](https://github.com/prometheus/blackbox_exporter) calls each of its target URLs from inside the cluster, like a user would, and Prometheus alerts when one stops answering with a `2xx`. To get alerted when your app is unreachable, add its URL to the targets, under the `blackbox-exporter` key of `appParams`. For example:
+The [blackbox exporter](https://github.com/prometheus/blackbox_exporter) calls each of its target URLs from inside the cluster, like a user would, and Prometheus alerts when one stops answering with a `2xx`. To get alerted when your app is unreachable, add its URL to the targets, under the `blackbox-exporter` key of `appParams`:
+
+<Tabs groupId="gateway">
+<TabItem value="public" label="Public">
+
 ```hcl
 "blackbox-exporter" = {
   "prometheus-blackbox-exporter" = {
@@ -216,6 +261,21 @@ The [blackbox exporter](https://github.com/prometheus/blackbox_exporter) calls e
       targets = [
         ...
         { name = "podinfo", url = "https://${local.domain_public_podinfo}" },
+      ]
+    }
+  }
+}
+```
+
+</TabItem>
+<TabItem value="private" label="Private">
+
+```hcl
+"blackbox-exporter" = {
+  "prometheus-blackbox-exporter" = {
+    serviceMonitor = {
+      targets = [
+        ...
         { name = "goldilocks", url = "https://${local.domain_private_goldilocks}" },
       ]
     }
@@ -223,14 +283,19 @@ The [blackbox exporter](https://github.com/prometheus/blackbox_exporter) calls e
 }
 ```
 
+</TabItem>
+</Tabs>
+
 {/* TODO: document testing a new hostname in staging. The live repository's staging tests
 (tests/staging_stack_test.go) poll each entry of endpointChecks, reading its host from a
 domain_name_<app> unit output. To cover a new app: copy a units/eks/domain_name/<app> unit in
 the catalog, add its block to the dev stack, and add an endpointChecks entry in live. */}
 
-Then follow [Test in Dev](/docs/applications/add-edit-or-remove-an-app/#test-in-dev). After you sync, also check that your hostname answers, replacing `<host>`. For a private hostname, connect to [Tailscale](/docs/security/tailscale/) first, by running `tailscale up`. ExternalDNS can take a minute to create the record:
+Then follow [Test in Dev](/docs/applications/add-edit-or-remove-an-app/#test-in-dev). After you sync, also check that your hostname answers, replacing `<host>`. For a private hostname, connect to [Tailscale](/docs/security/tailscale/) first, by running `tailscale up`:
 ```bash
 curl -I https://<host>
 ```
+
+If it doesn't resolve yet, wait a minute for ExternalDNS to create the record.
 
 To ship your change to `staging` and `prod`, see [Release an App Change](/docs/applications/release-an-app-change/). Before you release, port your `dns.hcl` and `domains.hcl` lines to your live fork, as in [Update the Shared Configuration](/docs/iac/bump-the-catalog-version/#update-the-shared-configuration).
