@@ -19,10 +19,16 @@ Otherwise, `staging` and `prod` keep syncing the original app of apps repository
 
 ## Tag the App of Apps Fork
 
-From the root of your app of apps fork, tag `main` and push the tag, replacing `<tag>` with the next version after your fork's latest tag (e.g. `v0.1.5`):
+From the root of your app of apps fork, pull `main` and print your fork's latest tag:
 ```bash
 git checkout main
 git pull origin main
+git fetch --tags
+git tag --sort=-v:refname | head -1
+```
+
+Tag `main` with the next minor version after it and push the tag, replacing `<tag>` (e.g. `v0.2.0` after `v0.1.4`):
+```bash
 git tag <tag>
 git push origin <tag>
 ```
@@ -38,13 +44,13 @@ locals {
 }
 ```
 
-Then continue at [Roll Out to Staging and Prod](/docs/deployment/release-a-change-to-production/#roll-out-to-staging-and-prod).
+Then return to [Update the Live Fork](/docs/deployment/release-a-change-to-production/#update-the-live-fork).
 
 ## Delete a Removed App's Namespace
 
 If your change removed an app and deleted its namespace file, ArgoCD leaves the namespace in the cluster, since it never deletes one (see [Deletion Safety](/docs/applications/how-the-app-of-apps-works/#deletion-safety)).
 
-Once your release reaches `prod`, connect `kubectl` to it as in [Check the Production Cluster](/docs/deployment/get-started/promote-to-production/#check-the-production-cluster), then delete the namespace, replacing `<namespace>`. This also deletes what's left inside it, such as the volumes of a `StatefulSet`:
+Once your release reaches `prod`, connect `kubectl` to it as in [Check Prod](/docs/deployment/release-a-change-to-production/#check-prod), then delete the namespace, replacing `<namespace>`. This also deletes what's left inside it, such as the volumes of a `StatefulSet`:
 ```bash
 kubectl delete namespace <namespace>
 ```
