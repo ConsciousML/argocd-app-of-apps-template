@@ -5,7 +5,7 @@ Deploys [Loki](https://grafana.com/docs/loki/latest/) via the upstream `loki` ch
 ## What's Inside
 
 - **[values.yaml](values.yaml)**: monolithic deployment mode, S3 storage, resource sizing
-- **[values-dev.yaml](values-dev.yaml)**, **[values-staging.yaml](values-staging.yaml)**, and **[values-prod.yaml](values-prod.yaml)**: per-environment overrides. See [`docs/environment-divergence.md`](../../../docs/environment-divergence.md)
+- **[values-dev.yaml](values-dev.yaml)**, **[values-staging.yaml](values-staging.yaml)**, and **[values-prod.yaml](values-prod.yaml)**: per-environment overrides. See [Configure an App per Environment](https://eks-forge.readthedocs.io/latest/docs/applications/configure-an-app-per-environment/)
 - **`templates/network-policy-*.yaml`**: one `CiliumNetworkPolicy` per component ([single-binary](templates/network-policy-single-binary.yaml), [gateway](templates/network-policy-gateway.yaml), [canary](templates/network-policy-canary.yaml), [chunks-cache](templates/network-policy-chunks-cache.yaml), [results-cache](templates/network-policy-results-cache.yaml))
 
 ## Upstream Dependencies

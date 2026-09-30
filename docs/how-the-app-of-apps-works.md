@@ -93,6 +93,8 @@ The catalog injects `global.environment` into the root Application, and `applica
 
 An overlay holds only the keys that differ, so the shared config lives once in `values.yaml` instead of being copied per environment. And since [`apps/values.schema.json`](../apps/values.schema.json) requires a non-empty `global.environment`, a missing environment fails loudly instead of silently loading a nonexistent `values-.yaml`.
 
+To add overlays to your app, see [Configure an App per Environment](/docs/applications/configure-an-app-per-environment/).
+
 ## Sync Waves
 Some Applications can't start before others. Take podinfo: its pods need the `podinfo` namespace, and its route to the internet needs both podinfo and the public gateway.
 
