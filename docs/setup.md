@@ -1,7 +1,7 @@
 {/* This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/. It is not meant to be read directly in this repository. */}
 # ArgoCD App of Apps Setup
 
-In this tutorial, you'll fork the [ArgoCD app of apps repository](https://github.com/ConsciousML/argocd-app-of-apps-template) and point your catalog fork at it to deploy your own applications to your cluster.
+In this tutorial, you'll fork the [ArgoCD app of apps repository](https://github.com/ConsciousML/argocd-app-of-apps-template), set up its pre-commit hooks, and point your catalog fork at it to deploy your own applications to your cluster.
 
 ## Fork the App of Apps Repository
 The app of apps repository holds the [Helm charts](https://helm.sh/docs/topics/charts/) and manifests that [ArgoCD](https://argo-cd.readthedocs.io/en/stable/) syncs into your cluster. Like the catalog and live repositories, it's meant to be forked and extended.
@@ -33,6 +33,34 @@ From the root of your app of apps fork, install the tools pinned in [`mise.toml`
 mise trust
 mise install
 ```
+
+## Enable the Pre-commit Hooks
+Your fork comes with [prek](https://github.com/j178/prek) hooks, defined in [`prek.toml`](../prek.toml). They lint the Helm charts, validate the manifests against their Kubernetes schemas, and scan them with [Trivy](https://trivy.dev/). These are the same checks the CI runs on every pull request, so you'll catch issues before you push.
+
+`mise` already installed `prek`. Wire the hooks into git:
+```bash
+prek install
+```
+
+The Helm hook builds the dependencies of each chart, so register the chart repositories they come from:
+```bash
+scripts/helm-repo-add.sh
+```
+
+Run every hook against the whole repository:
+```bash
+prek run --all-files
+```
+
+You'll see each hook pass:
+```
+Helm lint and kubeconform................................................Passed
+kubeconform plain manifests..............................................Passed
+Trivy....................................................................Passed
+Trivy secret scan........................................................Passed
+```
+
+From now on, the hooks run on the files you change each time you `git commit`.
 
 ## Point the Catalog at Your Fork
 From the root of your [catalog fork](/docs/quickstart/installation/#fork-the-eks-forge-catalog), set these two values in [`pipelines/github.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/pipelines/github.hcl) and leave the others as is:
