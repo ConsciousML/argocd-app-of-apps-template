@@ -4,7 +4,7 @@
 
 This guide shows you how to add, edit, or remove an [application](/docs/applications/how-the-app-of-apps-works/#the-root-app-and-its-children) in your [app of apps fork](/docs/applications/get-started/app-of-apps-setup/#fork-the-app-of-apps-repository), test it in [`dev`](/docs/iac/#dev), and merge it. It assumes you've already followed [Point the Catalog at Your Fork](/docs/applications/get-started/app-of-apps-setup/#point-the-catalog-at-your-fork).
 
-To ship a merged change to `staging` and `prod`, see [Release an App Change](/docs/applications/release-an-app-change/) instead.
+To ship a merged change to `staging` and `prod`, see [Release a Change to Production](/docs/deployment/release-a-change-to-production/) instead.
 
 ## Point Dev at Your Branch
 
@@ -174,7 +174,7 @@ ArgoCD never deletes a namespace (see [Deletion Safety](/docs/applications/how-t
 kubectl delete namespace <namespace>
 ```
 
-Once you release the removal, do the same in `staging` and `prod`.
+Once you release the removal, do the same in `prod`, as in [Delete a Removed App's Namespace](/docs/applications/release-an-app-change/#delete-a-removed-apps-namespace).
 
 ## Restrict the App's Traffic
 
@@ -204,4 +204,4 @@ If you also opened a pull request in your catalog fork, merge it the same way fr
 
 Finally, remove the `APP_OF_APPS_BRANCH` line from the `.env` of your catalog fork, so your next `dev` deployment syncs from `main` again.
 
-To ship your change to `staging` and `prod`, see [Release an App Change](/docs/applications/release-an-app-change/).
+To ship your change to `staging` and `prod`, see [Release a Change to Production](/docs/deployment/release-a-change-to-production/).

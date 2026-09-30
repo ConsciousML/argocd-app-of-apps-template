@@ -297,5 +297,3 @@ curl -I https://<host>
 ```
 
 If it doesn't resolve yet, wait a minute for ExternalDNS to create the record.
-
-To ship your change to `staging` and `prod`, see [Release an App Change](/docs/applications/release-an-app-change/). Before you release, port your `dns.hcl` and `domains.hcl` lines to your live fork, as in [Update the Shared Configuration](/docs/iac/bump-the-catalog-version/#update-the-shared-configuration).
