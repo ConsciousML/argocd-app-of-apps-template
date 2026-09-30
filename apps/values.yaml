@@ -230,7 +230,8 @@ applications:
     destination:
       namespace: monitoring
     syncWave: -1
-  # Depends on external-secrets-operator.
+  # Depends on:
+  # - external-secrets-operator
   - name: argocd-secrets
     path: charts/external-secrets-operator/secret-sync
     destination:
@@ -271,7 +272,8 @@ applications:
       - charts/gateway-api/httproute/argocd-httproute-values.yaml
 
   # --- Tailscale ---
-  # Depends on external-secrets-operator.
+  # Depends on:
+  # - external-secrets-operator
   - name: tailscale-secrets
     path: charts/external-secrets-operator/secret-sync
     destination:
@@ -301,7 +303,8 @@ applications:
     syncWave: 7
 
   # --- Prometheus stack ---
-  # Depends on external-secrets-operator.
+  # Depends on:
+  # - external-secrets-operator
   - name: grafana-secrets
     path: charts/external-secrets-operator/secret-sync
     destination:
@@ -309,7 +312,8 @@ applications:
     syncWave: 5
     extraValueFiles:
       - charts/external-secrets-operator/secret-sync/grafana-secrets-values.yaml
-  # Depends on external-secrets-operator.
+  # Depends on:
+  # - external-secrets-operator
   - name: alertmanager-secrets
     path: charts/external-secrets-operator/secret-sync
     destination:

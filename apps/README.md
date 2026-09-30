@@ -21,7 +21,7 @@ Each entry under `applications` accepts:
 
 `appParams.<name>` (top-level, sibling of `applications`) is injected as `spec.source.helm.values` on the matching `Application`. This is how the app-of-apps caller passes runtime values, like hostnames or secret keys, without editing this file. See [`../README.md`](../README.md) for how to add a new application entry.
 
-`global.environment` (top-level, sibling of `applications`) is set by the catalog, not this repo, and holds the deploying environment's name (`dev`, `staging`, `prod`). It's the value `extraValueFiles` entries render against to pick a `values-{environment}.yaml` overlay. See [`docs/environment-divergence.md`](../docs/environment-divergence.md) for how to add one.
+`global.environment` (top-level, sibling of `applications`) is set by the catalog, not this repo, and holds the deploying environment's name (`dev`, `staging`, `prod`). It's the value `extraValueFiles` entries render against to pick a `values-{environment}.yaml` overlay. See [Configure an App per Environment](https://eks-forge.readthedocs.io/latest/docs/applications/configure-an-app-per-environment/) for how to add one.
 
 ## Upstream Dependencies
 

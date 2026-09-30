@@ -12,4 +12,4 @@ Each `*-secrets-values.yaml` file is loaded via `extraValueFiles` in [`apps/valu
 
 ## Upstream Dependencies
 
-- **[`app_of_apps`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl)** (catalog): injects `secretStoreName`, `awsRegion`, and each instance's `remoteKey` via `appParams`
+- **[`app_of_apps`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl)** (catalog): injects `secretStoreName`, `awsRegion`, and each instance's `remoteKey` via `appParams` (see [`values.yaml`](values.yaml))
