@@ -19,7 +19,7 @@ Otherwise, `staging` and `prod` keep syncing the original app of apps repository
 
 ## Tag the App of Apps Fork
 
-From the root of your app of apps fork, tag `main` and push the tag, replacing `<tag>` with the next version after the `app_of_apps_target_revision` your live fork pins (e.g. `v0.1.5`):
+From the root of your app of apps fork, tag `main` and push the tag, replacing `<tag>` with the next version after your fork's latest tag (e.g. `v0.1.5`):
 ```bash
 git checkout main
 git pull origin main
