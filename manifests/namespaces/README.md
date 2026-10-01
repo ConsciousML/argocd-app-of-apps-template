@@ -1,3 +1,5 @@
+<!-- This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/docs/reference/manifests/namespaces/. It is not meant to be read directly in this repository. -->
+
 # `namespaces` Manifests Reference
 
 The [`namespaces` manifests](./) define one `Namespace` per file, named after the namespace, carrying its cluster-wide labels.

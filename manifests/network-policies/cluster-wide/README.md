@@ -1,3 +1,5 @@
+<!-- This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/docs/reference/manifests/network-policies/cluster-wide/. It is not meant to be read directly in this repository. -->
+
 # `network-policies-cluster-wide` Manifests Reference
 
 The [`network-policies-cluster-wide` manifests](./) define `CiliumClusterwideNetworkPolicy` rules, one file per concern. Each `endpointSelector` lists the namespaces it applies to directly:

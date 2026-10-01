@@ -1,3 +1,5 @@
+<!-- This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/docs/reference/manifests/podinfo/. It is not meant to be read directly in this repository. -->
+
 # `podinfo` Manifests Reference
 
 The [`podinfo` manifests](./) deploy [stefanprodan/podinfo](https://github.com/stefanprodan/podinfo), a sample app used to verify an end-to-end deploy, meant to be swapped for a real app in a fork. Exposes `/metrics`, scraped via the bundled `ServiceMonitor`. Also demos an HPA on CPU, see [Load Testing](../../docs/load-testing.md).

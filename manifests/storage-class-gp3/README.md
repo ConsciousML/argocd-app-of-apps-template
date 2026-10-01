@@ -1,3 +1,5 @@
+<!-- This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/docs/reference/manifests/storage-class-gp3/. It is not meant to be read directly in this repository. -->
+
 # `storage-class-gp3` Manifests Reference
 
 The [`storage-class-gp3` manifests](./) define the default `gp3` `StorageClass`, backed by the [EBS CSI driver](https://docs.aws.amazon.com/eks/latest/userguide/ebs-csi.html), used by any `PersistentVolumeClaim` that doesn't request a storage class explicitly.

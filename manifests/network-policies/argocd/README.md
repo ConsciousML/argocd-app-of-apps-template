@@ -1,3 +1,5 @@
+<!-- This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/docs/reference/manifests/network-policies/argocd/. It is not meant to be read directly in this repository. -->
+
 # `argocd-network-policies` Manifests Reference
 
 The [`argocd-network-policies` manifests](./) define the `CiliumNetworkPolicy` rules for ArgoCD's own components. `argocd` is in [`default-deny.yaml`](../cluster-wide/default-deny.yaml)'s namespace list, so these rules are enforced.
