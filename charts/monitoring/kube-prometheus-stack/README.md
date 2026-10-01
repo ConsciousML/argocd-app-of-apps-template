@@ -44,7 +44,7 @@ For per-environment overrides, read [Configure an App per Environment](https://e
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | kube-prometheus-stack.prometheus.prometheusSpec.replicas | int | `2` | Prometheus replicas, each with its own PVC. Hard pod anti-affinity, spread across AZs, and a PDB keeping 1 up during disruption. |
-| kube-prometheus-stack.prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues | bool | `false` | Picks up every `ServiceMonitor`, and with the `podMonitor` and `rule` selectors below, every `PodMonitor` and `PrometheusRule`, regardless of labels. |
+| kube-prometheus-stack.prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues | bool | `false` | Picks up every `ServiceMonitor` regardless of labels. `podMonitorSelectorNilUsesHelmValues` and `ruleSelectorNilUsesHelmValues` do the same for `PodMonitor` and `PrometheusRule`. |
 | kube-prometheus-stack.prometheus.prometheusSpec.storageSpec | object | see values.yaml | `gp3` PVC per replica. PVC retention is set per environment in `values-<env>.yaml`. |
 
 ### Alertmanager
