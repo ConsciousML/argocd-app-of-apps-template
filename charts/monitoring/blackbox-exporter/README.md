@@ -1,0 +1,38 @@
+# `blackbox-exporter` Helm Chart Reference
+
+The [`blackbox-exporter` chart](./) deploys [blackbox-exporter](https://github.com/prometheus/blackbox_exporter) via the upstream `prometheus-blackbox-exporter` chart, probing every private and public tool endpoint for HTTP reachability. [Values](#values) lists only what this chart sets. For every other key, read the upstream [`values.yaml`](https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus-blackbox-exporter/values.yaml).
+
+## What's Inside
+
+- **[templates/network-policy.yaml](templates/network-policy.yaml)**: the exporter's `CiliumNetworkPolicy`
+- **[values.yaml](values.yaml)**: see [Values](#values)
+- **[values.schema.json](values.schema.json)**: rejects the values the catalog injects via `appParams` when empty, so a missing injection fails the render
+- **[placeholder-values.yaml](placeholder-values.yaml)**: used only by `scripts/validate-helm.sh`, so standalone `helm template` and kubeconform pass
+
+## Values
+
+### Exporter
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| prometheus-blackbox-exporter.resources | object | see values.yaml | Resource requests and limits. |
+| prometheus-blackbox-exporter.podSecurityContext | object | see values.yaml | Pod-level non-root user, UID and GID 1000. |
+| prometheus-blackbox-exporter.nodeSelector | object | see values.yaml | Pins the exporter to the `critical` NodePool, with a matching `tolerations` entry. |
+
+### Probes
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| prometheus-blackbox-exporter.serviceMonitor.defaults.module | string | `"http_2xx"` | Probe module for every target, expecting an HTTP 2xx. |
+| prometheus-blackbox-exporter.serviceMonitor.targets | list | `[]` | Endpoints to probe, one `ServiceMonitor` each. Injected by the catalog via `appParams`, from `domains.hcl`. |
+
+### Alerts
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| prometheus-blackbox-exporter.prometheusRule.rules | list | see values.yaml | Uptime alerts: endpoint down, slow probe, and SSL certificate expiry. Each carries `component: uptime`, which Alertmanager routes on. |
+
+## Upstream Dependencies
+
+- **[`app_of_apps`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl)** (catalog): injects `serviceMonitor.targets` from [`domains.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/pipelines/dev/eks/domains.hcl)
+- **[`kube-prometheus-stack`](../kube-prometheus-stack)**: Alertmanager routes these alerts by their `component: uptime` label

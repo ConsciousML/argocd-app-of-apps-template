@@ -1,0 +1,28 @@
+# `tailscale-connector` Helm Chart Reference
+
+The [`tailscale-connector` chart](./) renders a Tailscale [`Connector`](https://tailscale.com/kb/1441/kubernetes-operator-connector) advertising the VPC CIDR as a subnet route, giving Tailnet devices routed access to private VPC resources.
+
+## What's Inside
+
+- **[templates/connector.yaml](templates/connector.yaml)**: the `Connector` CR
+- **[templates/proxyclass.yaml](templates/proxyclass.yaml)**: pins the operator-managed proxy pod onto the `elastic` NodePool and sets its resources
+- **[templates/network-policy.yaml](templates/network-policy.yaml)**: the proxy pod's `CiliumNetworkPolicy`
+- **[values.yaml](values.yaml)**: see [Values](#values)
+- **[values.schema.json](values.schema.json)**: rejects the values the catalog injects via `appParams` when empty, so a missing injection fails the render
+- **[placeholder-values.yaml](placeholder-values.yaml)**: used only by `scripts/validate-helm.sh`, so standalone `helm template` and kubeconform pass
+
+## Values
+
+### Connector
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| name | string | `""` | `Connector` name, `<cluster name>-connector`. Injected by the catalog via `appParams`. |
+| hostnamePrefix | string | `""` | Tailnet hostname prefix of the proxy devices, the EKS cluster name. Injected by the catalog via `appParams`. |
+| advertiseRoutes | list | `[]` | Subnet routes to advertise, the VPC CIDR. Injected by the catalog via `appParams`. |
+| replicas | int | `1` | Number of subnet router proxy pods. |
+
+## Upstream Dependencies
+
+- **[`app_of_apps`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl)** (catalog): injects `name`, `hostnamePrefix`, and `advertiseRoutes` via `appParams`
+- **[`tailscale-operator`](../operator)**: this chart's `Connector` CRD is installed by the operator, synced before this chart

@@ -1,4 +1,4 @@
-# `httproute` Chart Reference
+# `httproute` Helm Chart Reference
 
 The [`httproute` chart](./) renders a generic `HTTPRoute` bound to a shared `Gateway`, reused by every app that needs a hostname. Each `*-httproute-values.yaml` file in this directory is one instance, loaded via `extraValueFiles` in [`apps/values.yaml`](../../../apps/values.yaml).
 
@@ -8,6 +8,7 @@ For setup steps, read [How to Expose an App](https://eks-forge.readthedocs.io/la
 
 - **[templates/httproute.yaml](templates/httproute.yaml)**: binds to both the `http` and `https` listeners of the target `Gateway`
 - **[values.yaml](values.yaml)**: empty defaults, see [Values](#values)
+- **[values.schema.json](values.schema.json)**: rejects an empty `host` or `backendRefs.default.name`
 - **[placeholder-values.yaml](placeholder-values.yaml)**: used only by `scripts/validate-helm.sh`, so standalone `helm template` and kubeconform pass
 - **[alertmanager-httproute-values.yaml](alertmanager-httproute-values.yaml)**: Alertmanager UI. Backend name injected via `appParams` from the `kube-prometheus-stack` release name
 - **[argocd-httproute-values.yaml](argocd-httproute-values.yaml)**: ArgoCD UI and API. Routes `Content-Type: application/grpc` requests to `argocd-server-grpc`, the rest to `argocd-server`
@@ -38,4 +39,4 @@ For setup steps, read [How to Expose an App](https://eks-forge.readthedocs.io/la
 
 ## Upstream Dependencies
 
-- **[`gateway`](../gateway)**: `gateway.name` and `gateway.namespace` in each instance's values file must reference `gateway-public` or `gateway-private` to match the intended `scope`
+- **[`gateway`](../gateway)**: each instance's entry in `apps/values.yaml` loads `public-gateway-values.yaml` or `private-gateway-values.yaml`, which sets `gateway.name` and `gateway.namespace`. It must match the instance's `scope` annotation

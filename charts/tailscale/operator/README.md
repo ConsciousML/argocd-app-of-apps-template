@@ -1,0 +1,25 @@
+# `tailscale-operator` Helm Chart Reference
+
+The [`tailscale-operator` chart](./) deploys the [Tailscale Kubernetes operator](https://tailscale.com/kb/1236/kubernetes-operator) via the upstream `tailscale-operator` chart. [Values](#values) lists only what this chart sets. For every other key, read the upstream [`values.yaml`](https://github.com/tailscale/tailscale/blob/main/cmd/k8s-operator/deploy/chart/values.yaml).
+
+## What's Inside
+
+- **[templates/network-policy.yaml](templates/network-policy.yaml)**: the operator's `CiliumNetworkPolicy`
+- **[values.yaml](values.yaml)**: see [Values](#values)
+
+## Values
+
+### Operator
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| tailscale-operator.operatorConfig.resources | object | see values.yaml | Resource requests and limits. |
+| tailscale-operator.operatorConfig.securityContext | object | see values.yaml | Drops all Linux capabilities and blocks privilege escalation. |
+| tailscale-operator.operatorConfig.podSecurityContext | object | see values.yaml | Applies the runtime's default seccomp profile. |
+| tailscale-operator.operatorConfig.nodeSelector | object | see values.yaml | Pins the operator to the `elastic` NodePool, with a matching `tolerations` entry. |
+
+## Upstream Dependencies
+
+- **[`external_secrets_operator`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/eks/addons/external_secrets_operator)** (catalog): provisions the IAM role ESO's service account assumes, needed before ESO can sync this operator's OAuth credentials
+- **[`tailscale-secrets`](../../external-secrets-operator/secret-sync/tailscale-secrets-values.yaml)**: syncs the OAuth client credentials into the `operator-oauth` secret this operator expects, synced before this chart
+- **[`units/tailscale`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/tailscale)** (catalog): provisions the WIF credential and GitHub secrets CI uses to authenticate to Tailscale when deploying this chart
