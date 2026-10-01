@@ -1,0 +1,16 @@
+apps
+charts/aws-lbc
+charts/external-dns
+charts/external-secrets-operator/operator
+charts/external-secrets-operator/secret-sync
+charts/gateway-api/gateway-class
+charts/gateway-api/gateway
+charts/monitoring/alloy
+charts/monitoring/blackbox-exporter
+charts/monitoring/kube-prometheus-stack
+charts/monitoring/loki
+charts/network-policies/kube-system
+charts/right-sizing/goldilocks
+charts/right-sizing/vpa
+charts/tailscale/connector
+charts/tailscale/operator

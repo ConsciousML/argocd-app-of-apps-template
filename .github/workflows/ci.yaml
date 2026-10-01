@@ -5,7 +5,33 @@ on:
   workflow_dispatch:
 
 jobs:
+  helm-docs:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          # Pushing with the deploy key, unlike GITHUB_TOKEN, re-triggers CI on the new commit.
+          ssh-key: ${{ secrets.HELM_DOCS_DEPLOY_KEY }}
+
+      - name: Read helm-docs version from mise.toml
+        id: version
+        run: echo "helm-docs=v$(sed -n 's/^helm-docs = "\(.*\)"/\1/p' mise.toml)" >> "$GITHUB_OUTPUT"
+
+      - name: Render chart READMEs and push changes back to PR
+        uses: losisin/helm-docs-github-action@v2.0.1
+        env:
+          # No action input for this flag, helm-docs reads it from the env.
+          HELM_DOCS_IGNORE_NON_DESCRIPTIONS: "true"
+        with:
+          version: ${{ steps.version.outputs.helm-docs }}
+          sort-values-order: file
+          git-push: "true"
+          git-commit-message: "docs: render chart READMEs with helm-docs"
+
   code-quality-checks:
+    needs: helm-docs
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
