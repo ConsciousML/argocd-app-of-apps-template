@@ -13,7 +13,7 @@ For a value that isn't sensitive, see [Pass Terraform Values to an App](/docs/ap
 
 ### Add a Secret Values File
 
-The [`secret-sync`](../charts/external-secrets-operator/secret-sync/) chart copies keys from one AWS secret into one Kubernetes `Secret`. Next to its `values.yaml`, add a `<app>-secrets-values.yaml` that sets all of:
+The [`secret-sync` chart](/docs/reference/helm_charts/external-secrets-operator/secret-sync/) copies keys from one AWS secret into one Kubernetes `Secret`. Next to its `values.yaml`, add a `<app>-secrets-values.yaml` that sets all of:
 - `name`: the name of the [`ExternalSecret`](https://external-secrets.io/latest/api/externalsecret/), the resource telling ESO what to copy.
 - `targetSecretName`: the name of the Kubernetes `Secret` ESO writes to, the one your app reads.
 - `targetCreationPolicy`: how ESO creates that `Secret`, usually `Owner`. See ESO's [Creation Policy](https://external-secrets.io/latest/guides/ownership-deletion-policy/#creation-policy).

@@ -15,7 +15,7 @@ Pick the gateway that fits your app. Each one is an [Application Load Balancer](
 
 ### Add a Route Values File
 
-The [`httproute`](../charts/gateway-api/httproute/) chart creates an [`HTTPRoute`](https://gateway-api.sigs.k8s.io/reference/api-types/httproute/), which binds a hostname on a gateway to your app's [`Service`](https://kubernetes.io/docs/concepts/services-networking/service/). Next to its `values.yaml`, add a `<app>-httproute-values.yaml` that sets:
+The [`httproute` chart](/docs/reference/helm_charts/gateway-api/httproute/) creates an [`HTTPRoute`](https://gateway-api.sigs.k8s.io/reference/api-types/httproute/), which binds a hostname on a gateway to your app's [`Service`](https://kubernetes.io/docs/concepts/services-networking/service/). Next to its `values.yaml`, add a `<app>-httproute-values.yaml` that sets:
 - `name`: the name of the `HTTPRoute`.
 - `rules`: one entry per path to route, with its `matches` and the `backendRefKey` it sends traffic to.
 - `backendRefs`: the `Service` behind each `backendRefKey`, with its `name` and `port` (the `Service` port, not the container's).
