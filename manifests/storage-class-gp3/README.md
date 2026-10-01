@@ -1,10 +1,10 @@
-# storage-class-gp3
+# `storage-class-gp3` Manifests Reference
 
-Defines the default `gp3` `StorageClass`, backed by the [EBS CSI driver](https://docs.aws.amazon.com/eks/latest/userguide/ebs-csi.html), used by any `PersistentVolumeClaim` that doesn't request a storage class explicitly.
+The [`storage-class-gp3` manifests](./) define the default `gp3` `StorageClass`, backed by the [EBS CSI driver](https://docs.aws.amazon.com/eks/latest/userguide/ebs-csi.html), used by any `PersistentVolumeClaim` that doesn't request a storage class explicitly.
 
 ## What's Inside
 
-- **[storageclass.yaml](storageclass.yaml)**: uses `WaitForFirstConsumer` binding mode so the volume is provisioned in the same availability zone as the pod that claims it, instead of an arbitrary zone at claim time
+- **[storageclass.yaml](storageclass.yaml)**: uses `WaitForFirstConsumer` binding mode, so the volume is provisioned in the same availability zone as the pod that claims it, instead of an arbitrary zone at claim time
 
 ## Upstream Dependencies
 
