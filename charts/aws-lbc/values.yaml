@@ -1,5 +1,6 @@
-# Injected by the catalog (terragrunt-template-catalog-eks) via appParams, pinned VPC
-# interface endpoint IPs. See units/eks/addons/argocd/app_of_apps in that repo.
+# -- VPC interface endpoint IPs (`ec2`, `elasticloadbalancing`, `tagging`, `shield`, `acm`) the network policy allows egress to. Injected by the catalog via `appParams`.
+# @section -- Network Policy
+# @default -- see values.yaml
 vpcEndpointCidrs:
   ec2: []
   elasticloadbalancing: []
@@ -8,14 +9,25 @@ vpcEndpointCidrs:
   acm: []
 
 aws-load-balancer-controller:
-  # Injected by the catalog (terragrunt-template-catalog-eks) via appParams, from the EKS
-  # cluster name, region, and VPC ID. See units/eks/addons/argocd/app_of_apps in that repo.
+  # -- EKS cluster name. Injected by the catalog via `appParams`.
+  # @section -- AWS Load Balancer Controller
   clusterName: ""
+  # -- AWS region. Injected by the catalog via `appParams`.
+  # @section -- AWS Load Balancer Controller
   region: ""
+  # -- VPC ID. Injected by the catalog via `appParams`.
+  # @section -- AWS Load Balancer Controller
   vpcId: ""
+  # -- Disables the webhook that mutates `Service` resources of type `LoadBalancer`.
+  # @section -- AWS Load Balancer Controller
   enableServiceMutatorWebhook: false
+  # -- Enables the Prometheus `ServiceMonitor`.
+  # @section -- AWS Load Balancer Controller
   serviceMonitor:
     enabled: true
+  # -- Pins pods to the `elastic` NodePool, with a matching `tolerations` entry.
+  # @section -- Scheduling
+  # @default -- see values.yaml
   nodeSelector:
     karpenter.sh/nodepool: elastic
   tolerations:
@@ -23,6 +35,9 @@ aws-load-balancer-controller:
       operator: Equal
       value: elastic
       effect: NoSchedule
+  # -- Resource requests and limits.
+  # @section -- Scheduling
+  # @default -- see values.yaml
   resources:
     requests:
       cpu: 15m

@@ -1,12 +1,17 @@
-# Injected by the catalog (terragrunt-template-catalog-eks) via appParams, pinned VPC
-# interface endpoint IPs. See units/eks/addons/argocd/app_of_apps in that repo.
 vpcEndpointCidrs:
+  # -- Secrets Manager VPC interface endpoint IPs the controller's network policy allows egress to. Injected by the catalog via `appParams`.
+  # @section -- Network Policy
   secretsmanager: []
 
 external-secrets:
+  # -- Enables the Prometheus `ServiceMonitor`.
+  # @section -- Controller
   serviceMonitor:
     enabled: true
 
+  # -- Controller resource requests and limits.
+  # @section -- Controller
+  # @default -- see values.yaml
   resources:
     requests:
       cpu: 11m
@@ -19,9 +24,15 @@ external-secrets:
   # more than just 'enabled', otherwise it's omitted even though container-level hardening
   # (readOnlyRootFilesystem, runAsNonRoot, runAsUser 1000, ...) is already applied by default.
   # runAsNonRoot here just makes that existing container-level guarantee explicit at the pod level.
+  # -- Sets `runAsNonRoot` at the pod level, also on `webhook` and `certController`.
+  # @section -- Controller
+  # @default -- see values.yaml
   podSecurityContext:
     runAsNonRoot: true
 
+  # -- Pins the controller to the `elastic` NodePool, with a matching `tolerations` entry. `webhook` and `certController` set the same.
+  # @section -- Controller
+  # @default -- see values.yaml
   nodeSelector:
     karpenter.sh/nodepool: elastic
   tolerations:
@@ -33,6 +44,9 @@ external-secrets:
   webhook:
     podSecurityContext:
       runAsNonRoot: true
+    # -- Webhook resource requests and limits.
+    # @section -- Webhook
+    # @default -- see values.yaml
     resources:
       requests:
         cpu: 11m
@@ -51,6 +65,9 @@ external-secrets:
   certController:
     podSecurityContext:
       runAsNonRoot: true
+    # -- Cert controller resource requests and limits.
+    # @section -- Cert Controller
+    # @default -- see values.yaml
     resources:
       requests:
         cpu: 11m

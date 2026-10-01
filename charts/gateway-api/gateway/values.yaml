@@ -1,12 +1,23 @@
 gateway:
-  # Overridden at sync time by public-gateway-values.yaml or private-gateway-values.yaml
-  # (see apps/values.yaml's extraValueFiles) — defaults here only so standalone
-  # `helm lint`/`helm template` don't nil-pointer.
+  # Empty defaults so standalone `helm lint` and `helm template` don't nil-pointer.
+  # -- `Gateway` name. Set per instance by `public-gateway-values.yaml` or `private-gateway-values.yaml`.
+  # @section -- Gateway
   name: ""
+  # -- `Gateway` namespace, shared by its `LoadBalancerConfiguration` and `TargetGroupConfiguration`.
+  # @section -- Gateway
   namespace: ""
+# -- `GatewayClass` name. Set by the [`gateway-class`](../gateway-class) chart's `values.yaml`, loaded via `extraValueFiles`.
+# @section -- Gateway
 gatewayClassName: ""
-# internet-facing (public) or internal (private)
+# -- ALB scheme, `internet-facing` (public) or `internal` (private).
+# @section -- Load Balancer
 scheme: ""
+# -- `TargetGroupConfiguration` name.
+# @section -- Load Balancer
 targetGroupConfigName: ""
+# -- `LoadBalancerConfiguration` name.
+# @section -- Load Balancer
 loadBalancerConfigName: ""
+# -- ACM certificate ARN, the default certificate of the `HTTPS:443` listener. Injected by the catalog via `appParams`.
+# @section -- Load Balancer
 certificateArn: ""

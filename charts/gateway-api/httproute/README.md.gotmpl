@@ -18,24 +18,7 @@ For setup steps, read [How to Expose an App](https://eks-forge.readthedocs.io/la
 - **[podinfo-httproute-values.yaml](podinfo-httproute-values.yaml)**: podinfo demo app, on the public `scope`
 - **[prometheus-httproute-values.yaml](prometheus-httproute-values.yaml)**: Prometheus UI. Backend name injected via `appParams` from the `kube-prometheus-stack` release name
 
-## Values
-
-### Gateway
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| gateway.name | string | `""` | Target `Gateway` name. Set by the shared `*-gateway-values.yaml` in `extraValueFiles`. |
-| gateway.namespace | string | `""` | Target `Gateway` namespace. Set by the shared `*-gateway-values.yaml` in `extraValueFiles`. |
-
-### Route
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| name | string | `""` | `HTTPRoute` name. |
-| host | string | `""` | Hostname. Injected by the catalog via `appParams` (from `domains.hcl`), never set per instance. |
-| rules | list | `[]` | Route rules. `matches` is Gateway API `HTTPRouteMatch` syntax. `backendRefKey` is a key into `backendRefs`. |
-| backendRefs | object | `{}` | Backends by key, each with `name` and `port`. |
-| annotations | object | `{}` | Must set `external-dns.alpha.kubernetes.io/scope` to `public` or `private`, else no DNS record. |
+{{ template "chart.valuesSection" . }}
 
 ## Upstream Dependencies
 

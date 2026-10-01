@@ -9,14 +9,7 @@ For setup steps, read [How to Expose an App](https://eks-forge.readthedocs.io/la
 - **[templates/gateway_class.yaml](templates/gateway_class.yaml)**: the `GatewayClass`
 - **[values.yaml](values.yaml)**: see [Values](#values)
 
-## Values
-
-### GatewayClass
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| gatewayClassName | string | `"aws-alb"` | `GatewayClass` name. Also loaded by both [`gateway`](../gateway) instances via `extraValueFiles`. |
-| controllerName | string | `"gateway.k8s.aws/alb"` | Controller implementing this class, the AWS Load Balancer Controller. |
+{{ template "chart.valuesSection" . }}
 
 ## Upstream Dependencies
 

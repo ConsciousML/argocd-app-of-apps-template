@@ -7,16 +7,7 @@ The [`tailscale-operator` chart](./) deploys the [Tailscale Kubernetes operator]
 - **[templates/network-policy.yaml](templates/network-policy.yaml)**: the operator's `CiliumNetworkPolicy`
 - **[values.yaml](values.yaml)**: see [Values](#values)
 
-## Values
-
-### Operator
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| tailscale-operator.operatorConfig.resources | object | see values.yaml | Resource requests and limits. |
-| tailscale-operator.operatorConfig.securityContext | object | see values.yaml | Drops all Linux capabilities and blocks privilege escalation. |
-| tailscale-operator.operatorConfig.podSecurityContext | object | see values.yaml | Applies the runtime's default seccomp profile. |
-| tailscale-operator.operatorConfig.nodeSelector | object | see values.yaml | Pins the operator to the `elastic` NodePool, with a matching `tolerations` entry. |
+{{ template "chart.valuesSection" . }}
 
 ## Upstream Dependencies
 

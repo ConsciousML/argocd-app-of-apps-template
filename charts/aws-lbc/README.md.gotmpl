@@ -10,30 +10,7 @@ The [`aws-lbc` chart](./) deploys the [AWS Load Balancer Controller](https://kub
 - **[values.schema.json](values.schema.json)**: rejects the values the catalog injects via `appParams` when empty, so a missing injection fails the render
 - **[placeholder-values.yaml](placeholder-values.yaml)**: used only by `scripts/validate-helm.sh`, so standalone `helm template` and kubeconform pass
 
-## Values
-
-### Network Policy
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| vpcEndpointCidrs | object | see values.yaml | VPC interface endpoint IPs (`ec2`, `elasticloadbalancing`, `tagging`, `shield`, `acm`) the network policy allows egress to. Injected by the catalog via `appParams`. |
-
-### AWS Load Balancer Controller
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| aws-load-balancer-controller.clusterName | string | `""` | EKS cluster name. Injected by the catalog via `appParams`. |
-| aws-load-balancer-controller.region | string | `""` | AWS region. Injected by the catalog via `appParams`. |
-| aws-load-balancer-controller.vpcId | string | `""` | VPC ID. Injected by the catalog via `appParams`. |
-| aws-load-balancer-controller.enableServiceMutatorWebhook | bool | `false` | Disables the webhook that mutates `Service` resources of type `LoadBalancer`. |
-| aws-load-balancer-controller.serviceMonitor | object | `{"enabled":true}` | Enables the Prometheus `ServiceMonitor`. |
-
-### Scheduling
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| aws-load-balancer-controller.nodeSelector | object | see values.yaml | Pins pods to the `elastic` NodePool, with a matching `tolerations` entry. |
-| aws-load-balancer-controller.resources | object | see values.yaml | Resource requests and limits. |
+{{ template "chart.valuesSection" . }}
 
 ## Gateway API CRDs
 

@@ -1,0 +1,20 @@
+# `loki` Helm Chart Reference
+
+The [`loki` chart](./) deploys [Loki](https://grafana.com/docs/loki/latest/) via the upstream `loki` chart, in monolithic mode with S3 storage. [Values](#values) lists only what this chart sets. For every other key, read the upstream [`values.yaml`](https://github.com/grafana-community/helm-charts/blob/main/charts/loki/values.yaml).
+
+For per-environment overrides, read [Configure an App per Environment](https://eks-forge.readthedocs.io/latest/docs/applications/configure-an-app-per-environment/).
+
+## What's Inside
+
+- **`templates/network-policy-*.yaml`**: one `CiliumNetworkPolicy` per component ([single-binary](templates/network-policy-single-binary.yaml), [gateway](templates/network-policy-gateway.yaml), [canary](templates/network-policy-canary.yaml), [chunks-cache](templates/network-policy-chunks-cache.yaml), [results-cache](templates/network-policy-results-cache.yaml))
+- **[values.yaml](values.yaml)**: see [Values](#values)
+- **[values.schema.json](values.schema.json)**: rejects the values the catalog injects via `appParams` when empty, so a missing injection fails the render
+- **[placeholder-values.yaml](placeholder-values.yaml)**: used only by `scripts/validate-helm.sh`, so standalone `helm template` and kubeconform pass
+- **[values-dev.yaml](values-dev.yaml)** and **[values-staging.yaml](values-staging.yaml)**: delete the `singleBinary` PVCs on StatefulSet delete and scale-down
+- **[values-prod.yaml](values-prod.yaml)**: retains the `singleBinary` PVCs on StatefulSet delete and scale-down
+
+{{ template "chart.valuesSection" . }}
+
+## Upstream Dependencies
+
+- **[`units/eks/addons/loki`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/eks/addons/loki)** (catalog): provisions the two S3 buckets `loki.loki.storage.bucketNames` points at, and the Pod Identity association the `releaseName` in [`apps/values.yaml`](../../../apps/values.yaml) must match

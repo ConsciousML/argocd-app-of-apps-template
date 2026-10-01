@@ -2,6 +2,8 @@
 # See https://grafana.com/docs/loki/latest/setup/install/helm/install-monolithic/
 
 loki:
+  # -- Monolithic mode, every Loki component in the `singleBinary` StatefulSet. The other modes' replicas are set to 0.
+  # @section -- Deployment
   deploymentMode: Monolithic
 
   # Parallel pod management creates all 3 replicas at once on a fresh apply, so none is
@@ -15,6 +17,9 @@ loki:
   # any ServiceMonitor). rules/alerts are the chart's built-in Grafana Loki mixin recording
   # rules and alerts. component: loki drives Alertmanager's routing tree (see
   # helm-kube-prometheus-stack/values.yaml).
+  # -- Enables the `ServiceMonitor` and the Loki mixin rules and alerts. Alerts carry `component: loki`, which Alertmanager routes on.
+  # @section -- Monitoring
+  # @default -- see values.yaml
   monitoring:
     serviceMonitor:
       enabled: true
@@ -28,14 +33,21 @@ loki:
   loki:
     # Single-tenant per environment, disable multi-tenancy (chart default: true,
     # which rejects writes without an X-Scope-OrgID header, 401 "no org id").
+    # -- Single tenant, so writes need no `X-Scope-OrgID` header.
+    # @section -- Loki Config
     auth_enabled: false
 
     commonConfig:
+      # -- Each log stream is written to 3 replicas.
+      # @section -- Loki Config
       replication_factor: 3
 
     # Injected by the catalog (terragrunt-template-catalog-eks) via appParams, from the
     # units/eks/addons/loki/s3 buckets and the EKS cluster's region. See
     # units/eks/addons/argocd/app_of_apps in that repo. No instance sets this itself.
+    # -- S3 `chunks` and `ruler` bucket names and region. Injected by the catalog via `appParams`.
+    # @section -- Loki Config
+    # @default -- see values.yaml
     storage:
       bucketNames:
         chunks: ""
@@ -56,6 +68,9 @@ loki:
     pattern_ingester:
       enabled: true
 
+    # -- 28-day retention, structured metadata, and the volume API.
+    # @section -- Loki Config
+    # @default -- see values.yaml
     limits_config:
       allow_structured_metadata: true
       volume_enabled: true
@@ -69,10 +84,15 @@ loki:
       enable_api: true
 
   singleBinary:
+    # -- `singleBinary` StatefulSet replicas.
+    # @section -- Single Binary
     replicas: 3
 
     # AZ-level spread: a replica stuck Pending on DoNotSchedule doesn't drop the ring below
     # quorum, the other replicas keep serving.
+    # -- Spreads replicas across AZs, `DoNotSchedule` when unsatisfiable.
+    # @section -- Single Binary
+    # @default -- see values.yaml
     topologySpreadConstraints:
       - maxSkew: 1
         topologyKey: topology.kubernetes.io/zone
@@ -85,9 +105,14 @@ loki:
 
     # Keep a majority (2/3) up during voluntary disruption, matching the ring's write quorum.
     podDisruptionBudget:
+      # -- Keeps a majority up during voluntary disruption.
+      # @section -- Single Binary
       minAvailable: 2
 
     # CPU sized to observed steady-state WAL checkpoint load (~1.1-1.2 cores per pod).
+    # -- Resource requests and limits. The caches, the gateway, the canary, and the sidecar set their own.
+    # @section -- Single Binary
+    # @default -- see values.yaml
     resources:
       requests:
         cpu: 1737m
@@ -95,6 +120,9 @@ loki:
       limits:
         cpu: 1737m
         memory: 324M
+    # -- Pins pods to the `critical` NodePool, with a matching `tolerations` entry. The caches and the gateway set the same.
+    # @section -- Single Binary
+    # @default -- see values.yaml
     nodeSelector:
       karpenter.sh/nodepool: critical
     tolerations:
@@ -103,12 +131,16 @@ loki:
         value: critical
         effect: NoSchedule
     persistence:
+      # -- PVC size per replica. PVC deletion is set per environment in `values-<env>.yaml`.
+      # @section -- Single Binary
       size: 30Gi
 
   # Right-sized from observed usage (chart default 8192, ~9.6Gi pod memory, is oversized
   # here). Same across environments. Monitor query latency and S3 GET cost. Bump if needed.
   # https://grafana.com/docs/loki/latest/operations/caching/
   chunksCache:
+    # -- Chunks cache memory in MB, below the chart default of 8192.
+    # @section -- Caches
     allocatedMemory: 1024
     resources:
       requests:
@@ -186,6 +218,8 @@ loki:
   # up for, without being able to preempt cluster-critical controllers like Karpenter itself or
   # the ArgoCD application-controller to do it.
   lokiCanary:
+    # -- Lets a canary pod preempt a lower-priority one on a full node. It tolerates both Karpenter NodePool taints and the MNG taint, so every node runs one.
+    # @section -- Canary
     priorityClassName: daemonset-critical
     resources:
       requests:
@@ -242,4 +276,6 @@ loki:
     replicas: 0
 
   minio:
+    # -- Disabled, storage is S3.
+    # @section -- Deployment
     enabled: false

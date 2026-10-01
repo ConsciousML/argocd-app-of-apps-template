@@ -11,28 +11,7 @@ For setup steps, read [How to Add, Edit, or Remove an App](https://eks-forge.rea
 - **[values.schema.json](values.schema.json)**: rejects an empty `config.spec.source.repoURL` or `global.environment`
 - **[placeholder-values.yaml](placeholder-values.yaml)**: used only by `scripts/validate-helm.sh`, so standalone `helm template` and kubeconform pass
 
-## Values
-
-### Source
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| config.spec.destination.server | string | `"https://kubernetes.default.svc"` | Cluster every child `Application` deploys to. |
-| config.spec.source.repoURL | string | `""` | This repository's URL, for every child `Application`. Set by the catalog from `github.hcl`. Must not be empty. |
-| config.spec.source.targetRevision | string | `"main"` | Git revision every child `Application` syncs. Set by the catalog. |
-
-### Catalog Inputs
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| appParams | object | `{}` | Values injected per application, keyed by `name`, as the child `Application`'s `spec.source.helm.values`. Set by the catalog's `app_of_apps` unit. |
-| global.environment | string | `""` | Deploying environment (`dev`, `staging`, or `prod`), rendered into `extraValueFiles` entries to pick a `values-<env>.yaml` overlay. Set by the catalog. Must not be empty. |
-
-### Applications
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| applications | list | see values.yaml | One child `Application` per entry. See [Values Schema](#values-schema). |
+{{ template "chart.valuesSection" . }}
 
 ## Values Schema
 
@@ -44,7 +23,7 @@ Each entry under `applications` accepts:
 | **`path`** | source path, when it differs from `name`. Used when multiple applications share a chart, like the `charts/gateway-api/httproute` instances |
 | **`destination.namespace`** | target namespace, defaults to `name` |
 | **`syncWave`** | sets the `argocd.argoproj.io/sync-wave` annotation, controlling apply order relative to other applications. See the comments in `values.yaml` for the current dependency chain |
-| **`extraValueFiles`** | paths to additional Helm values files, loaded through a second `source` entry referenced via `$values`. Each entry is rendered with `tpl`, so it can reference `.Values.global.environment` to pick a per-environment overlay, like `loki`'s `values-{{ .Values.global.environment }}.yaml`. Also used to share values between a chart instance and a related one, like `kube-prometheus-stack` pulling in `secret-sync`'s Grafana secret name |
+| **`extraValueFiles`** | paths to additional Helm values files, loaded through a second `source` entry referenced via `$values`. Each entry is rendered with `tpl`, so it can reference `.Values.global.environment` to pick a per-environment overlay, like `loki`'s `values-{{ "{{" }} .Values.global.environment }}.yaml`. Also used to share values between a chart instance and a related one, like `kube-prometheus-stack` pulling in `secret-sync`'s Grafana secret name |
 | **`tool.helm.releaseName`** | pins the Helm release name. Several instances rely on this to match a Pod Identity association's expected `ServiceAccount` name or a catalog-side Terraform local. See the comments beside each entry in `values.yaml` for specifics |
 | **`syncOptions`** | extra entries appended to `syncPolicy.syncOptions`, alongside the default `CreateNamespace=false` |
 | **`preventCascadeDelete`** | when `true`, drops the cascade-delete finalizer and sets `automated.prune: false`, so this app can never delete a resource it manages. Only set for apps owning cluster-scoped resources like `Namespace`, where deleting the app must not delete everything inside them |

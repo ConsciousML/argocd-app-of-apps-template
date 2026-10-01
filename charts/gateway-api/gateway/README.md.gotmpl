@@ -15,24 +15,7 @@ For setup steps, read [How to Expose an App](https://eks-forge.readthedocs.io/la
 - **[public-gateway-values.yaml](public-gateway-values.yaml)**: `gateway-public` instance. Also loaded by every public [`httproute`](../httproute) instance to target this `Gateway`
 - **[private-gateway-values.yaml](private-gateway-values.yaml)**: `gateway-private` instance. Also loaded by every private [`httproute`](../httproute) instance to target this `Gateway`
 
-## Values
-
-### Gateway
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| gateway.name | string | `""` | `Gateway` name. Set per instance by `public-gateway-values.yaml` or `private-gateway-values.yaml`. |
-| gateway.namespace | string | `""` | `Gateway` namespace, shared by its `LoadBalancerConfiguration` and `TargetGroupConfiguration`. |
-| gatewayClassName | string | `""` | `GatewayClass` name. Set by the [`gateway-class`](../gateway-class) chart's `values.yaml`, loaded via `extraValueFiles`. |
-
-### Load Balancer
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| scheme | string | `""` | ALB scheme, `internet-facing` (public) or `internal` (private). |
-| targetGroupConfigName | string | `""` | `TargetGroupConfiguration` name. |
-| loadBalancerConfigName | string | `""` | `LoadBalancerConfiguration` name. |
-| certificateArn | string | `""` | ACM certificate ARN, the default certificate of the `HTTPS:443` listener. Injected by the catalog via `appParams`. |
+{{ template "chart.valuesSection" . }}
 
 ## Sync Waves
 

@@ -7,24 +7,7 @@ The [`vpa` chart](./) deploys a recommender-only Kubernetes [Vertical Pod Autosc
 - **[templates/network-policy.yaml](templates/network-policy.yaml)**: the recommender's `CiliumNetworkPolicy`
 - **[values.yaml](values.yaml)**: see [Values](#values)
 
-## Values
-
-### Recommender
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| vpa.recommender.extraArgs | object | see values.yaml | Recommender flags: CPU at p90 and memory at p99, history backfilled from kube-prometheus-stack's Prometheus. |
-| vpa.recommender.podMonitor | object | `{"enabled":true}` | Enables the Prometheus `PodMonitor`. |
-| vpa.recommender.resources | object | see values.yaml | Resource requests and limits. |
-| vpa.recommender.nodeSelector | object | see values.yaml | Pins the recommender to the `elastic` NodePool, with a matching `tolerations` entry. |
-
-### Disabled Components
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| vpa.updater.enabled | bool | `false` | Disabled, so running pods are never evicted. |
-| vpa.admissionController.enabled | bool | `false` | Disabled, so pods are never resized at admission. |
-| vpa.metrics-server.enabled | bool | `false` | Disabled, metrics-server is the EKS addon instead. |
+{{ template "chart.valuesSection" . }}
 
 ## Upstream Dependencies
 

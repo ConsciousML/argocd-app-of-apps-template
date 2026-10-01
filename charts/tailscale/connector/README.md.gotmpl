@@ -11,16 +11,7 @@ The [`tailscale-connector` chart](./) renders a Tailscale [`Connector`](https://
 - **[values.schema.json](values.schema.json)**: rejects the values the catalog injects via `appParams` when empty, so a missing injection fails the render
 - **[placeholder-values.yaml](placeholder-values.yaml)**: used only by `scripts/validate-helm.sh`, so standalone `helm template` and kubeconform pass
 
-## Values
-
-### Connector
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| name | string | `""` | `Connector` name, `<cluster name>-connector`. Injected by the catalog via `appParams`. |
-| hostnamePrefix | string | `""` | Tailnet hostname prefix of the proxy devices, the EKS cluster name. Injected by the catalog via `appParams`. |
-| advertiseRoutes | list | `[]` | Subnet routes to advertise, the VPC CIDR. Injected by the catalog via `appParams`. |
-| replicas | int | `1` | Number of subnet router proxy pods. |
+{{ template "chart.valuesSection" . }}
 
 ## Upstream Dependencies
 

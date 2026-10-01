@@ -1,33 +1,51 @@
-# Injected by the catalog (terragrunt-template-catalog-eks) via appParams, pinned VPC
-# interface endpoint IPs. See units/eks/addons/argocd/app_of_apps in that repo.
 vpcEndpointCidrs:
+  # -- Route53 VPC interface endpoint IPs the network policy allows egress to. Injected by the catalog via `appParams`.
+  # @section -- Network Policy
   route53: []
 
 external-dns:
   provider:
     name: aws
-  # txtOwnerId, txtPrefix, and domainFilters are overridden per instance at sync time by the
-  # catalog's app_of_apps unit via appParams.
+  # -- TXT registry owner, the EKS cluster name. Injected per instance by the catalog via `appParams`.
+  # @section -- ExternalDNS
   txtOwnerId: ""
+  # -- TXT record prefix, unique per instance. Injected per instance by the catalog via `appParams`.
+  # @section -- ExternalDNS
   txtPrefix: ""
+  # -- Hosted zone domain this instance manages. Injected per instance by the catalog via `appParams`.
+  # @section -- ExternalDNS
   domainFilters: []
   triggerLoopOnEvent: true
+  # -- Watches `Service`, `Ingress`, and `HTTPRoute` resources.
+  # @section -- ExternalDNS
+  # @default -- see values.yaml
   sources:
     - service
     - ingress
     - gateway-httproute
   registry: txt
+  # -- `sync` also deletes the records this instance owns once their source is gone.
+  # @section -- ExternalDNS
   policy: sync
   logLevel: info
+  # -- Enables the Prometheus `ServiceMonitor`.
+  # @section -- ExternalDNS
   serviceMonitor:
     enabled: true
-  # annotationFilter, extraArgs.aws-zone-type, and serviceAccount.name are overridden per
-  # instance (private/public) via extraValueFiles in apps/values.yaml.
+  # -- Only claims resources with this `external-dns.alpha.kubernetes.io/scope` annotation. Set per instance by `*-values.yaml`.
+  # @section -- ExternalDNS
   annotationFilter: ""
   extraArgs:
+    # -- Route53 zone type, `private` or `public`. Set per instance by `*-values.yaml`.
+    # @section -- ExternalDNS
     aws-zone-type: ""
   serviceAccount:
+    # -- Must match the catalog's Pod Identity association. Set per instance by `*-values.yaml`.
+    # @section -- ExternalDNS
     name: ""
+  # -- Resource requests and limits.
+  # @section -- Scheduling
+  # @default -- see values.yaml
   resources:
     requests:
       cpu: 11m
@@ -35,6 +53,9 @@ external-dns:
     limits:
       cpu: 11m
       memory: 36M
+  # -- Pins pods to the `elastic` NodePool, with a matching `tolerations` entry.
+  # @section -- Scheduling
+  # @default -- see values.yaml
   nodeSelector:
     karpenter.sh/nodepool: elastic
   tolerations:

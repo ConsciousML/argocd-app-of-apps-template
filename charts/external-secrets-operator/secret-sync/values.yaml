@@ -1,12 +1,27 @@
-# Injected per instance by the catalog (terragrunt-template-catalog-eks) via appParams, from
-# the environment, the region, and the secret_name output of the unit creating the AWS
-# secret. See units/eks/addons/argocd/app_of_apps in that repo. No instance sets these itself.
+# -- `SecretStore` name. Injected per instance by the catalog via `appParams`.
+# @section -- AWS Source
 secretStoreName: ""
+# -- AWS region of the Secrets Manager secret. Injected per instance by the catalog via `appParams`.
+# @section -- AWS Source
 awsRegion: ""
+# -- Secrets Manager secret name, the `secret_name` output of the catalog unit creating it. Injected per instance by the catalog via `appParams`.
+# @section -- AWS Source
 remoteKey: ""
 
+# -- `ExternalSecret` name.
+# @section -- Target Secret
 name: ""
+# -- Kubernetes `Secret` to write.
+# @section -- Target Secret
 targetSecretName: ""
+# -- `Owner` creates and owns the `Secret`. `Merge` writes into an existing one.
+# @section -- Target Secret
+# @default -- `Merge` when empty
 targetCreationPolicy: ""
+# -- `CreatedOnce` syncs once. `Periodic` keeps polling, for rotated secrets.
+# @section -- Target Secret
+# @default -- `CreatedOnce` when empty
 refreshPolicy: ""
+# -- Keys to sync, each a `secretKey` in the target `Secret` and a `remoteProperty` in the AWS secret's JSON.
+# @section -- Target Secret
 data: []

@@ -12,13 +12,7 @@ For how `CiliumNetworkPolicy` enforcement works, read [`docs/network-policies.md
 - **[values.schema.json](values.schema.json)**: rejects the values the catalog injects via `appParams` when empty, so a missing injection fails the render
 - **[placeholder-values.yaml](placeholder-values.yaml)**: used only by `scripts/validate-helm.sh`, so standalone `helm template` and kubeconform pass
 
-## Values
-
-### Network Policy
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| vpcEndpointCidrs | object | see values.yaml | VPC interface endpoint IPs (`ec2`, `sqs`, `iam`) that `ebs-csi-controller` and `karpenter` egress is scoped to. Injected by the catalog via `appParams`. |
+{{ template "chart.valuesSection" . }}
 
 ## Sync Order
 

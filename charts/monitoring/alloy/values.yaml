@@ -4,12 +4,18 @@
 
 alloy:
   alloy:
+    # -- Resource requests and limits.
+    # @section -- Alloy
+    # @default -- see values.yaml
     resources:
       requests:
         cpu: 11m
         memory: 94M
       limits:
         memory: 94M
+    # -- Alloy pipeline. Collects this node's pod logs and the cluster's events via the Kubernetes API, and pushes both to `loki-gateway`.
+    # @section -- Alloy
+    # @default -- see values.yaml
     configMap:
       content: |
         // Restrict to pods on the same node as this Alloy instance:
@@ -105,6 +111,9 @@ alloy:
 
     # UID/GID 473 matches the chart's own ci/nonroot-values.yaml fixture for the
     # image's built-in non-root user.
+    # -- Runs as non-root UID and GID 473 with a read-only root filesystem.
+    # @section -- Alloy
+    # @default -- see values.yaml
     securityContext:
       readOnlyRootFilesystem: true
       runAsNonRoot: true
@@ -116,11 +125,17 @@ alloy:
 
     # No volume is mounted at alloy.storagePath (/tmp/alloy, the WAL/positions dir) by
     # default, so it needs one for the container to run with readOnlyRootFilesystem above.
+    # -- Mounts the `alloy-data` `emptyDir` (see `controller.volumes.extra`) at `/tmp/alloy`, the storage path.
+    # @section -- Alloy
+    # @default -- see values.yaml
     mounts:
       extra:
         - name: alloy-data
           mountPath: /tmp/alloy
 
+  # -- Config reloader sidecar resources, and a non-root `securityContext` (UID and GID 65534).
+  # @section -- Config Reloader
+  # @default -- see values.yaml
   configReloader:
     resources:
       requests:
@@ -144,11 +159,16 @@ alloy:
   global:
     # Pod-level securityContext (rendered from global, not controller, despite living
     # alongside the DaemonSet spec).
+    # -- Pod-level `runAsNonRoot`, and `fsGroup` 473 so `alloy-data` is writable.
+    # @section -- DaemonSet
+    # @default -- see values.yaml
     podSecurityContext:
       fsGroup: 473 # so the alloy-data emptyDir below is writable by the runAsUser above
       runAsNonRoot: true # container-level runAsNonRoot alone doesn't satisfy the pod-level check
 
   controller:
+    # -- One Alloy pod per node.
+    # @section -- DaemonSet
     type: daemonset # chart default, kept explicit: log collection needs one Alloy per node
     # Karpenter only accounts for a DaemonSet's overhead when a node is first launched, so a
     # DaemonSet pod that needs to land on an already-full node would otherwise stay Pending
@@ -156,11 +176,19 @@ alloy:
     # lower-priority pod instead, which turns into a new pending pod that Karpenter will scale
     # up for, without being able to preempt cluster-critical controllers like Karpenter itself
     # or the ArgoCD application-controller to do it.
+    # -- Lets a pod preempt a lower-priority one on a full node.
+    # @section -- DaemonSet
     priorityClassName: daemonset-critical
+    # -- The `alloy-data` `emptyDir`.
+    # @section -- DaemonSet
+    # @default -- see values.yaml
     volumes:
       extra:
         - name: alloy-data
           emptyDir: {}
+    # -- Tolerates both Karpenter NodePool taints and the MNG taint, so every node runs a pod.
+    # @section -- DaemonSet
+    # @default -- see values.yaml
     tolerations:
       - key: karpenter.sh/workload-class
         operator: Exists
