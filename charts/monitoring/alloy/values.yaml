@@ -135,7 +135,7 @@ alloy:
 
   # -- Config reloader sidecar resources, and a non-root `securityContext` (UID and GID 65534).
   # @section -- Config Reloader
-    # @default -- see values.yaml
+  # @default -- see values.yaml
   configReloader:
     resources:
       requests:
