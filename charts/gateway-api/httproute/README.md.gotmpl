@@ -1,12 +1,21 @@
 # `httproute` Chart Reference
 
-The [`httproute` chart](./) renders a generic `HTTPRoute` bound to a shared `Gateway`, reused by every app that needs a hostname. Each `*-values.yaml` file in this directory is one instance, loaded via `extraValueFiles` in [`apps/values.yaml`](../../../apps/values.yaml).
+The [`httproute` chart](./) renders a generic `HTTPRoute` bound to a shared `Gateway`, reused by every app that needs a hostname. Each `*-httproute-values.yaml` file in this directory is one instance, loaded via `extraValueFiles` in [`apps/values.yaml`](../../../apps/values.yaml).
 
 For setup steps, read [How to Expose an App](https://eks-forge.readthedocs.io/latest/docs/applications/expose-an-app/).
 
 ## What's Inside
 
 - **[templates/httproute.yaml](templates/httproute.yaml)**: binds to both the `http` and `https` listeners of the target `Gateway`
+- **[values.yaml](values.yaml)**: empty defaults, see [Values](#values)
+- **[placeholder-values.yaml](placeholder-values.yaml)**: used only by `scripts/validate-helm.sh`, so standalone `helm template` and kubeconform pass
+- **[alertmanager-httproute-values.yaml](alertmanager-httproute-values.yaml)**: Alertmanager UI. Backend name injected via `appParams` from the `kube-prometheus-stack` release name
+- **[argocd-httproute-values.yaml](argocd-httproute-values.yaml)**: ArgoCD UI and API. Routes `Content-Type: application/grpc` requests to `argocd-server-grpc`, the rest to `argocd-server`
+- **[goldilocks-httproute-values.yaml](goldilocks-httproute-values.yaml)**: Goldilocks dashboard
+- **[grafana-httproute-values.yaml](grafana-httproute-values.yaml)**: Grafana UI. Backend name injected via `appParams` from the `kube-prometheus-stack` release name
+- **[hubble-ui-httproute-values.yaml](hubble-ui-httproute-values.yaml)**: Hubble UI
+- **[podinfo-httproute-values.yaml](podinfo-httproute-values.yaml)**: podinfo demo app, on the public `scope`
+- **[prometheus-httproute-values.yaml](prometheus-httproute-values.yaml)**: Prometheus UI. Backend name injected via `appParams` from the `kube-prometheus-stack` release name
 
 {{ template "chart.valuesSection" . }}
 
