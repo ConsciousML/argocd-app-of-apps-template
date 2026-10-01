@@ -1,3 +1,5 @@
+<!-- This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/docs/reference/helm_charts/tailscale/operator/. It is not meant to be read directly in this repository. -->
+
 # `tailscale-operator` Helm Chart Reference
 
 The [`tailscale-operator` chart](./) deploys the [Tailscale Kubernetes operator](https://tailscale.com/kb/1236/kubernetes-operator) via the upstream `tailscale-operator` chart. [Values](#values) lists only what this chart sets. For every other key, read the upstream [`values.yaml`](https://github.com/tailscale/tailscale/blob/main/cmd/k8s-operator/deploy/chart/values.yaml).

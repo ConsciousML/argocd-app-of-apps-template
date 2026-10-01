@@ -1,8 +1,10 @@
+<!-- This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/docs/reference/helm_charts/gateway-api/gateway-class/. It is not meant to be read directly in this repository. -->
+
 # `gateway-class` Helm Chart Reference
 
 The [`gateway-class` chart](./) renders a `GatewayClass` implemented by the AWS Load Balancer Controller.
 
-For setup steps, read [How to Expose an App](https://eks-forge.readthedocs.io/latest/docs/applications/expose-an-app/).
+For setup steps, read [How to Expose an App](/docs/applications/expose-an-app/).
 
 ## What's Inside
 

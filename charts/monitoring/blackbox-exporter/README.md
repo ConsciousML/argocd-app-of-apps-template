@@ -1,3 +1,5 @@
+<!-- This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/docs/reference/helm_charts/monitoring/blackbox-exporter/. It is not meant to be read directly in this repository. -->
+
 # `blackbox-exporter` Helm Chart Reference
 
 The [`blackbox-exporter` chart](./) deploys [blackbox-exporter](https://github.com/prometheus/blackbox_exporter) via the upstream `prometheus-blackbox-exporter` chart, probing every private and public tool endpoint for HTTP reachability. [Values](#values) lists only what this chart sets. For every other key, read the upstream [`values.yaml`](https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus-blackbox-exporter/values.yaml).

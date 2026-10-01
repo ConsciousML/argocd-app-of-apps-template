@@ -1,3 +1,5 @@
+<!-- This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/docs/reference/helm_charts/network-policies/kube-system/. It is not meant to be read directly in this repository. -->
+
 # `network-policies-kube-system` Helm Chart Reference
 
 The [`network-policies-kube-system` chart](./) renders the `CiliumNetworkPolicy` rules for `kube-system` addons managed by Terraform or EKS: `coredns`, `metrics-server`, `karpenter`, `ebs-csi-controller`, `ebs-csi-node`, `hubble-relay`, and `hubble-ui`. None has an ArgoCD-owned chart to hold its own `templates/network-policy.yaml`.

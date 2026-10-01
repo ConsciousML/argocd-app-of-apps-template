@@ -1,8 +1,10 @@
+<!-- This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/docs/reference/helm_charts/gateway-api/gateway/. It is not meant to be read directly in this repository. -->
+
 # `gateway` Helm Chart Reference
 
 The [`gateway` chart](./) renders a Gateway API `Gateway` backed by an ALB, in two instances: `gateway-public` (internet-facing) and `gateway-private` (internal). Each `*-gateway-values.yaml` file in this directory is one instance, loaded via `extraValueFiles` in [`apps/values.yaml`](../../../apps/values.yaml).
 
-For setup steps, read [How to Expose an App](https://eks-forge.readthedocs.io/latest/docs/applications/expose-an-app/).
+For setup steps, read [How to Expose an App](/docs/applications/expose-an-app/).
 
 ## What's Inside
 

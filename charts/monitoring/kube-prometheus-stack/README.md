@@ -1,8 +1,10 @@
+<!-- This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/docs/reference/helm_charts/monitoring/kube-prometheus-stack/. It is not meant to be read directly in this repository. -->
+
 # `kube-prometheus-stack` Helm Chart Reference
 
 The [`kube-prometheus-stack` chart](./) deploys [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) (Prometheus, Alertmanager, Grafana, and their operator) via the upstream chart. [Values](#values) lists only what this chart sets. For every other key, read the upstream [`values.yaml`](https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml).
 
-For per-environment overrides, read [Configure an App per Environment](https://eks-forge.readthedocs.io/latest/docs/applications/configure-an-app-per-environment/).
+For per-environment overrides, read [Configure an App per Environment](/docs/applications/configure-an-app-per-environment/).
 
 ## What's Inside
 

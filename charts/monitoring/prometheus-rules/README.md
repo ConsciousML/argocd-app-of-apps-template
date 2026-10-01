@@ -1,3 +1,5 @@
+<!-- This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/docs/reference/helm_charts/monitoring/prometheus-rules/. It is not meant to be read directly in this repository. -->
+
 # prometheus-rules
 
 Standalone `PrometheusRule` manifests, one per component, for alerts not bundled by a Helm chart.
