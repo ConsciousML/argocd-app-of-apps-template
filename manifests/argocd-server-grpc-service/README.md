@@ -1,3 +1,5 @@
+<!-- This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/docs/reference/manifests/argocd-server-grpc-service/. It is not meant to be read directly in this repository. -->
+
 # `argocd-server-grpc-service` Manifests Reference
 
 The [`argocd-server-grpc-service` manifests](./) add a second `Service` and its target group config for ArgoCD's gRPC traffic, routed via the shared private Gateway's [`httproute`](../../charts/gateway-api/httproute).

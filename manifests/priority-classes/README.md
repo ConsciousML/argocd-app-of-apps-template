@@ -1,3 +1,5 @@
+<!-- This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/docs/reference/manifests/priority-classes/. It is not meant to be read directly in this repository. -->
+
 # `priority-classes` Manifests Reference
 
 The [`priority-classes` manifests](./) define `daemonset-critical`, a `PriorityClass` for cluster-wide DaemonSets (Alloy, Loki's canary, `prometheus-node-exporter`) that must land on every node, including ones a lower-priority workload already filled up.
