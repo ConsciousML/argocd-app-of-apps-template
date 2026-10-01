@@ -72,3 +72,33 @@ locals {
 }
 ```
 On your next `dev` deployment, ArgoCD syncs every application from your fork instead of the original app of apps repository.
+
+## Enable README Generation in CI
+Your fork's CI generates each chart's README and pushes it back to your PR. To push, it needs a write deploy key, stored as the `HELM_DOCS_DEPLOY_KEY` secret on your fork.
+
+The `app_of_apps_deploy_key` [bootstrap pipeline](/docs/quickstart/bootstrap) creates both. It reads your fork's owner and name from the `github.hcl` you just edited.
+
+From the root of your [catalog fork](/docs/quickstart/installation/#fork-the-eks-forge-catalog), run:
+```bash
+source .env
+cd pipelines/bootstrap/app_of_apps_deploy_key/
+terragrunt stack clean
+terragrunt stack generate
+terragrunt run --all apply --backend-bootstrap --non-interactive --no-stack-generate
+```
+
+Then, list the GitHub Actions secrets of your app of apps fork:
+```bash
+gh secret list -R $GITHUB_OWNER/$APP_OF_APPS_REPO_NAME
+```
+
+You should see `HELM_DOCS_DEPLOY_KEY`.
+
+Finally, list the deploy keys of your app of apps fork:
+```bash
+gh repo deploy-key list -R $GITHUB_OWNER/$APP_OF_APPS_REPO_NAME
+```
+
+You should see `Helm Docs Deploy Key` with `read-write` permission.
+
+For more information about this bootstrap, read the [App of Apps Deploy Key](/docs/reference/bootstrap/app_of_apps_deploy_key/) reference.
