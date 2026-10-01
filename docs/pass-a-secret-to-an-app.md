@@ -114,7 +114,7 @@ Create a unit that stores your secret in AWS Secrets Manager, by following the *
 <Tabs groupId="secret-source">
 <TabItem value="generated" label="Generated password">
 
-Use the [`aws_secret_password`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/modules/aws_secret_password) module. It stores the password under the `plaintext` key, and its bcrypt hash under `bcrypt_hash`. For example, Grafana's unit, [`units/eks/addons/prometheus_stack/grafana/aws_secret_password/terragrunt.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/prometheus_stack/grafana/aws_secret_password/terragrunt.hcl):
+Use the [`aws_secret_password` module](/docs/reference/terraform_modules/aws_secret_password/). It stores the password under the `plaintext` key, and its bcrypt hash under `bcrypt_hash`. For example, Grafana's unit, [`units/eks/addons/prometheus_stack/grafana/aws_secret_password/terragrunt.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/prometheus_stack/grafana/aws_secret_password/terragrunt.hcl):
 ```hcl
 terraform {
   source = "git::git@github.com:${include.root.locals.github_owner_catalog}/${include.root.locals.github_repo_name_catalog}.git//modules/aws_secret_password/?ref=${values.version}"
@@ -131,7 +131,7 @@ inputs = {
 </TabItem>
 <TabItem value="other" label="Other value">
 
-Use the [`aws_secretsmanager_secret`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/modules/aws_secretsmanager_secret) module. It stores each key you set in `secret_data`, which your `remoteProperty` values must match. For example, the Slack bot token Alertmanager reads, in [`units/eks/addons/prometheus_stack/alertmanager/aws_secret_slack_bot/terragrunt.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/prometheus_stack/alertmanager/aws_secret_slack_bot/terragrunt.hcl):
+Use the [`aws_secretsmanager_secret` module](/docs/reference/terraform_modules/aws_secretsmanager_secret/). It stores each key you set in `secret_data`, which your `remoteProperty` values must match. For example, the Slack bot token Alertmanager reads, in [`units/eks/addons/prometheus_stack/alertmanager/aws_secret_slack_bot/terragrunt.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/prometheus_stack/alertmanager/aws_secret_slack_bot/terragrunt.hcl):
 ```hcl
 terraform {
   source = "git::git@github.com:${include.root.locals.github_owner_catalog}/${include.root.locals.github_repo_name_catalog}.git//modules/aws_secretsmanager_secret/?ref=${values.version}"
