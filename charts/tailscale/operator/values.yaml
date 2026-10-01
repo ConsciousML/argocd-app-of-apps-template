@@ -1,5 +1,8 @@
 tailscale-operator:
   operatorConfig:
+    # -- Resource requests and limits.
+    # @section -- Operator
+    # @default -- see values.yaml
     resources:
       requests:
         cpu: 11m
@@ -7,13 +10,22 @@ tailscale-operator:
       limits:
         cpu: 11m
         memory: 36M
+    # -- Drops all Linux capabilities and blocks privilege escalation.
+    # @section -- Operator
+    # @default -- see values.yaml
     securityContext:
       allowPrivilegeEscalation: false
       capabilities:
         drop: ["ALL"] # strip default Linux capabilities, none are needed
+    # -- Applies the runtime's default seccomp profile.
+    # @section -- Operator
+    # @default -- see values.yaml
     podSecurityContext:
       seccompProfile:
         type: RuntimeDefault # apply the runtime's default seccomp profile to block risky syscalls
+    # -- Pins the operator to the `elastic` NodePool, with a matching `tolerations` entry.
+    # @section -- Operator
+    # @default -- see values.yaml
     nodeSelector:
       karpenter.sh/nodepool: elastic
     tolerations:

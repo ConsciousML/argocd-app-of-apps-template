@@ -1,14 +1,24 @@
 kube-prometheus-stack:
-  # Both set via catalog appParams (units/eks/addons/argocd/app_of_apps/terragrunt.hcl)
-  fullnameOverride: "" # also composes the helm-httproute backendRef names, Helm/YAML can't do that string interpolation itself
-  environment: ""      # read by alertmanager.config below (via tplConfig) to prefix each Slack channel name
+  # fullnameOverride also composes the httproute backendRef names, Helm and YAML can't do
+  # that string interpolation themselves.
+  # -- Names this chart's own resources. Must match `tool.helm.releaseName` in `apps/values.yaml`. Injected by the catalog via `appParams`.
+  # @section -- Release
+  fullnameOverride: ""
+  # -- Environment name, prefixes each Slack channel in `alertmanager.config`. Injected by the catalog via `appParams`.
+  # @section -- Release
+  environment: ""
 
   # Installed by the catalog's prometheus_operator_crds unit ahead of ArgoCD, not this chart,
   # so the ServiceMonitor CRD already exists by first sync instead of only after this app.
   crds:
+    # -- Disabled, the catalog's `prometheus_operator_crds` unit installs the CRDs before ArgoCD syncs.
+    # @section -- Release
     enabled: false
 
   # These control plane components are AWS-managed on EKS and not exposed for scraping
+  # -- Disabled with `kubeScheduler` and `kubeControllerManager`, AWS-managed on EKS.
+  # @section -- Release
+  # @default -- see values.yaml
   kubeEtcd: { enabled: false }
   kubeScheduler: { enabled: false }
   kubeControllerManager: { enabled: false }
@@ -49,6 +59,8 @@ kube-prometheus-stack:
   # up for, without being able to preempt cluster-critical controllers like Karpenter itself
   # or the ArgoCD application-controller to do it.
   prometheus-node-exporter:
+    # -- Lets a node-exporter pod preempt a lower-priority one on a full node. It tolerates both Karpenter NodePool taints and the MNG taint, so every node runs one.
+    # @section -- Scheduling
     priorityClassName: daemonset-critical
     resources:
       requests:
@@ -100,6 +112,9 @@ kube-prometheus-stack:
     # Watchdog is still isolated by an alertname matcher evaluated before the component routes,
     # and InfoInhibitor's severity: none is still caught by the info/none route before it, so
     # this label only actually changes where TargetDown lands.
+    # -- `component` label per default rule group, which Alertmanager routes on.
+    # @section -- Alerting
+    # @default -- see values.yaml
     additionalRuleGroupLabels:
       general: { component: k8s }
       alertmanager: { component: prometheus-stack }
@@ -141,6 +156,8 @@ kube-prometheus-stack:
     prometheusSpec:
       # 2 independent replicas, each with their own PVC below. No shared storage needed,
       # Prometheus HA doesn't require it (dedup happens on the query/Grafana side).
+      # -- Prometheus replicas, each with its own PVC. Hard pod anti-affinity, spread across AZs, and a PDB keeping 1 up during disruption.
+      # @section -- Prometheus
       replicas: 2
 
       # Hard, not the chart's soft default: the critical NodePool can launch a second spot
@@ -164,6 +181,8 @@ kube-prometheus-stack:
       # Scrape any ServiceMonitor/PodMonitor in the cluster regardless of labels, and load any
       # PrometheusRule regardless of labels, so other addons can opt into scraping/alerting
       # just by enabling their chart's serviceMonitor/PrometheusRule.
+      # -- Picks up every `ServiceMonitor`, and with the `podMonitor` and `rule` selectors below, every `PodMonitor` and `PrometheusRule`, regardless of labels.
+      # @section -- Prometheus
       serviceMonitorSelectorNilUsesHelmValues: false
       podMonitorSelectorNilUsesHelmValues: false
       ruleSelectorNilUsesHelmValues: false
@@ -171,6 +190,9 @@ kube-prometheus-stack:
       # Goldilocks/VPA can't produce a recommendation for this StatefulSet (prometheus-operator
       # owns it, VPA won't target a StatefulSet with a non-scalable parent controller), sized
       # from kubectl top instead
+      # -- Resource requests and limits. Every component sets its own.
+      # @section -- Scheduling
+      # @default -- see values.yaml
       resources:
         requests:
           cpu: 93m
@@ -178,6 +200,9 @@ kube-prometheus-stack:
         limits:
           memory: 1560M
 
+      # -- Pins Prometheus to the `critical` NodePool, with a matching `tolerations` entry. Every component except node-exporter sets the same.
+      # @section -- Scheduling
+      # @default -- see values.yaml
       nodeSelector:
         karpenter.sh/nodepool: critical
       tolerations:
@@ -186,6 +211,9 @@ kube-prometheus-stack:
           value: critical
           effect: NoSchedule
 
+      # -- `gp3` PVC per replica. PVC retention is set per environment in `values-<env>.yaml`.
+      # @section -- Prometheus
+      # @default -- see values.yaml
       storageSpec:
         volumeClaimTemplate:
           spec:
@@ -200,6 +228,8 @@ kube-prometheus-stack:
       # Replicas gossip to sync silences and notification state, no leader or majority
       # needed. 2 replicas removes the single point of failure but can't resolve
       # conflicts from a network partition, 3 can.
+      # -- Alertmanager replicas, each with its own `gp3` PVC. Hard pod anti-affinity, spread across AZs, and a PDB keeping a majority up.
+      # @section -- Alertmanager
       replicas: 3
 
       # Hard, not soft default: matches prometheus.prometheusSpec above.
@@ -248,6 +278,9 @@ kube-prometheus-stack:
       # The Prometheus Operator mounts each key of this Secret as a file under
       # /etc/alertmanager/secrets/alertmanager-slack-bot/, which config.global.http_config below
       # points at.
+      # -- Mounts the Slack bot token `Secret`. Must match `targetSecretName` in `secret-sync/alertmanager-secrets-values.yaml`.
+      # @section -- Alertmanager
+      # @default -- see values.yaml
       secrets:
         - alertmanager-slack-bot
 
@@ -280,6 +313,9 @@ kube-prometheus-stack:
     # since Watchdog itself fires at severity: none. Anything matching none of these (missing or
     # unexpected component/severity) falls to the top-level "unrouted" receiver instead of
     # silently mixing into prometheus-stack-warning, so a gap in this routing tree is visible.
+    # -- Slack routing tree, one `<environment>-<component>-<severity>` channel per route. Unmatched alerts go to `<environment>-unrouted`.
+    # @section -- Alertmanager
+    # @default -- see values.yaml
     config:
       global:
         # Bot token auth (https://prometheus.io/docs/alerting/latest/configuration/#slack_config):
@@ -448,6 +484,9 @@ kube-prometheus-stack:
           REQ_USERNAME: admin
 
     # Appends to the chart's auto-provisioned Prometheus/Alertmanager datasources.
+    # -- Adds Loki as a datasource. Prometheus stays the default.
+    # @section -- Grafana
+    # @default -- see values.yaml
     additionalDataSources:
       - name: Loki
         type: loki
@@ -507,6 +546,9 @@ kube-prometheus-stack:
             type: file
             options:
               path: /var/lib/grafana/dashboards/blackbox-exporter
+    # -- Addon dashboards (Karpenter, ExternalDNS, AWS Load Balancer Controller, External Secrets Operator, ArgoCD, Loki, and blackbox-exporter), each in its own folder from `dashboardProviders`.
+    # @section -- Grafana
+    # @default -- see values.yaml
     dashboards:
       # https://karpenter.sh/docs/getting-started/getting-started-with-karpenter/#monitoring-with-grafana-optional
       karpenter:
@@ -558,10 +600,9 @@ kube-prometheus-stack:
           revision: 6
           datasource:
             - { name: DS_PROMETHEUS, value: Prometheus }
-    # Placeholders for `helm template` to pass in CI. Overridden at sync time by appParams
-    # (see the catalog's app_of_apps unit), which is also the single source of truth shared
-    # with grafana-secrets' targetSecretName/secretKey.
     admin:
+      # -- Admin credentials `Secret`, with `passwordKey`. Both set by `secret-sync/grafana-secrets-values.yaml`, loaded via `extraValueFiles`.
+      # @section -- Grafana
       existingSecret: ""
       passwordKey: ""
     env:

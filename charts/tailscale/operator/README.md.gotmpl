@@ -1,10 +1,13 @@
-# tailscale-operator
+# `tailscale-operator` Helm Chart Reference
 
-Deploys the [Tailscale Kubernetes operator](https://tailscale.com/kb/1236/kubernetes-operator) via the upstream `tailscale-operator` chart, unmodified.
+The [`tailscale-operator` chart](./) deploys the [Tailscale Kubernetes operator](https://tailscale.com/kb/1236/kubernetes-operator) via the upstream `tailscale-operator` chart. [Values](#values) lists only what this chart sets. For every other key, read the upstream [`values.yaml`](https://github.com/tailscale/tailscale/blob/main/cmd/k8s-operator/deploy/chart/values.yaml).
 
 ## What's Inside
 
 - **[templates/network-policy.yaml](templates/network-policy.yaml)**: the operator's `CiliumNetworkPolicy`
+- **[values.yaml](values.yaml)**: see [Values](#values)
+
+{{ template "chart.valuesSection" . }}
 
 ## Upstream Dependencies
 

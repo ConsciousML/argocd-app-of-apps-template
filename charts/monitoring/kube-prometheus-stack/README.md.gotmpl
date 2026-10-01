@@ -1,0 +1,28 @@
+# `kube-prometheus-stack` Helm Chart Reference
+
+The [`kube-prometheus-stack` chart](./) deploys [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) (Prometheus, Alertmanager, Grafana, and their operator) via the upstream chart. [Values](#values) lists only what this chart sets. For every other key, read the upstream [`values.yaml`](https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml).
+
+For per-environment overrides, read [Configure an App per Environment](https://eks-forge.readthedocs.io/latest/docs/applications/configure-an-app-per-environment/).
+
+## What's Inside
+
+- **`templates/network-policy-*.yaml`**: one `CiliumNetworkPolicy` per component ([prometheus](templates/network-policy-prometheus.yaml), [alertmanager](templates/network-policy-alertmanager.yaml), [grafana](templates/network-policy-grafana.yaml), [operator](templates/network-policy-operator.yaml), [kube-state-metrics](templates/network-policy-kube-state-metrics.yaml))
+- **[values.yaml](values.yaml)**: see [Values](#values)
+- **[values.schema.json](values.schema.json)**: rejects the values the catalog injects via `appParams` when empty, so a missing injection fails the render
+- **[placeholder-values.yaml](placeholder-values.yaml)**: used only by `scripts/validate-helm.sh`, so standalone `helm template` and kubeconform pass
+- **[values-dev.yaml](values-dev.yaml)** and **[values-staging.yaml](values-staging.yaml)**: delete the Prometheus and Alertmanager PVCs on StatefulSet delete, retain them on scale-down
+- **[values-prod.yaml](values-prod.yaml)**: retains the Prometheus and Alertmanager PVCs on StatefulSet delete and scale-down
+- **[`secret-sync/grafana-secrets-values.yaml`](../../external-secrets-operator/secret-sync/grafana-secrets-values.yaml)**: loaded by this app via `extraValueFiles` in [`apps/values.yaml`](../../../apps/values.yaml), sets `grafana.admin.existingSecret` and `passwordKey` to the `Secret` that `grafana-secrets` syncs
+
+{{ template "chart.valuesSection" . }}
+
+## Resource Names
+
+`fullnameOverride` only names this chart's own resources: the `prometheus`, `alertmanager`, and operator objects. Grafana, `kube-state-metrics`, and `node-exporter` are bundled subcharts that derive their resource names from the Helm release name instead. Anything referencing those names, like an [`httproute`](../../gateway-api/httproute) `backendRef`, must match `tool.helm.releaseName` in `apps/values.yaml`, or it silently points at the wrong Service.
+
+## Upstream Dependencies
+
+- **[`prometheus_stack`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/eks/addons/prometheus_stack)** (catalog): `grafana/aws_secret_password` generates the admin password that `grafana-secrets` syncs in
+- **[`app_of_apps`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl)** (catalog): injects `fullnameOverride`, `environment`, and the Prometheus and Alertmanager `externalUrl` via `appParams`
+- **[`storage-class-gp3`](../../../manifests/storage-class-gp3)**: provisions the `gp3` `StorageClass` both `prometheus` and `alertmanager` request for their persistent volumes
+- **[`alertmanager-secrets`](../../external-secrets-operator/secret-sync/alertmanager-secrets-values.yaml)**: syncs the Slack bot token `Secret` Alertmanager mounts

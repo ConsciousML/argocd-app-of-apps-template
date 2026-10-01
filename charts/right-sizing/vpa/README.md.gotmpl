@@ -1,0 +1,15 @@
+# `vpa` Helm Chart Reference
+
+The [`vpa` chart](./) deploys a recommender-only Kubernetes [Vertical Pod Autoscaler](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler) via the upstream Fairwinds `vpa` chart, the source data for [Goldilocks](../goldilocks/). It only writes recommendations to each `VerticalPodAutoscaler`'s `status`. It never evicts or resizes running pods. [Values](#values) lists only what this chart sets. For every other key, read the upstream [`values.yaml`](https://github.com/FairwindsOps/charts/blob/master/stable/vpa/values.yaml).
+
+## What's Inside
+
+- **[templates/network-policy.yaml](templates/network-policy.yaml)**: the recommender's `CiliumNetworkPolicy`
+- **[values.yaml](values.yaml)**: see [Values](#values)
+
+{{ template "chart.valuesSection" . }}
+
+## Upstream Dependencies
+
+- **EKS `metrics-server` addon** ([terragrunt-template-catalog-eks](https://github.com/ConsciousML/terragrunt-template-catalog-eks)): the recommender hard-depends on it for live resource usage
+- **[`kube-prometheus-stack`](../../monitoring/kube-prometheus-stack)**: Prometheus backfills the recommender's history at startup. Non-fatal if not ready yet

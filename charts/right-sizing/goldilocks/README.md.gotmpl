@@ -1,0 +1,16 @@
+# `goldilocks` Helm Chart Reference
+
+The [`goldilocks` chart](./) deploys the [Goldilocks](https://goldilocks.docs.fairwinds.com/) dashboard via the upstream Fairwinds `goldilocks` chart. It reads `VerticalPodAutoscaler` recommendations and summarizes them per workload. [Values](#values) lists only what this chart sets. For every other key, read the upstream [`values.yaml`](https://github.com/FairwindsOps/charts/blob/master/stable/goldilocks/values.yaml).
+
+## What's Inside
+
+- **[templates/network-policy.yaml](templates/network-policy.yaml)**: the dashboard's `CiliumNetworkPolicy`
+- **[values.yaml](values.yaml)**: see [Values](#values)
+- **`goldilocks-httproute`** (app-of-apps): an instance of the generic [`httproute`](../../gateway-api/httproute) chart, exposes the dashboard
+
+{{ template "chart.valuesSection" . }}
+
+## Upstream Dependencies
+
+- **[`vpa`](../vpa/)**: the VPA recommender and CRD that Goldilocks reads recommendations from
+- **EKS `metrics-server` addon** ([terragrunt-template-catalog-eks](https://github.com/ConsciousML/terragrunt-template-catalog-eks)): required by the VPA recommender, not by Goldilocks directly

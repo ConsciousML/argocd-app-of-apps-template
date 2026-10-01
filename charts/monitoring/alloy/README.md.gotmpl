@@ -1,0 +1,14 @@
+# `alloy` Helm Chart Reference
+
+The [`alloy` chart](./) deploys [Grafana Alloy](https://grafana.com/docs/alloy/latest/) via the upstream `alloy` chart, as a DaemonSet collecting and forwarding pod logs and Kubernetes cluster events to [Loki](../loki/). [Values](#values) lists only what this chart sets. For every other key, read the upstream [`values.yaml`](https://github.com/grafana/alloy/blob/main/operations/helm/charts/alloy/values.yaml).
+
+## What's Inside
+
+- **[templates/network-policy.yaml](templates/network-policy.yaml)**: the DaemonSet's `CiliumNetworkPolicy`
+- **[values.yaml](values.yaml)**: see [Values](#values)
+
+{{ template "chart.valuesSection" . }}
+
+## Upstream Dependencies
+
+- **[`loki`](../loki/)**: receives logs at `loki-gateway`. Alloy retries failed writes, so Loki doesn't need to be up first

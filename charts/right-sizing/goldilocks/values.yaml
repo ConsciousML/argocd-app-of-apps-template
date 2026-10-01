@@ -1,14 +1,23 @@
 goldilocks:
   # VPA (recommender only) is installed separately by helm-vpa.
   vpa:
+    # -- Disabled, VPA is the separate [`vpa`](../vpa) chart.
+    # @section -- Disabled Components
     enabled: false
   # Provisioned as the EKS-managed metrics-server addon (terragrunt-template-catalog-eks),
   # not by this chart.
   metrics-server:
+    # -- Disabled, metrics-server is the EKS addon instead.
+    # @section -- Disabled Components
     enabled: false
   controller:
     flags:
+      # -- Creates a VPA for every workload in every namespace, no namespace label needed.
+      # @section -- Controller
       on-by-default: "true"
+    # -- Resource requests and limits.
+    # @section -- Controller
+    # @default -- see values.yaml
     resources:
       requests:
         cpu: 15m
@@ -16,6 +25,9 @@ goldilocks:
       limits:
         cpu: 15m
         memory: 105M
+    # -- Pins the controller to the `elastic` NodePool, with a matching `tolerations` entry.
+    # @section -- Controller
+    # @default -- see values.yaml
     nodeSelector:
       karpenter.sh/nodepool: elastic
     tolerations:
@@ -28,6 +40,9 @@ goldilocks:
       # prometheus-* pod to its Prometheus Operator CR, and logs a "forbidden" error on
       # every reconcile (VPAs still get created via fallback, but the top-level-owner
       # lookup fails).
+      # -- Read access to `alertmanagers` and `prometheuses` (`monitoring.coreos.com`).
+      # @section -- Controller
+      # @default -- see values.yaml
       extraRules:
         - apiGroups:
             - 'monitoring.coreos.com'
@@ -43,7 +58,12 @@ goldilocks:
     # Separate flag from controller.flags above, also needed for the dashboard to list
     # every namespace instead of only labeled ones.
     flags:
+      # -- Lists every namespace, not only labeled ones.
+      # @section -- Dashboard
       on-by-default: "true"
+    # -- Resource requests and limits.
+    # @section -- Dashboard
+    # @default -- see values.yaml
     resources:
       requests:
         cpu: 15m
@@ -51,6 +71,9 @@ goldilocks:
       limits:
         cpu: 75m
         memory: 105M
+    # -- Pins the dashboard to the `elastic` NodePool, with a matching `tolerations` entry.
+    # @section -- Dashboard
+    # @default -- see values.yaml
     nodeSelector:
       karpenter.sh/nodepool: elastic
     tolerations:

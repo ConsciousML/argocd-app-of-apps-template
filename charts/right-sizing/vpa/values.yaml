@@ -5,6 +5,9 @@ vpa:
     # failure, so memory gets a higher percentile on top of the default 15% margin.
     # CPU stays at the chart default (p90) since throttling is a soft failure and
     # doesn't warrant stacking a higher percentile on top of the margin too.
+    # -- Recommender flags: CPU at p90 and memory at p99, history backfilled from kube-prometheus-stack's Prometheus.
+    # @section -- Recommender
+    # @default -- see values.yaml
     extraArgs:
       target-cpu-percentile: "0.90"
       target-memory-percentile: "0.99"
@@ -22,14 +25,22 @@ vpa:
       metric-for-pod-labels: kube_pod_info{job="kube-state-metrics"}[8d]
       pod-namespace-label: namespace
       pod-name-label: pod
+    # -- Enables the Prometheus `PodMonitor`.
+    # @section -- Recommender
     podMonitor:
       enabled: true
+    # -- Resource requests and limits.
+    # @section -- Recommender
+    # @default -- see values.yaml
     resources:
       requests:
         cpu: 15m
         memory: 100Mi
       limits:
         memory: 100Mi
+    # -- Pins the recommender to the `elastic` NodePool, with a matching `tolerations` entry.
+    # @section -- Recommender
+    # @default -- see values.yaml
     nodeSelector:
       karpenter.sh/nodepool: elastic
     tolerations:
@@ -38,10 +49,16 @@ vpa:
         value: elastic
         effect: NoSchedule
   updater:
+    # -- Disabled, so running pods are never evicted.
+    # @section -- Disabled Components
     enabled: false
   admissionController:
+    # -- Disabled, so pods are never resized at admission.
+    # @section -- Disabled Components
     enabled: false
   # Provisioned as the EKS-managed metrics-server addon (terragrunt-template-catalog-eks),
   # not by this chart.
   metrics-server:
+    # -- Disabled, metrics-server is the EKS addon instead.
+    # @section -- Disabled Components
     enabled: false

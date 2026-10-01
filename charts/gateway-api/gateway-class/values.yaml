@@ -1,2 +1,6 @@
+# -- `GatewayClass` name. Also loaded by both [`gateway`](../gateway) instances via `extraValueFiles`.
+# @section -- GatewayClass
 gatewayClassName: aws-alb
+# -- Controller implementing this class, the AWS Load Balancer Controller.
+# @section -- GatewayClass
 controllerName: gateway.k8s.aws/alb

@@ -1,7 +1,12 @@
-# Injected per instance by the catalog (terragrunt-template-catalog-eks) via appParams,
-# from the EKS cluster name and VPC CIDR. See units/eks/addons/argocd/app_of_apps in
-# that repo. No instance sets this itself.
+# -- `Connector` name, `<cluster name>-connector`. Injected by the catalog via `appParams`.
+# @section -- Connector
 name: ""
+# -- Tailnet hostname prefix of the proxy devices, the EKS cluster name. Injected by the catalog via `appParams`.
+# @section -- Connector
 hostnamePrefix: ""
+# -- Subnet routes to advertise, the VPC CIDR. Injected by the catalog via `appParams`.
+# @section -- Connector
 advertiseRoutes: []
+# -- Number of subnet router proxy pods.
+# @section -- Connector
 replicas: 1

@@ -1,12 +1,19 @@
 config:
   spec:
     destination:
+      # -- Cluster every child `Application` deploys to.
+      # @section -- Source
       server: https://kubernetes.default.svc
     source:
-      # Set by the catalog from github.hcl. Schema rejects empty.
+      # -- This repository's URL, for every child `Application`. Set by the catalog from `github.hcl`. Must not be empty.
+      # @section -- Source
       repoURL: ""
+      # -- Git revision every child `Application` syncs. Set by the catalog.
+      # @section -- Source
       targetRevision: main
 
+# -- Values injected per application, keyed by `name`, as the child `Application`'s `spec.source.helm.values`. Set by the catalog's `app_of_apps` unit.
+# @section -- Catalog Inputs
 appParams: {}
 
 # environment has no real default, the catalog sets it (global.environment) when
@@ -14,8 +21,13 @@ appParams: {}
 # loudly instead of silently pointing extraValueFiles at a nonexistent values-.yaml. Use
 # placeholder-values.yaml for local testing.
 global:
+  # -- Deploying environment (`dev`, `staging`, or `prod`), rendered into `extraValueFiles` entries to pick a `values-<env>.yaml` overlay. Set by the catalog. Must not be empty.
+  # @section -- Catalog Inputs
   environment: ""
 
+# -- One child `Application` per entry. See [Values Schema](#values-schema).
+# @section -- Applications
+# @default -- see values.yaml
 applications:
   # --- Namespaces ---
   # Owns Namespace resources: pruning or cascade-deleting this app must never delete one,
