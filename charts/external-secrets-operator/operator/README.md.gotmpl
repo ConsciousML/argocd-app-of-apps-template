@@ -1,8 +1,10 @@
+<!-- This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/docs/reference/helm_charts/external-secrets-operator/operator/. It is not meant to be read directly in this repository. -->
+
 # `external-secrets-operator` Helm Chart Reference
 
 The [`external-secrets-operator` chart](./) deploys the [External Secrets Operator](https://external-secrets.io/latest/) controller and CRDs (`SecretStore`, `ExternalSecret`) via the upstream `external-secrets` chart. [Values](#values) lists only what this chart sets. For every other key, read the upstream [`values.yaml`](https://github.com/external-secrets/external-secrets/blob/main/deploy/charts/external-secrets/values.yaml).
 
-For setup steps, read [How to Pass a Secret to an App](https://eks-forge.readthedocs.io/latest/docs/applications/pass-a-secret-to-an-app/).
+For setup steps, read [How to Pass a Secret to an App](/docs/applications/pass-a-secret-to-an-app/).
 
 ## What's Inside
 

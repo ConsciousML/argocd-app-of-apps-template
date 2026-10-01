@@ -1,8 +1,10 @@
+<!-- This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/docs/reference/helm_charts/monitoring/loki/. It is not meant to be read directly in this repository. -->
+
 # `loki` Helm Chart Reference
 
 The [`loki` chart](./) deploys [Loki](https://grafana.com/docs/loki/latest/) via the upstream `loki` chart, in monolithic mode with S3 storage. [Values](#values) lists only what this chart sets. For every other key, read the upstream [`values.yaml`](https://github.com/grafana-community/helm-charts/blob/main/charts/loki/values.yaml).
 
-For per-environment overrides, read [Configure an App per Environment](https://eks-forge.readthedocs.io/latest/docs/applications/configure-an-app-per-environment/).
+For per-environment overrides, read [Configure an App per Environment](/docs/applications/configure-an-app-per-environment/).
 
 ## What's Inside
 

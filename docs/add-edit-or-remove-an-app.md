@@ -88,7 +88,7 @@ Add an entry under `applications` in [`apps/values.yaml`](../apps/values.yaml), 
     syncWave: 4
 ```
 
-For the other fields, such as `tool.helm.releaseName` or `syncOptions`, see the [App of Apps](/docs/reference/applications/app_of_apps/) reference.
+For the other fields, such as `tool.helm.releaseName` or `syncOptions`, see the [`apps` Helm Chart](/docs/reference/helm_charts/app-of-apps/) reference.
 
 ### Set the Sync Wave
 

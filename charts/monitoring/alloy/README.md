@@ -1,3 +1,5 @@
+<!-- This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/docs/reference/helm_charts/monitoring/alloy/. It is not meant to be read directly in this repository. -->
+
 # `alloy` Helm Chart Reference
 
 The [`alloy` chart](./) deploys [Grafana Alloy](https://grafana.com/docs/alloy/latest/) via the upstream `alloy` chart, as a DaemonSet collecting and forwarding pod logs and Kubernetes cluster events to [Loki](../loki/). [Values](#values) lists only what this chart sets. For every other key, read the upstream [`values.yaml`](https://github.com/grafana/alloy/blob/main/operations/helm/charts/alloy/values.yaml).

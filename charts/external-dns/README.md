@@ -1,8 +1,10 @@
+<!-- This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/docs/reference/helm_charts/external-dns/. It is not meant to be read directly in this repository. -->
+
 # `external-dns` Helm Chart Reference
 
 The [`external-dns` chart](./) deploys [ExternalDNS](https://kubernetes-sigs.github.io/external-dns/) via the upstream `external-dns` chart, reused for both the private and public hosted zones. Each `external-dns-*-values.yaml` file in this directory is one instance, loaded via `extraValueFiles` in [`apps/values.yaml`](../../apps/values.yaml). [Values](#values) lists only what this chart sets. For every other key, read the upstream [`values.yaml`](https://github.com/kubernetes-sigs/external-dns/blob/master/charts/external-dns/values.yaml).
 
-For setup steps, read [How to Expose an App](https://eks-forge.readthedocs.io/latest/docs/applications/expose-an-app/).
+For setup steps, read [How to Expose an App](/docs/applications/expose-an-app/).
 
 ## What's Inside
 

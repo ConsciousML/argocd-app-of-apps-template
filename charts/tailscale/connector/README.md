@@ -1,3 +1,5 @@
+<!-- This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/docs/reference/helm_charts/tailscale/connector/. It is not meant to be read directly in this repository. -->
+
 # `tailscale-connector` Helm Chart Reference
 
 The [`tailscale-connector` chart](./) renders a Tailscale [`Connector`](https://tailscale.com/kb/1441/kubernetes-operator-connector) advertising the VPC CIDR as a subnet route, giving Tailnet devices routed access to private VPC resources.

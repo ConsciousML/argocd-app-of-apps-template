@@ -1,3 +1,5 @@
+<!-- This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/docs/reference/helm_charts/aws-lbc/. It is not meant to be read directly in this repository. -->
+
 # `aws-lbc` Helm Chart Reference
 
 The [`aws-lbc` chart](./) deploys the [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller/) via the upstream `aws-load-balancer-controller` chart. It provisions ALBs from `Ingress` and `Gateway` resources. [Values](#values) lists only what this chart sets. For every other key, read the upstream [`values.yaml`](https://github.com/kubernetes-sigs/aws-load-balancer-controller/blob/main/helm/aws-load-balancer-controller/values.yaml).

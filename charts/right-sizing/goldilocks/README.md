@@ -1,3 +1,5 @@
+<!-- This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/docs/reference/helm_charts/right-sizing/goldilocks/. It is not meant to be read directly in this repository. -->
+
 # `goldilocks` Helm Chart Reference
 
 The [`goldilocks` chart](./) deploys the [Goldilocks](https://goldilocks.docs.fairwinds.com/) dashboard via the upstream Fairwinds `goldilocks` chart. It reads `VerticalPodAutoscaler` recommendations and summarizes them per workload. [Values](#values) lists only what this chart sets. For every other key, read the upstream [`values.yaml`](https://github.com/FairwindsOps/charts/blob/master/stable/goldilocks/values.yaml).

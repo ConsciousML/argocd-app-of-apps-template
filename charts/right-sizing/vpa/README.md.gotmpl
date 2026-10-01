@@ -1,3 +1,5 @@
+<!-- This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/docs/reference/helm_charts/right-sizing/vpa/. It is not meant to be read directly in this repository. -->
+
 # `vpa` Helm Chart Reference
 
 The [`vpa` chart](./) deploys a recommender-only Kubernetes [Vertical Pod Autoscaler](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler) via the upstream Fairwinds `vpa` chart, the source data for [Goldilocks](../goldilocks/). It only writes recommendations to each `VerticalPodAutoscaler`'s `status`. It never evicts or resizes running pods. [Values](#values) lists only what this chart sets. For every other key, read the upstream [`values.yaml`](https://github.com/FairwindsOps/charts/blob/master/stable/vpa/values.yaml).

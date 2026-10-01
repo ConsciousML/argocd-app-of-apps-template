@@ -1,8 +1,10 @@
+<!-- This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/docs/reference/helm_charts/external-secrets-operator/secret-sync/. It is not meant to be read directly in this repository. -->
+
 # `secret-sync` Helm Chart Reference
 
 The [`secret-sync` chart](./) renders a generic `SecretStore` (backed by AWS Secrets Manager) plus an `ExternalSecret` that syncs specific keys from one AWS secret into a Kubernetes `Secret`. Each `*-secrets-values.yaml` file in this directory is one instance, loaded via `extraValueFiles` in [`apps/values.yaml`](../../../apps/values.yaml).
 
-For setup steps, read [How to Pass a Secret to an App](https://eks-forge.readthedocs.io/latest/docs/applications/pass-a-secret-to-an-app/).
+For setup steps, read [How to Pass a Secret to an App](/docs/applications/pass-a-secret-to-an-app/).
 
 ## What's Inside
 
