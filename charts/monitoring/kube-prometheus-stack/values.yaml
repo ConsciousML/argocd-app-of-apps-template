@@ -181,7 +181,7 @@ kube-prometheus-stack:
       # Scrape any ServiceMonitor/PodMonitor in the cluster regardless of labels, and load any
       # PrometheusRule regardless of labels, so other addons can opt into scraping/alerting
       # just by enabling their chart's serviceMonitor/PrometheusRule.
-      # -- Picks up every `ServiceMonitor`, and with the `podMonitor` and `rule` selectors below, every `PodMonitor` and `PrometheusRule`, regardless of labels.
+      # -- Picks up every `ServiceMonitor` regardless of labels. `podMonitorSelectorNilUsesHelmValues` and `ruleSelectorNilUsesHelmValues` do the same for `PodMonitor` and `PrometheusRule`.
       # @section -- Prometheus
       serviceMonitorSelectorNilUsesHelmValues: false
       podMonitorSelectorNilUsesHelmValues: false
