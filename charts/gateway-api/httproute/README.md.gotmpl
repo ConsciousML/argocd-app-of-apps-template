@@ -1,0 +1,15 @@
+# `httproute` Chart Reference
+
+The [`httproute` chart](./) renders a generic `HTTPRoute` bound to a shared `Gateway`, reused by every app that needs a hostname. Each `*-values.yaml` file in this directory is one instance, loaded via `extraValueFiles` in [`apps/values.yaml`](../../../apps/values.yaml).
+
+For setup steps, read [How to Expose an App](https://eks-forge.readthedocs.io/latest/docs/applications/expose-an-app/).
+
+## What's Inside
+
+- **[templates/httproute.yaml](templates/httproute.yaml)**: binds to both the `http` and `https` listeners of the target `Gateway`
+
+{{ template "chart.valuesSection" . }}
+
+## Upstream Dependencies
+
+- **[`gateway`](../gateway)**: `gateway.name` and `gateway.namespace` in each instance's values file must reference `gateway-public` or `gateway-private` to match the intended `scope`

@@ -1,14 +1,25 @@
 gateway:
+  # -- Target `Gateway` name. Set by the shared `*-gateway-values.yaml` in `extraValueFiles`.
+  # @section -- Gateway
   name: ""
+  # -- Target `Gateway` namespace. Set by the shared `*-gateway-values.yaml` in `extraValueFiles`.
+  # @section -- Gateway
   namespace: ""
+# -- `HTTPRoute` name.
+# @section -- Route
 name: ""
-# Injected per instance by the catalog (terragrunt-template-catalog-eks) via appParams,
-# from domains.hcl. See units/eks/addons/argocd/app_of_apps in that repo. No instance
-# sets this itself.
+# -- Hostname. Injected by the catalog via `appParams` (from `domains.hcl`), never set per instance.
+# @section -- Route
 host: ""
-# matches is Gateway API HTTPRouteMatch syntax. backendRefKey is a key into backendRefs,
-# not the backend itself, so appParams can override just a name (e.g. compose
-# "<release>-grafana") without restating the whole rules list.
+# backendRefKey points into backendRefs, not at the backend itself, so appParams can
+# override just a name (e.g. compose "<release>-grafana") without restating the whole
+# rules list.
+# -- Route rules. `matches` is Gateway API `HTTPRouteMatch` syntax. `backendRefKey` is a key into `backendRefs`.
+# @section -- Route
 rules: []
+# -- Backends by key, each with `name` and `port`.
+# @section -- Route
 backendRefs: {}
+# -- Must set `external-dns.alpha.kubernetes.io/scope` to `public` or `private`, else no DNS record.
+# @section -- Route
 annotations: {}
