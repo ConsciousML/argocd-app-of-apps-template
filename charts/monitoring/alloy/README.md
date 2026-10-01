@@ -18,6 +18,12 @@ The [`alloy` chart](./) deploys [Grafana Alloy](https://grafana.com/docs/alloy/l
 | alloy.alloy.securityContext | object | see values.yaml | Runs as non-root UID and GID 473 with a read-only root filesystem. |
 | alloy.alloy.mounts | object | see values.yaml | Mounts the `alloy-data` `emptyDir` (see `controller.volumes.extra`) at `/tmp/alloy`, the storage path. |
 
+### Config Reloader
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| alloy.configReloader | object | see values.yaml | Config reloader sidecar resources, and a non-root `securityContext` (UID and GID 65534). |
+
 ### DaemonSet
 
 | Key | Type | Default | Description |
