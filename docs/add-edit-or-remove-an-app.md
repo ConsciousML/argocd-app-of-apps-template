@@ -73,7 +73,7 @@ Put the app's files in a new directory, as either:
 - **Plain manifests** under `manifests/<name>/`, one [Kubernetes manifest](https://kubernetes.io/docs/concepts/overview/working-with-objects/) per resource (e.g. [`manifests/podinfo`](../manifests/podinfo/)).
 - **A [Helm chart](https://helm.sh/docs/topics/charts/)** under `charts/<chart>/` or `charts/<group>/<chart>/`, written from scratch or wrapping an upstream chart as a dependency (e.g. [`charts/monitoring/blackbox-exporter`](../charts/monitoring/blackbox-exporter/)).
 
-For a Helm chart, write its README as `README.md.gotmpl`, with `{{ template "chart.valuesSection" . }}` where the values table goes. Document each value the chart sets with a [`# --` comment](https://github.com/norwoodj/helm-docs#valuesyaml-metadata) in its `values.yaml`. Values without one get no row. CI renders `README.md` from both and pushes it to your pull request.
+For a Helm chart, document it by following [Document a Helm Chart](/docs/applications/document-a-helm-chart/).
 
 Add a `nodeSelector` and `tolerations` to the app's pods by following [Schedule Pods](/docs/compute/schedule-pods/).
 
