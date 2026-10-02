@@ -23,8 +23,7 @@ endpointSelector:
 
 ## Onboarding a Namespace
 
-<!-- MIGRATE: how-to, move to the site's how-to guides -->
-Onboarding a namespace means adding it to the relevant file's `values` list. `default-deny.yaml` takes every opted-in namespace, the others only where needed.
+See [Write Network Policies](/docs/security/write-network-policies/).
 
 ## History
 

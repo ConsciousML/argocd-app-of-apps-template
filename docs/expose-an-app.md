@@ -137,7 +137,7 @@ appParams:
 
 ### Allow Gateway Traffic
 
-If your app already has a `CiliumNetworkPolicy`, allow the gateway's traffic in it. Otherwise, do it when you [Restrict the App's Traffic](/docs/applications/add-edit-or-remove-an-app/#restrict-the-apps-traffic).
+If your app already has a `CiliumNetworkPolicy`, allow the gateway's traffic in it. Otherwise, do it when you follow [Write Network Policies](/docs/security/write-network-policies/).
 
 The ALB isn't a pod, so Cilium sees its traffic as coming from `world`. Allow ingress from `world` on the container port, not the `Service` port. For example, in [`manifests/podinfo/podinfo-network-policy.yaml`](../manifests/podinfo/podinfo-network-policy.yaml):
 ```yaml
@@ -155,7 +155,7 @@ spec:
     ...
 ```
 
-For the rest of the policy, see [Control an App's Network Traffic](/docs/security/control-an-app-network-traffic/).
+For the rest of the policy, see [Write Network Policies](/docs/security/write-network-policies/).
 
 ## In Your Catalog Fork
 
