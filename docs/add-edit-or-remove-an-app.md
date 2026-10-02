@@ -157,12 +157,7 @@ kubectl get pods -n <namespace>
 This only shows the app started. Then, test that it behaves as intended (e.g. by calling its `Service` through [`kubectl port-forward`](https://kubernetes.io/docs/tasks/access-application-cluster/port-forward-access-application-cluster/)).
 
 :::warning
-A [network policy](https://docs.cilium.io/en/stable/security/policy/) can silently drop the traffic between your app and an existing component. If your app's logs show connection timeouts, or its Application is stuck in the `Degraded` state, list the traffic dropped in the cluster from the root of your catalog fork:
-```bash
-hubble observe --verdict DROPPED -P | grep -v "Unsupported L3"
-```
-
-If it shows drops to or from your app, see [Control an App's Network Traffic](/docs/security/control-an-app-network-traffic/).
+A [network policy](https://docs.cilium.io/en/stable/security/policy/) can silently drop the traffic between your app and an existing component. If you added an app, or changed what it talks to, allow its traffic by following [Write Network Policies](/docs/security/write-network-policies/).
 :::
 
 If you removed an app, check that its Application is no longer listed, and that its resources are gone:
@@ -177,10 +172,6 @@ kubectl delete namespace <namespace>
 ```
 
 Once you release the removal, do the same in `prod`, as in [Delete a Removed App's Namespace](/docs/applications/release-an-app-change/#delete-a-removed-apps-namespace).
-
-## Restrict the App's Traffic
-
-Once your app works in `dev`, restrict its traffic. If you added it in a new namespace, no network policy applies to it yet. Deny all its traffic by default, then allow only what it needs, by following [Control an App's Network Traffic](/docs/security/control-an-app-network-traffic/). Then repeat [Test in Dev](#test-in-dev), to catch any traffic you forgot to allow.
 
 ## Open a Pull Request
 
