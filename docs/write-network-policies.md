@@ -149,10 +149,12 @@ spec:
 
 ### Find the Peer's Policy
 
-If the other end is an existing pod, add its side of the rule to its policy. In [`apps/values.yaml`](../apps/values.yaml), find the entry whose `destination.namespace` is the peer's namespace, and whose name matches the peer's pod name (e.g. `kube-prometheus-stack` for `prometheus-kube-prometheus-stack-prometheus-0`). If no entry matches, as for ArgoCD or CoreDNS, take the one whose name contains `network-policies`. The policy is a `*network-policy*.yaml` file under its `path`.
+If the other end is an existing pod, add its side of the rule to its policy. In [`apps/values.yaml`](../apps/values.yaml), find the entry whose `destination.namespace` is the peer's namespace, whose name matches the peer's pod name (e.g. `kube-prometheus-stack` for `prometheus-kube-prometheus-stack-prometheus-0`), and whose `path` holds a `*network-policy*.yaml` file. If no entry matches, the peer's policy is in a shared entry:
+- An ArgoCD pod: `argocd-network-policies`.
+- A `kube-system` pod (e.g. CoreDNS or Hubble UI): `network-policies-kube-system`.
 
 :::warning
-If a drop shows `world` where you expect a pod, that pod may have started before Cilium's agent on its node, so Cilium doesn't manage it. Restart it, or run [`scripts/restart-missing-cilium-endpoints.sh`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/scripts/restart-missing-cilium-endpoints.sh) from the root of your catalog fork, then look for drops again.
+If a drop shows `world` where you expect a pod, that pod may have started before Cilium's agent on its node, so Cilium doesn't manage it. Restart it, or run [`scripts/restart-missing-cilium-endpoints.sh`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/scripts/restart-missing-cilium-endpoints.sh) from the root of your catalog fork, then look for drops again. The script restarts every workload with a pod Cilium doesn't manage, across the cluster, not only the peer. Outside `dev`, run it during a maintenance window.
 :::
 
 ### Match the Peer
@@ -170,7 +172,7 @@ In either kind of policy, match the other end of the flow with one of the select
 | An AWS API with a VPC endpoint | `toCIDR` on `vpcEndpointCidrs` | N/A | [IP/CIDR Based](https://docs.cilium.io/en/stable/security/policy/layer3/#cidr-based) | [`charts/external-dns/templates/network-policy.yaml`](../charts/external-dns/templates/network-policy.yaml) |
 | S3, or anything outside AWS | `toEntities: [world]` | N/A | [Entities Based](https://docs.cilium.io/en/stable/security/policy/layer3/#entities-based) | [`network-policy-single-binary.yaml`](../charts/monitoring/loki/templates/network-policy-single-binary.yaml) |
 
-For an AWS API, the catalog injects the endpoint's IPs in `vpcEndpointCidrs`, see [Pass Terraform Values to an App](/docs/applications/pass-terraform-values-to-an-app/). If the service has no endpoint yet, add it to `endpoint_host_offsets` and `app_param_key_map` in the catalog's [`pipelines/network.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/pipelines/network.hcl).
+For an AWS API, pass the endpoint's IPs to your app in `vpcEndpointCidrs` through `appParams`, as in [Pass Terraform Values to an App](/docs/applications/pass-terraform-values-to-an-app/) (e.g. `external-dns-private` in the catalog's [`units/eks/addons/argocd/app_of_apps/terragrunt.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl)). If the service isn't in `app_param_key_map` in the catalog's [`pipelines/network.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/pipelines/network.hcl), add it there. If it isn't in `endpoint_host_offsets` either, it has no endpoint yet: add it there too, with an unused offset.
 
 :::warning
 Only [Layer 3](https://docs.cilium.io/en/stable/security/policy/layer3/) and [Layer 4](https://docs.cilium.io/en/stable/security/policy/layer4/) rules work. Cilium doesn't support [Layer 7](https://docs.cilium.io/en/stable/security/policy/layer7/) rules (e.g. HTTP paths) when chained to the AWS VPC CNI, as in EKS Forge (see Cilium's [AWS VPC CNI chaining](https://docs.cilium.io/en/stable/installation/cni-chaining-aws-cni/) limitations). [`toFQDNs`](https://docs.cilium.io/en/stable/security/policy/layer3/#dns-based) doesn't work either, since it needs a Layer 7 DNS rule.
