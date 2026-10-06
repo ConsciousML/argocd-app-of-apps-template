@@ -4,7 +4,7 @@
 
 The [`network-policies-kube-system` chart](./) renders the `CiliumNetworkPolicy` rules for `kube-system` addons managed by Terraform or EKS: `coredns`, `metrics-server`, `karpenter`, `ebs-csi-controller`, `ebs-csi-node`, `hubble-relay`, and `hubble-ui`. None has an ArgoCD-owned chart to hold its own `templates/network-policy.yaml`.
 
-For how `CiliumNetworkPolicy` enforcement works, read [`docs/network-policies.md`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/docs/network-policies.md) in the catalog.
+For how `CiliumNetworkPolicy` enforcement works, and why these policies live here, see [How Network Policies Work](/docs/security/how-network-policies-work/#avoiding-a-lockout).
 
 ## What's Inside
 
@@ -15,21 +15,6 @@ For how `CiliumNetworkPolicy` enforcement works, read [`docs/network-policies.md
 - **[placeholder-values.yaml](placeholder-values.yaml)**: used only by `scripts/validate-helm.sh`, so standalone `helm template` and kubeconform pass
 
 {{ template "chart.valuesSection" . }}
-
-## Sync Order
-
-<!-- MIGRATE: explanation, move to the site's explanation docs -->
-This Application syncs at an earlier wave than `network-policies-cluster-wide`, so these allow rules exist before `kube-system` (already in [`default-deny.yaml`](../../../manifests/network-policies/cluster-wide/default-deny.yaml)'s namespace list) gets denied. [`manifests/network-policies/argocd`](../../../manifests/network-policies/argocd/README.md) follows the same reasoning.
-
-## Pods Without a Policy
-
-<!-- MIGRATE: explanation, move to the site's explanation docs -->
-`aws-node`, `kube-proxy`, `cilium`, `cilium-operator`, and `eks-pod-identity-agent` have no policy here. They're all `hostNetwork: true`, which Cilium collapses into the single per-node `reserved:host` identity when host firewall isn't enabled. There's no distinct endpoint to attach a `CiliumNetworkPolicy` to, and `default-deny.yaml`'s namespace-scoped selector can't reach `reserved:host` either. Confirmed empirically: restarting each of them produced zero Hubble-visible flows.
-
-## Shared Egress
-
-<!-- MIGRATE: explanation, move to the site's explanation docs -->
-`network-policy-shared-egress.yaml` covers pods from other Applications too, because Cilium enforces by pod labels and namespace, not by which Application created the resource.
 
 ## Upstream Dependencies
 

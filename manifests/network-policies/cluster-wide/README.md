@@ -24,8 +24,3 @@ endpointSelector:
 ## Onboarding a Namespace
 
 See [Write Network Policies](/docs/security/write-network-policies/).
-
-## History
-
-<!-- MIGRATE: explanation, move to the site's explanation docs -->
-`default-deny.yaml` replaces the per-namespace default-deny `CiliumNetworkPolicy` files.
