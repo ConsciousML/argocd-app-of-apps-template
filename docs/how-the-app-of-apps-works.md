@@ -119,7 +119,7 @@ When a pod can't fit on the existing nodes, [Karpenter](https://karpenter.sh/) l
 So every Application that runs pods is held to wave `3` or later, even without a real dependency on the DaemonSets. The `DaemonSets Priority` comment in [`apps/values.yaml`](../apps/values.yaml) marks the entries this rule applies to.
 
 ## Namespaces
-[`apps/templates/applications.yaml`](../apps/templates/applications.yaml) sets `CreateNamespace=false` on every child Application, so none of them can create its own namespace. Instead, the `namespaces` Application creates them all from [`manifests/namespaces`](../manifests/namespaces/), each with its [security](/docs/security/) labels.
+[`apps/templates/applications.yaml`](../apps/templates/applications.yaml) sets `CreateNamespace=false` on every child Application, so none of them can create its own namespace. Instead, the `namespaces` Application creates them all from [`manifests/namespaces`](../manifests/namespaces/), each with its [Pod Security Admission](https://kubernetes.io/docs/concepts/security/pod-security-admission/) labels.
 
 This way, no application can end up in a namespace without those labels. An application whose namespace is missing from `manifests/namespaces` fails to sync instead.
 
