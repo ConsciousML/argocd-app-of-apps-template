@@ -2,7 +2,7 @@
 
 # `podinfo` Manifests Reference
 
-The [`podinfo` manifests](./) deploy [stefanprodan/podinfo](https://github.com/stefanprodan/podinfo), a sample app used to verify an end-to-end deploy, meant to be swapped for a real app in a fork. Exposes `/metrics`, scraped via the bundled `ServiceMonitor`. Also demos an HPA on CPU, see [Load Testing](../../docs/load-testing.md).
+The [`podinfo` manifests](./) deploy [stefanprodan/podinfo](https://github.com/stefanprodan/podinfo), a sample app used to verify an end-to-end deploy, meant to be swapped for a real app in a fork. Exposes `/metrics`, scraped via the bundled `ServiceMonitor`. Also demos an HPA on CPU, see [How Load Testing Works](/docs/applications/load-testing/how-load-testing-works/).
 
 ## What's Inside
 
