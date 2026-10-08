@@ -17,7 +17,7 @@ rollout of the current one.
 Check first with `argocd account get-user-info`. If it reports logged in, skip this step.
 
 Otherwise, confirm Tailscale is connected, then log in with the command from
-[Log in to ArgoCD](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/README.md#log-in-to-argocd)
+[Log in to ArgoCD](https://github.com/ConsciousML/eks-forge-catalog/blob/main/README.md#log-in-to-argocd)
 in the catalog repo's README.
 
 ## The loop

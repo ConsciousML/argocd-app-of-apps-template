@@ -15,5 +15,5 @@ The [`blackbox-exporter` chart](./) deploys [blackbox-exporter](https://github.c
 
 ## Upstream Dependencies
 
-- **[`app_of_apps`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl)** (catalog): injects `serviceMonitor.targets` from [`domains.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/pipelines/dev/eks/domains.hcl)
+- **[`app_of_apps`](https://github.com/ConsciousML/eks-forge-catalog/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl)** (catalog): injects `serviceMonitor.targets` from [`domains.hcl`](https://github.com/ConsciousML/eks-forge-catalog/blob/main/pipelines/dev/eks/domains.hcl)
 - **[`kube-prometheus-stack`](../kube-prometheus-stack)**: Alertmanager routes these alerts by their `component: uptime` label

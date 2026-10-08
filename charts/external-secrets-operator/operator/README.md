@@ -45,4 +45,4 @@ For setup steps, read [How to Pass a Secret to an App](/docs/applications/pass-a
 
 ## Upstream Dependencies
 
-- **[`external_secrets_operator`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/eks/addons/external_secrets_operator)** (catalog): provisions the IAM role this controller's service account assumes via Pod Identity, scoped to secrets prefixed with the environment name
+- **[`external_secrets_operator`](https://github.com/ConsciousML/eks-forge-catalog/tree/main/units/eks/addons/external_secrets_operator)** (catalog): provisions the IAM role this controller's service account assumes via Pod Identity, scoped to secrets prefixed with the environment name

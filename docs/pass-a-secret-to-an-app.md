@@ -114,7 +114,7 @@ Create a unit that stores your secret in AWS Secrets Manager, by following the *
 <Tabs groupId="secret-source">
 <TabItem value="generated" label="Generated password">
 
-Use the [`aws_secret_password` module](/docs/reference/terraform_modules/aws_secret_password/). It stores the password under the `plaintext` key, and its bcrypt hash under `bcrypt_hash`. For example, Grafana's unit, [`units/eks/addons/prometheus_stack/grafana/aws_secret_password/terragrunt.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/prometheus_stack/grafana/aws_secret_password/terragrunt.hcl):
+Use the [`aws_secret_password` module](/docs/reference/terraform_modules/aws_secret_password/). It stores the password under the `plaintext` key, and its bcrypt hash under `bcrypt_hash`. For example, Grafana's unit, [`units/eks/addons/prometheus_stack/grafana/aws_secret_password/terragrunt.hcl`](https://github.com/ConsciousML/eks-forge-catalog/blob/main/units/eks/addons/prometheus_stack/grafana/aws_secret_password/terragrunt.hcl):
 ```hcl
 terraform {
   source = "git::git@github.com:${include.root.locals.github_owner_catalog}/${include.root.locals.github_repo_name_catalog}.git//modules/aws_secret_password/?ref=${values.version}"
@@ -131,7 +131,7 @@ inputs = {
 </TabItem>
 <TabItem value="other" label="Other value">
 
-Use the [`aws_secretsmanager_secret` module](/docs/reference/terraform_modules/aws_secretsmanager_secret/). It stores each key you set in `secret_data`, which your `remoteProperty` values must match. For example, the Slack bot token Alertmanager reads, in [`units/eks/addons/prometheus_stack/alertmanager/aws_secret_slack_bot/terragrunt.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/prometheus_stack/alertmanager/aws_secret_slack_bot/terragrunt.hcl):
+Use the [`aws_secretsmanager_secret` module](/docs/reference/terraform_modules/aws_secretsmanager_secret/). It stores each key you set in `secret_data`, which your `remoteProperty` values must match. For example, the Slack bot token Alertmanager reads, in [`units/eks/addons/prometheus_stack/alertmanager/aws_secret_slack_bot/terragrunt.hcl`](https://github.com/ConsciousML/eks-forge-catalog/blob/main/units/eks/addons/prometheus_stack/alertmanager/aws_secret_slack_bot/terragrunt.hcl):
 ```hcl
 terraform {
   source = "git::git@github.com:${include.root.locals.github_owner_catalog}/${include.root.locals.github_repo_name_catalog}.git//modules/aws_secretsmanager_secret/?ref=${values.version}"
@@ -153,7 +153,7 @@ The dev stack passes it `bot_token` from an environment variable, with `bot_toke
 </Tabs>
 
 :::warning
-Prefix the secret's name with `${include.root.locals.environment}-`, as in [Read Shared Config](/docs/iac/add-a-unit/#read-shared-config). ESO's [IAM role](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/external_secrets_operator/iam_role/terragrunt.hcl) can only read secrets whose name starts with the environment, so any other name fails the sync.
+Prefix the secret's name with `${include.root.locals.environment}-`, as in [Read Shared Config](/docs/iac/add-a-unit/#read-shared-config). ESO's [IAM role](https://github.com/ConsciousML/eks-forge-catalog/blob/main/units/eks/addons/external_secrets_operator/iam_role/terragrunt.hcl) can only read secrets whose name starts with the environment, so any other name fails the sync.
 :::
 
 Then:
@@ -162,7 +162,7 @@ Then:
 
 ### Pass the Secret to ESO
 
-In the `argocd_app_of_apps` unit, [`units/eks/addons/argocd/app_of_apps/terragrunt.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl), read your unit's `secret_name` output, as in [Read Other Units' Outputs](/docs/iac/add-a-unit/#read-other-units-outputs). For example, for Alertmanager:
+In the `argocd_app_of_apps` unit, [`units/eks/addons/argocd/app_of_apps/terragrunt.hcl`](https://github.com/ConsciousML/eks-forge-catalog/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl), read your unit's `secret_name` output, as in [Read Other Units' Outputs](/docs/iac/add-a-unit/#read-other-units-outputs). For example, for Alertmanager:
 ```hcl
 dependency "alertmanager_slack_bot_secret" {
   config_path = "../../prometheus_stack/alertmanager/aws_secret_slack_bot"

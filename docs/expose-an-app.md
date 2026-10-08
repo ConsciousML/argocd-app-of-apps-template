@@ -161,7 +161,7 @@ For the rest of the policy, see [Write Network Policies](/docs/security/write-ne
 
 ### Add the Hostname
 
-In [`pipelines/dns.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/pipelines/dns.hcl), add your app's subdomain. Keep it a single label (no dot), since the wildcard certificate only covers one level. For example, for podinfo:
+In [`pipelines/dns.hcl`](https://github.com/ConsciousML/eks-forge-catalog/blob/main/pipelines/dns.hcl), add your app's subdomain. Keep it a single label (no dot), since the wildcard certificate only covers one level. For example, for podinfo:
 ```hcl
 locals {
   ...
@@ -169,7 +169,7 @@ locals {
 }
 ```
 
-Then, in [`pipelines/dev/eks/domains.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/pipelines/dev/eks/domains.hcl), build the full hostname under your gateway's domain:
+Then, in [`pipelines/dev/eks/domains.hcl`](https://github.com/ConsciousML/eks-forge-catalog/blob/main/pipelines/dev/eks/domains.hcl), build the full hostname under your gateway's domain:
 
 <Tabs groupId="gateway">
 <TabItem value="public" label="Public">
@@ -198,7 +198,7 @@ See the [HCL Configuration](/docs/reference/hcl_configuration/#domainshcl) refer
 
 ### Inject the Hostname
 
-In the `argocd_app_of_apps` unit, [`units/eks/addons/argocd/app_of_apps/terragrunt.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl), read your hostname from `domains.hcl` in `locals`. Then, under `inputs.helm_values.appParams`, set it as the `host` of your `<app>-httproute` key (see [Add the `appParams` Entry](/docs/applications/pass-terraform-values-to-an-app/#add-the-appparams-entry)):
+In the `argocd_app_of_apps` unit, [`units/eks/addons/argocd/app_of_apps/terragrunt.hcl`](https://github.com/ConsciousML/eks-forge-catalog/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl), read your hostname from `domains.hcl` in `locals`. Then, under `inputs.helm_values.appParams`, set it as the `host` of your `<app>-httproute` key (see [Add the `appParams` Entry](/docs/applications/pass-terraform-values-to-an-app/#add-the-appparams-entry)):
 
 <Tabs groupId="gateway">
 <TabItem value="public" label="Public">

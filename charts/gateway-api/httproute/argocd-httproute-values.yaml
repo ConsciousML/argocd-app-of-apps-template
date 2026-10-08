@@ -1,4 +1,4 @@
-# host is injected by the catalog (terragrunt-template-catalog-eks) via appParams, from
+# host is injected by the catalog (eks-forge-catalog) via appParams, from
 # domains.hcl. See units/eks/addons/argocd/app_of_apps in that repo. Not set here.
 name: argocd-server
 rules:

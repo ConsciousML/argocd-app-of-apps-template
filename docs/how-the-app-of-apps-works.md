@@ -1,7 +1,7 @@
 {/* This doc is aggregated into the EKS Forge documentation site: https://eks-forge.readthedocs.io/latest/. It is not meant to be read directly in this repository. */}
 # How the App of Apps Repository Works
 
-The [app of apps repository](https://github.com/ConsciousML/argocd-app-of-apps-template) holds everything [ArgoCD](https://argo-cd.readthedocs.io/en/stable/) deploys inside your cluster, from controllers like the AWS Load Balancer Controller to your own applications. This page explains why it's structured the way it is.
+The [app of apps repository](https://github.com/ConsciousML/eks-forge-app-of-apps) holds everything [ArgoCD](https://argo-cd.readthedocs.io/en/stable/) deploys inside your cluster, from controllers like the AWS Load Balancer Controller to your own applications. This page explains why it's structured the way it is.
 
 ## What Is the App of Apps Pattern
 ArgoCD deploys Kubernetes resources through [Applications](https://argo-cd.readthedocs.io/en/stable/core_concepts/): each one points at a path in a git repository and keeps the cluster in sync with it. An Application is itself a Kubernetes resource, so an Application can deploy other Applications.
@@ -39,7 +39,7 @@ A child Application is an entry, not a directory. Several entries can share one 
 
 ## Who Owns What
 Two repositories deploy what runs in your cluster:
-- The [catalog](https://github.com/ConsciousML/terragrunt-template-catalog-eks) owns the AWS resources (IAM roles, Pod Identity associations, secrets, certificates, etc.), the root Application, and every value from a Terraform module.
+- The [catalog](https://github.com/ConsciousML/eks-forge-catalog) owns the AWS resources (IAM roles, Pod Identity associations, secrets, certificates, etc.), the root Application, and every value from a Terraform module.
 - The app of apps repository owns the charts, the manifests, the list of Applications, and their default values.
 
 This split keeps each change in one place. An application change ships through ArgoCD without a Terraform apply. And values that depend on the deployment, like a certificate ARN or a hostname, never get hardcoded in the app of apps repository: the catalog injects them at deploy time.
@@ -58,7 +58,7 @@ flowchart LR
     params -->|key| k3["aws-lbc"] -->|values| v3["vpcEndpointCidrs"] --> c3["Application<br/>aws-lbc"]
 ```
 
-The [`argocd_app_of_apps` unit](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl) sets `appParams` as a Helm value on the root Application. For each entry in `apps/values.yaml`, [`apps/templates/applications.yaml`](../apps/templates/applications.yaml) looks up `appParams.<name>` and passes it to the child as its Helm values.
+The [`argocd_app_of_apps` unit](https://github.com/ConsciousML/eks-forge-catalog/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl) sets `appParams` as a Helm value on the root Application. For each entry in `apps/values.yaml`, [`apps/templates/applications.yaml`](../apps/templates/applications.yaml) looks up `appParams.<name>` and passes it to the child as its Helm values.
 
 `appParams` is a map. Each key is an Application's `name`, and it maps to the Helm values that Application receives. For example, the catalog gives `podinfo-httproute` its hostname:
 ```hcl

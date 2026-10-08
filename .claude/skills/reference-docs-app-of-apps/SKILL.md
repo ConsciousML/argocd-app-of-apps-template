@@ -3,11 +3,11 @@ name: reference-docs-app-of-apps
 description: Rules for writing or editing a reference doc in this repo, a chart README.md.gotmpl, a values.yaml comment, or a manifest README. Use before writing or editing one. Not for tutorials, how-tos, or explanations.
 ---
 
-Follow these terragrunt-template-catalog-eks skills first. These rules extend them and don't
+Follow these eks-forge-catalog skills first. These rules extend them and don't
 repeat them:
 
-- Docs: [`reference-docs-catalog`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/.claude/skills/reference-docs-catalog/SKILL.md)
-- Comments: [`inline-comments-catalog`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/.claude/skills/inline-comments-catalog/SKILL.md)
+- Docs: [`reference-docs-catalog`](https://github.com/ConsciousML/eks-forge-catalog/blob/main/.claude/skills/reference-docs-catalog/SKILL.md)
+- Comments: [`inline-comments-catalog`](https://github.com/ConsciousML/eks-forge-catalog/blob/main/.claude/skills/inline-comments-catalog/SKILL.md)
 
 ## Scope
 

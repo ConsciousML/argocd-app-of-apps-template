@@ -353,7 +353,7 @@ applications:
         # operator); bundled subcharts (grafana, kube-state-metrics, node-exporter) derive
         # their own names from the release name instead, which backendRefs rely on. Must
         # match the catalog's local.kube_prometheus_stack_release (units/eks/addons/argocd/
-        # app_of_apps/terragrunt.hcl in terragrunt-template-catalog-eks).
+        # app_of_apps/terragrunt.hcl in eks-forge-catalog).
         releaseName: kube-prometheus-stack
     extraValueFiles:
       - charts/external-secrets-operator/secret-sync/grafana-secrets-values.yaml

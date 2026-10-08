@@ -39,4 +39,4 @@ The [`goldilocks` chart](./) deploys the [Goldilocks](https://goldilocks.docs.fa
 ## Upstream Dependencies
 
 - **[`vpa`](../vpa/)**: the VPA recommender and CRD that Goldilocks reads recommendations from
-- **EKS `metrics-server` addon** ([terragrunt-template-catalog-eks](https://github.com/ConsciousML/terragrunt-template-catalog-eks)): required by the VPA recommender, not by Goldilocks directly
+- **EKS `metrics-server` addon** ([eks-forge-catalog](https://github.com/ConsciousML/eks-forge-catalog)): required by the VPA recommender, not by Goldilocks directly

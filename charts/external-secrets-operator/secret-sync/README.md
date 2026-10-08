@@ -40,5 +40,5 @@ For setup steps, read [How to Pass a Secret to an App](/docs/applications/pass-a
 
 ## Upstream Dependencies
 
-- **[`app_of_apps`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl)** (catalog): injects the [AWS Source](#aws-source) values via `appParams`
+- **[`app_of_apps`](https://github.com/ConsciousML/eks-forge-catalog/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl)** (catalog): injects the [AWS Source](#aws-source) values via `appParams`
 - **[`external-secrets-operator`](../operator)**: installs the `SecretStore` and `ExternalSecret` CRDs and reconciles them
