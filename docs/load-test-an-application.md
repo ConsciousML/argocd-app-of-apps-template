@@ -10,9 +10,7 @@ Every file below goes next to your app's files: in `manifests/<name>/` for plain
 
 ## Add an HPA
 
-If your app already has an HPA, or must keep a fixed number of replicas, skip to [Write the k6 Script](#write-the-k6-script).
-
-Otherwise, add a [`HorizontalPodAutoscaler`](https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/) that targets your app's `Deployment`, with its range of replicas and the CPU usage to hold. For example, [`manifests/podinfo/podinfo-hpa.yaml`](../manifests/podinfo/podinfo-hpa.yaml):
+If your app must scale its pods with the load and has no HPA yet, add a [`HorizontalPodAutoscaler`](https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/) that targets your app's `Deployment`, with its range of replicas and the CPU usage to hold. For example, [`manifests/podinfo/podinfo-hpa.yaml`](../manifests/podinfo/podinfo-hpa.yaml):
 ```yaml
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -113,6 +111,8 @@ spec:
             ...
 ```
 
+For its other fields, see Kubernetes' [CronJob](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/) docs.
+
 It runs k6 on the `elastic` NodePool. To place it elsewhere, see [Schedule Pods](/docs/compute/schedule-pods/).
 
 ## Allow the Traffic
@@ -180,7 +180,10 @@ In another terminal, watch the HPA add replicas as the load grows, then remove t
 kubectl get hpa -n <namespace> -w
 ```
 
-If its `TARGETS` column shows `<unknown>`, a container has no CPU `requests` (see [Add an HPA](#add-an-hpa)).
+If its `TARGETS` column still shows `<unknown>` after a minute, the HPA can't read the CPU usage. Its events say why, most often a container with no CPU `requests` (see [Add an HPA](#add-an-hpa)):
+```bash
+kubectl describe hpa -n <namespace>
+```
 
 If every request fails, a network policy is dropping them. See [Find Dropped Traffic](/docs/security/write-network-policies/#find-dropped-traffic).
 
