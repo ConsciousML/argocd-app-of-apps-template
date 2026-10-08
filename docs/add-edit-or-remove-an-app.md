@@ -14,7 +14,7 @@ git checkout -b <branch>
 git push -u origin <branch>
 ```
 
-If your change needs one of the [Extra Steps](#extra-steps) other than a different config per environment, or removes an app that receives Terraform values, it also touches your catalog fork. Create a branch from the root of your catalog fork too:
+If your change needs one of the [Extra Steps](#extra-steps) other than a different config per environment or metrics in Prometheus, or removes an app that receives Terraform values, it also touches your catalog fork. Create a branch from the root of your catalog fork too:
 ```bash
 git checkout -b <branch>
 git push -u origin <branch>
@@ -116,6 +116,7 @@ Depending on what your app needs, also follow:
 - **A secret** (e.g. a password): [Pass a Secret to an App](/docs/applications/pass-a-secret-to-an-app/).
 - **A hostname**: [Expose an App](/docs/applications/expose-an-app/).
 - **A different config per environment**: [Configure an App per Environment](/docs/applications/configure-an-app-per-environment/).
+- **Metrics in Prometheus**: [Monitor a New App](/docs/monitoring/monitor-a-new-app/).
 - **An AWS resource** (e.g. an S3 bucket or an IAM role): [Add a Unit](/docs/iac/add-a-unit/).
 
 ## Edit an App
