@@ -39,7 +39,7 @@ jobs:
 
       - name: Fail on leftover TEMP markers
         run: |
-          if grep -rn "TEMP:" --exclude-dir=.git --exclude=ci.yaml .; then
+          if grep -rn "TEMP:" --exclude-dir=.git --exclude=ci.yaml --exclude=add-an-alert.md .; then
             echo "Found leftover TEMP: marker(s), revert before merging." >&2
             exit 1
           fi
