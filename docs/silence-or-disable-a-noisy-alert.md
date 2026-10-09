@@ -5,7 +5,7 @@ import TabItem from '@theme/TabItem';
 
 # How to Silence or Disable a Noisy Alert
 
-This guide shows you how to stop an alert from posting to Slack, either for a while with a [silence](https://prometheus.io/docs/alerting/latest/alertmanager/#silences) in [Alertmanager](https://prometheus.io/docs/alerting/latest/alertmanager/), or for good by disabling its rule. You need it when an alert keeps firing and there's nothing for you to fix.
+This guide shows you how to stop an alert from posting to Slack, either temporarily with a [silence](https://prometheus.io/docs/alerting/latest/alertmanager/#silences) in [Alertmanager](https://prometheus.io/docs/alerting/latest/alertmanager/), or permanently by disabling its rule. You need it when an alert keeps firing and there's nothing for you to fix.
 
 Pick the one that fits your alert:
 - **Silence**: the alert is right, but you can't act on it now (e.g. during a maintenance, or an incident you're already fixing). A silence expires on its own, and changes nothing in your forks.
@@ -32,7 +32,7 @@ Click **Preview Alerts** to list the alerts your silence mutes, then **Create**.
 
 The alert keeps firing in Prometheus: only its Slack messages stop. If it still fires when the silence expires, its messages resume.
 
-To end a silence early, click **Silences** in the top menu, find yours, then click **Expire** and **Confirm**.
+To lift a silence before it expires, click **Silences** in the top menu, find yours, then click **Expire** and **Confirm**.
 
 :::warning
 Never silence `Watchdog`. It always fires, and its messages in `#<environment>-watchdog` are how you know alerts still reach Slack.
