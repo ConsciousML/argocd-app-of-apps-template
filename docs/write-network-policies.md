@@ -50,7 +50,7 @@ Oct  2 10:15:07.208: monitoring/prometheus-kube-prometheus-stack-prometheus-0:51
 `EGRESS DENIED` means the source's policies lack the rule (here, `my-app` resolving DNS). `INGRESS DENIED` means the destination's policies lack it (here, Prometheus scraping `my-app`).
 
 :::warning
-If a drop shows `world` where you expect a pod, that pod may have started before Cilium's agent on its node, so Cilium doesn't manage it. Restart it, or run [`scripts/restart-missing-cilium-endpoints.sh`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/scripts/restart-missing-cilium-endpoints.sh) from the root of your catalog fork, then look for drops again. The script restarts every workload with a pod Cilium doesn't manage, across the cluster, not only the peer. Outside `dev`, run it during a maintenance window.
+If a drop shows `world` where you expect a pod, that pod may have started before Cilium's agent on its node, so Cilium doesn't manage it. Restart it, or run [`scripts/restart-missing-cilium-endpoints.sh`](https://github.com/ConsciousML/eks-forge-catalog/blob/main/scripts/restart-missing-cilium-endpoints.sh) from the root of your catalog fork, then look for drops again. The script restarts every workload with a pod Cilium doesn't manage, across the cluster, not only the peer. Outside `dev`, run it during a maintenance window.
 :::
 
 ## Allow Each Dropped Flow
@@ -203,11 +203,11 @@ If no file matches, the policy is named after its Helm release (`{{ .Release.Nam
 
 For an AWS API with a VPC endpoint, the pod reaches the endpoint's fixed IPs, which the catalog passes to your chart in `vpcEndpointCidrs`.
 
-If the service has no endpoint yet (it isn't in `endpoint_host_offsets` in the catalog's [`pipelines/network.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/pipelines/network.hcl)), add one first by following [Add a VPC Endpoint](/docs/iac/add-a-vpc-endpoint/).
+If the service has no endpoint yet (it isn't in `endpoint_host_offsets` in the catalog's [`pipelines/network.hcl`](https://github.com/ConsciousML/eks-forge-catalog/blob/main/pipelines/network.hcl)), add one first by following [Add a VPC Endpoint](/docs/iac/add-a-vpc-endpoint/).
 
 Whether or not you added it, check `app_param_key_map` in the same file. If the service isn't there, add it. Its value is the key your chart reads under `vpcEndpointCidrs`.
 
-Then pass `vpcEndpointCidrs.<key>` to your chart by following [Pass Terraform Values to an App](/docs/applications/pass-terraform-values-to-an-app/), reading it from `dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.<key>`. For example, `external-dns-private` in the catalog's [`units/eks/addons/argocd/app_of_apps/terragrunt.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl):
+Then pass `vpcEndpointCidrs.<key>` to your chart by following [Pass Terraform Values to an App](/docs/applications/pass-terraform-values-to-an-app/), reading it from `dependency.vpc_endpoint_cidrs.outputs.vpc_endpoint_cidrs.<key>`. For example, `external-dns-private` in the catalog's [`units/eks/addons/argocd/app_of_apps/terragrunt.hcl`](https://github.com/ConsciousML/eks-forge-catalog/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl):
 ```hcl
 "external-dns-private" = {
   vpcEndpointCidrs = {

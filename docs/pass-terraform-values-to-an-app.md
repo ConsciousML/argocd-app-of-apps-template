@@ -22,7 +22,7 @@ In your chart's `values.yaml`, set the value to empty, with a comment saying the
 
 Set the value at the top level. For example, the Tailscale connector's name, hostname prefix, and advertised routes, in [`charts/tailscale/connector/values.yaml`](../charts/tailscale/connector/values.yaml):
 ```yaml
-# Injected per instance by the catalog (terragrunt-template-catalog-eks) via appParams,
+# Injected per instance by the catalog (eks-forge-catalog) via appParams,
 # from the EKS cluster name and VPC CIDR. See units/eks/addons/argocd/app_of_apps in
 # that repo. No instance sets this itself.
 name: ""
@@ -36,7 +36,7 @@ advertiseRoutes: []
 Nest the value under the dependency's `name` from your `Chart.yaml`. For example, the AWS Load Balancer Controller's cluster name, region, and VPC ID, under its `aws-load-balancer-controller` dependency, in [`charts/aws-lbc/values.yaml`](../charts/aws-lbc/values.yaml):
 ```yaml
 aws-load-balancer-controller:
-  # Injected by the catalog (terragrunt-template-catalog-eks) via appParams, from the EKS
+  # Injected by the catalog (eks-forge-catalog) via appParams, from the EKS
   # cluster name, region, and VPC ID. See units/eks/addons/argocd/app_of_apps in that repo.
   clusterName: ""
   region: ""
@@ -108,7 +108,7 @@ For example, [`charts/tailscale/connector/placeholder-values.yaml`](../charts/ta
 ```yaml
 # Used only by scripts/validate-helm.sh so standalone `helm template` and
 # kubeconform pass. Real values are injected by the catalog
-# (terragrunt-template-catalog-eks) via appParams, from the EKS cluster name
+# (eks-forge-catalog) via appParams, from the EKS cluster name
 # and VPC CIDR. See units/eks/addons/argocd/app_of_apps in that repo.
 name: "placeholder-connector"
 hostnamePrefix: "placeholder-cluster"
@@ -123,7 +123,7 @@ Nest the dummies as in `values.yaml`. For example, [`charts/aws-lbc/placeholder-
 ```yaml
 # Used only by scripts/validate-helm.sh so standalone `helm template` and
 # kubeconform pass. Real values are injected by the catalog
-# (terragrunt-template-catalog-eks) via appParams, from the EKS cluster name, region, and
+# (eks-forge-catalog) via appParams, from the EKS cluster name, region, and
 # VPC ID. See units/eks/addons/argocd/app_of_apps in that repo.
 ...
 aws-load-balancer-controller:
@@ -189,7 +189,7 @@ appParams:
 
 ### Read the Value
 
-Open the `argocd_app_of_apps` unit, [`units/eks/addons/argocd/app_of_apps/terragrunt.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl). Depending on where the value comes from:
+Open the `argocd_app_of_apps` unit, [`units/eks/addons/argocd/app_of_apps/terragrunt.hcl`](https://github.com/ConsciousML/eks-forge-catalog/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl). Depending on where the value comes from:
 - **Shared configuration** (e.g. the region): find the file that holds it in the [HCL Configuration](/docs/reference/hcl_configuration/) reference, and read it as in [Read Shared Config](/docs/iac/add-a-unit/#read-shared-config).
 - **An output of a unit the file already reads outputs from** (e.g. `vpc`): you already have it, go on to [Add the `appParams` Entry](#add-the-appparams-entry).
 - **An output of any other unit**: read it as in [Read Other Units' Outputs](/docs/iac/add-a-unit/#read-other-units-outputs).

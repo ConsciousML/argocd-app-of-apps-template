@@ -65,7 +65,7 @@ Keep `{{ template "chart.valuesSection" . }}` as is, between `## What's Inside` 
 
 Under `## Upstream Dependencies`, add one bullet per component the chart needs, such as the catalog unit that injects its values via `appParams`, or another chart. Say what the chart needs from it. Don't list the components that depend on the chart. For example, in [`charts/monitoring/blackbox-exporter/README.md.gotmpl`](../charts/monitoring/blackbox-exporter/README.md.gotmpl):
 ```markdown
-- **[`app_of_apps`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl)** (catalog): injects `serviceMonitor.targets` from [`domains.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/pipelines/dev/eks/domains.hcl)
+- **[`app_of_apps`](https://github.com/ConsciousML/eks-forge-catalog/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl)** (catalog): injects `serviceMonitor.targets` from [`domains.hcl`](https://github.com/ConsciousML/eks-forge-catalog/blob/main/pipelines/dev/eks/domains.hcl)
 - **[`kube-prometheus-stack`](../kube-prometheus-stack)**: Alertmanager routes these alerts by their `component: uptime` label
 ```
 

@@ -56,7 +56,7 @@ vpa:
     # -- Disabled, so pods are never resized at admission.
     # @section -- Disabled Components
     enabled: false
-  # Provisioned as the EKS-managed metrics-server addon (terragrunt-template-catalog-eks),
+  # Provisioned as the EKS-managed metrics-server addon (eks-forge-catalog),
   # not by this chart.
   metrics-server:
     # -- Disabled, metrics-server is the EKS addon instead.

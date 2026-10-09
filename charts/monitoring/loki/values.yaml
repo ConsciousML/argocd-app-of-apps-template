@@ -42,7 +42,7 @@ loki:
       # @section -- Loki Config
       replication_factor: 3
 
-    # Injected by the catalog (terragrunt-template-catalog-eks) via appParams, from the
+    # Injected by the catalog (eks-forge-catalog) via appParams, from the
     # units/eks/addons/loki/s3 buckets and the EKS cluster's region. See
     # units/eks/addons/argocd/app_of_apps in that repo. No instance sets this itself.
     # -- S3 `chunks` and `ruler` bucket names and region. Injected by the catalog via `appParams`.

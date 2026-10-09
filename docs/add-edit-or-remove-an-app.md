@@ -130,7 +130,7 @@ Delete:
 - The app's directory under `manifests/` or `charts/`. Skip it if another entry shares it (e.g. `charts/gateway-api/httproute`), and delete only the app's own values file instead.
 - The app's entry in [`apps/values.yaml`](../apps/values.yaml). Drop it from the `# Depends on:` comment of every entry that listed it, and recompute their `syncWave` (see [Set the Sync Wave](#set-the-sync-wave)).
 - The app's namespace from [`manifests/namespaces/`](../manifests/namespaces/) and [`manifests/network-policies/cluster-wide/`](../manifests/network-policies/cluster-wide/), if no other app runs in it.
-- The app's key in [`apps/values.schema.json`](../apps/values.schema.json) and under `appParams` in [`apps/placeholder-values.yaml`](../apps/placeholder-values.yaml), if it receives [Terraform values](/docs/applications/pass-terraform-values-to-an-app/). Also delete its entry under `appParams` in the catalog's [`argocd_app_of_apps` unit](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl).
+- The app's key in [`apps/values.schema.json`](../apps/values.schema.json) and under `appParams` in [`apps/placeholder-values.yaml`](../apps/placeholder-values.yaml), if it receives [Terraform values](/docs/applications/pass-terraform-values-to-an-app/). Also delete its entry under `appParams` in the catalog's [`argocd_app_of_apps` unit](https://github.com/ConsciousML/eks-forge-catalog/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl).
 - Any other reference to the app in the catalog's `argocd_app_of_apps` unit, such as its hostname in `locals` or its target under the `blackbox-exporter` entry of `appParams`.
 
 ## Test in Dev

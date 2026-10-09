@@ -47,4 +47,4 @@ For setup steps, read [How to Expose an App](/docs/applications/expose-an-app/).
 
 ## Upstream Dependencies
 
-- **[`external_dns`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/eks/addons/external_dns)** (catalog): provisions the IAM role each instance's `serviceAccount.name` assumes via Pod Identity
+- **[`external_dns`](https://github.com/ConsciousML/eks-forge-catalog/tree/main/units/eks/addons/external_dns)** (catalog): provisions the IAM role each instance's `serviceAccount.name` assumes via Pod Identity

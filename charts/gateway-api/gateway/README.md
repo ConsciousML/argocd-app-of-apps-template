@@ -42,5 +42,5 @@ Each template sets its own `argocd.argoproj.io/sync-wave`, ordering the three re
 
 ## Upstream Dependencies
 
-- **[`route53`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/eks/route53)** (catalog): its `acm_certificate` unit issues the wildcard certificate injected into `certificateArn`
+- **[`route53`](https://github.com/ConsciousML/eks-forge-catalog/tree/main/units/eks/route53)** (catalog): its `acm_certificate` unit issues the wildcard certificate injected into `certificateArn`
 - **[`gateway-class`](../gateway-class)**: both instances load its `values.yaml` via `extraValueFiles` to reference the same `gatewayClassName`

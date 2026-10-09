@@ -30,7 +30,7 @@ prometheus-blackbox-exporter:
       effect: NoSchedule
 
   # One ServiceMonitor per target, scraping /probe against that target's URL. Real targets
-  # injected by the catalog (terragrunt-template-catalog-eks) via appParams, from domains.hcl.
+  # injected by the catalog (eks-forge-catalog) via appParams, from domains.hcl.
   serviceMonitor:
     enabled: true
     defaults:

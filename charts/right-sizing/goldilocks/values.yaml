@@ -4,7 +4,7 @@ goldilocks:
     # -- Disabled, VPA is the separate [`vpa`](../vpa) chart.
     # @section -- Disabled Components
     enabled: false
-  # Provisioned as the EKS-managed metrics-server addon (terragrunt-template-catalog-eks),
+  # Provisioned as the EKS-managed metrics-server addon (eks-forge-catalog),
   # not by this chart.
   metrics-server:
     # -- Disabled, metrics-server is the EKS addon instead.

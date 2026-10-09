@@ -21,4 +21,4 @@ The chart bundles its own copy of the Gateway API CRDs. [`crds-aws-lbc-gateway-a
 
 ## Upstream Dependencies
 
-- **[`aws_load_balancer_controller`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/eks/addons/aws_load_balancer_controller)** (catalog): provisions the IAM role this controller's service account assumes via Pod Identity. See this app's entry in [`apps/values.yaml`](../../apps/values.yaml) for the `tool.helm.releaseName` pin that keeps the Helm release name matching that service account
+- **[`aws_load_balancer_controller`](https://github.com/ConsciousML/eks-forge-catalog/tree/main/units/eks/addons/aws_load_balancer_controller)** (catalog): provisions the IAM role this controller's service account assumes via Pod Identity. See this app's entry in [`apps/values.yaml`](../../apps/values.yaml) for the `tool.helm.releaseName` pin that keeps the Helm release name matching that service account

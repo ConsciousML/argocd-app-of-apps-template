@@ -13,5 +13,5 @@ The [`vpa` chart](./) deploys a recommender-only Kubernetes [Vertical Pod Autosc
 
 ## Upstream Dependencies
 
-- **EKS `metrics-server` addon** ([terragrunt-template-catalog-eks](https://github.com/ConsciousML/terragrunt-template-catalog-eks)): the recommender hard-depends on it for live resource usage
+- **EKS `metrics-server` addon** ([eks-forge-catalog](https://github.com/ConsciousML/eks-forge-catalog)): the recommender hard-depends on it for live resource usage
 - **[`kube-prometheus-stack`](../../monitoring/kube-prometheus-stack)**: Prometheus backfills the recommender's history at startup. Non-fatal if not ready yet

@@ -64,4 +64,4 @@ For per-environment overrides, read [Configure an App per Environment](/docs/app
 
 ## Upstream Dependencies
 
-- **[`units/eks/addons/loki`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/eks/addons/loki)** (catalog): provisions the two S3 buckets `loki.loki.storage.bucketNames` points at, and the Pod Identity association the `releaseName` in [`apps/values.yaml`](../../../apps/values.yaml) must match
+- **[`units/eks/addons/loki`](https://github.com/ConsciousML/eks-forge-catalog/tree/main/units/eks/addons/loki)** (catalog): provisions the two S3 buckets `loki.loki.storage.bucketNames` points at, and the Pod Identity association the `releaseName` in [`apps/values.yaml`](../../../apps/values.yaml) must match

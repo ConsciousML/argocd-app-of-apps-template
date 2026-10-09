@@ -24,7 +24,7 @@ For per-environment overrides, read [Configure an App per Environment](/docs/app
 
 ## Upstream Dependencies
 
-- **[`prometheus_stack`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/tree/main/units/eks/addons/prometheus_stack)** (catalog): `grafana/aws_secret_password` generates the admin password that `grafana-secrets` syncs in
-- **[`app_of_apps`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl)** (catalog): injects `fullnameOverride`, `environment`, and the Prometheus and Alertmanager `externalUrl` via `appParams`
+- **[`prometheus_stack`](https://github.com/ConsciousML/eks-forge-catalog/tree/main/units/eks/addons/prometheus_stack)** (catalog): `grafana/aws_secret_password` generates the admin password that `grafana-secrets` syncs in
+- **[`app_of_apps`](https://github.com/ConsciousML/eks-forge-catalog/blob/main/units/eks/addons/argocd/app_of_apps/terragrunt.hcl)** (catalog): injects `fullnameOverride`, `environment`, and the Prometheus and Alertmanager `externalUrl` via `appParams`
 - **[`storage-class-gp3`](../../../manifests/storage-class-gp3)**: provisions the `gp3` `StorageClass` both `prometheus` and `alertmanager` request for their persistent volumes
 - **[`alertmanager-secrets`](../../external-secrets-operator/secret-sync/alertmanager-secrets-values.yaml)**: syncs the Slack bot token `Secret` Alertmanager mounts
