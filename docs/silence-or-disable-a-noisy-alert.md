@@ -32,7 +32,7 @@ Click **Preview Alerts** to list the alerts your silence mutes, then **Create**.
 
 The alert keeps firing in Prometheus: only its Slack messages stop. If it still fires when the silence expires, its messages resume.
 
-To lift a silence before it expires, click **Silences** in the top menu, find yours, then click **Expire** and **Confirm**.
+To remove a silence before its duration ends, click **Silences** in the top menu, find yours, then click **Expire** and **Confirm**.
 
 :::warning
 Never silence `Watchdog`. It always fires, and its messages in `#<environment>-watchdog` are how you know alerts still reach Slack.
