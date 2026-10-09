@@ -5,7 +5,7 @@ import TabItem from '@theme/TabItem';
 
 # How to Add a Grafana Dashboard
 
-This guide shows you how to add a dashboard to [Grafana](https://grafana.com/oss/), through the values of the `kube-prometheus-stack` chart. You need it when you want to chart the metrics of an app or a tool, with a dashboard that's deployed with your cluster in every environment. It assumes the metrics are already in Prometheus (see [Monitor a New App](/docs/monitoring/monitor-a-new-app/)), and that you've created a branch in your app of apps fork, as in [Point Dev at Your Branch](/docs/applications/add-edit-or-remove-an-app/#point-dev-at-your-branch). It needs no change in your catalog fork.
+This guide shows you how to add a dashboard to [Grafana](https://grafana.com/oss/), through the values of the `kube-prometheus-stack` chart. You need it when you want to visualize the metrics of an app or a tool. It assumes the metrics are already in Prometheus (see [Monitor a New App](/docs/monitoring/monitor-a-new-app/)), and that you've created a branch in your app of apps fork, as in [Point Dev at Your Branch](/docs/applications/add-edit-or-remove-an-app/#point-dev-at-your-branch). It needs no change in your catalog fork.
 
 If you've never opened a Grafana dashboard, follow [Explore Your Metrics](/docs/monitoring/get-started/metrics/) first.
 
@@ -83,7 +83,7 @@ If the dashboard isn't on grafana.com, replace `gnetId` and `revision` with the 
 Build your dashboard in the Grafana of `dev`, then [export it as JSON](https://grafana.com/docs/grafana/latest/visualizations/dashboards/share-dashboards-panels/). Leave the option that exports it for another instance off, so its panels keep pointing at the `Prometheus` and `Loki` datasources, which have the same name in every environment.
 
 :::warning
-Grafana stores nothing on disk. A dashboard you build in its UI is lost when its pod restarts, so export it before you deploy.
+Grafana has no persistent volume. A dashboard you build in its UI is lost when its pod is replaced, so export it before you deploy.
 :::
 
 In the same file, add an entry under `grafana.dashboards`, under the name of your provider. Its key is the name of the dashboard's file, so it must be unique within the folder. Paste the JSON under its `json` key:
@@ -118,7 +118,13 @@ Deploy your change to `dev` by following [Test in Dev](/docs/applications/add-ed
 
 Grafana is only reachable over [Tailscale](/docs/security/tailscale/). Connect by running `tailscale up`, then open `https://grafana.private.dev.<base_domain>` in your browser, replacing `<base_domain>` with your base domain, and log in as in [Log In to Grafana](/docs/monitoring/get-started/metrics/#log-in-to-grafana).
 
-In the left menu, click **Dashboards**, and open your folder. Your dashboard should be listed. Open it, and check that its panels show data.
+In the left menu, click **Dashboards**, and open your folder. Your dashboard should be listed. Open it, and check that its panels show data. If something is off, see [Troubleshooting](#troubleshooting).
+
+Then open a pull request and merge it, as in [Open a Pull Request](/docs/applications/add-edit-or-remove-an-app/#open-a-pull-request).
+
+To get alerted on the metrics you chart, see [Add an Alert](/docs/monitoring/alerting/add-an-alert/).
+
+## Troubleshooting
 
 If Grafana doesn't answer, or still shows the old dashboards, check that its new pod is running:
 ```bash
@@ -130,7 +136,3 @@ A pod stuck in `Init` couldn't download a dashboard. If the pod is running but y
 If your folder is missing, check that the `options.path` of your provider ends with its `name`, and that your entry under `dashboards` sits under that same name.
 
 If the panels show a datasource error, an input has no entry under `datasource`, or its `value` isn't the exact name of a datasource. If they show **No data**, run one of their queries in Prometheus, as in [Explore Your Metrics](/docs/monitoring/get-started/metrics/). An empty result means the dashboard expects metrics or labels your cluster doesn't have.
-
-Then open a pull request and merge it, as in [Open a Pull Request](/docs/applications/add-edit-or-remove-an-app/#open-a-pull-request).
-
-To get alerted on the metrics you chart, see [Add an Alert](/docs/monitoring/alerting/add-an-alert/).
