@@ -6,7 +6,7 @@ This guide shows you how to ship the changes merged in your [app of apps fork](/
 
 ## Point Live at Your App of Apps Fork
 
-From the root of your live fork, ensure these two values in [`live/github.hcl`](https://github.com/ConsciousML/terragrunt-template-live-eks/blob/main/live/github.hcl) point at your app of apps fork:
+From the root of your live fork, ensure these two values in [`live/github.hcl`](https://github.com/ConsciousML/eks-forge-live/blob/main/live/github.hcl) point at your app of apps fork:
 ```hcl
 locals {
   github_owner_app_of_apps     = "<your-github-username-or-org-name-where-your-app-of-apps-fork-is>"
@@ -35,7 +35,7 @@ git push origin <tag>
 
 ## Pin the Tag in Live
 
-From the root of your live fork, set `app_of_apps_target_revision` to your tag in both [`live/staging/eks/stack/terragrunt.stack.hcl`](https://github.com/ConsciousML/terragrunt-template-live-eks/blob/main/live/staging/eks/stack/terragrunt.stack.hcl) and [`live/prod/eks/stack/terragrunt.stack.hcl`](https://github.com/ConsciousML/terragrunt-template-live-eks/blob/main/live/prod/eks/stack/terragrunt.stack.hcl). Set the same tag in both, since CI only tests `staging`:
+From the root of your live fork, set `app_of_apps_target_revision` to your tag in both [`live/staging/eks/stack/terragrunt.stack.hcl`](https://github.com/ConsciousML/eks-forge-live/blob/main/live/staging/eks/stack/terragrunt.stack.hcl) and [`live/prod/eks/stack/terragrunt.stack.hcl`](https://github.com/ConsciousML/eks-forge-live/blob/main/live/prod/eks/stack/terragrunt.stack.hcl). Set the same tag in both, since CI only tests `staging`:
 ```hcl
 locals {
   ...
