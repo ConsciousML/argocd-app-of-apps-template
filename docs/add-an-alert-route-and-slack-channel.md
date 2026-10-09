@@ -10,7 +10,7 @@ First, pick a name for your component, with only lowercase letters, digits, and 
 
 ### Add the Channel Names
 
-Add one name per severity to `channel_names` in [`pipelines/bootstrap/slack/channels.hcl`](https://github.com/ConsciousML/terragrunt-template-catalog-eks/blob/main/pipelines/bootstrap/slack/channels.hcl), without the environment or a leading `#`. For example, for `uptime`:
+Add one name per severity to `channel_names` in [`pipelines/bootstrap/slack/channels.hcl`](https://github.com/ConsciousML/eks-forge-catalog/blob/main/pipelines/bootstrap/slack/channels.hcl), without the environment or a leading `#`. For example, for `uptime`:
 ```hcl
 locals {
   channel_names = [
@@ -100,4 +100,4 @@ Follow [Open a Pull Request](/docs/applications/add-edit-or-remove-an-app/#open-
 
 Follow [Release a Change to Production](/docs/deployment/release-a-change-to-production/), with both [Release an IaC Change](/docs/iac/release-an-iac-change/) and [Release an App Change](/docs/applications/release-an-app-change/) in the same pull request.
 
-Your live fork has its own list of channels. In the [Update the Bootstrap Pipelines](/docs/iac/release-an-iac-change/#update-the-bootstrap-pipelines) step, add the same names to [`live/bootstrap/slack/channels.hcl`](https://github.com/ConsciousML/terragrunt-template-live-eks/blob/main/live/bootstrap/slack/channels.hcl). Its apply creates the `staging-` and `prod-` channels, which you then join. Without them, Alertmanager posts the alerts of your component to channels that don't exist in `staging` and `prod`.
+Your live fork has its own list of channels. In the [Update the Bootstrap Pipelines](/docs/iac/release-an-iac-change/#update-the-bootstrap-pipelines) step, add the same names to [`live/bootstrap/slack/channels.hcl`](https://github.com/ConsciousML/eks-forge-live/blob/main/live/bootstrap/slack/channels.hcl). Its apply creates the `staging-` and `prod-` channels, which you then join. Without them, Alertmanager posts the alerts of your component to channels that don't exist in `staging` and `prod`.

@@ -44,7 +44,7 @@ Two repositories deploy what runs in your cluster:
 
 This split keeps each change in one place. An application change ships through ArgoCD without a Terraform apply. And values that depend on the deployment, like a certificate ARN or a hostname, never get hardcoded in the app of apps repository: the catalog injects them at deploy time.
 
-The catalog also injects the repository URL and git revision every child Application syncs from. So `github.hcl` and the environment's revision are the only places that decide which fork and which version a cluster runs. `dev` reads the catalog's `github.hcl`, while `staging` and `prod` read the one in the [live repository](https://github.com/ConsciousML/terragrunt-template-live-eks).
+The catalog also injects the repository URL and git revision every child Application syncs from. So `github.hcl` and the environment's revision are the only places that decide which fork and which version a cluster runs. `dev` reads the catalog's `github.hcl`, while `staging` and `prod` read the one in the [live repository](https://github.com/ConsciousML/eks-forge-live).
 
 ## `appParams` Injection
 The catalog passes values to child Applications through a single map, `appParams`:
@@ -131,6 +131,6 @@ Namespaces are the exception. Deleting one deletes everything inside it, ArgoCD'
 ## Versioning per Environment
 Each environment decides which version of the app of apps repository it runs:
 - `dev` follows a branch, `main` by default. You can point it at your own branch to try a change before merging it, as in [Deploy an App Change to Dev](/docs/applications/get-started/deployment/).
-- `staging` and `prod` pin a git tag in the [live repository](https://github.com/ConsciousML/terragrunt-template-live-eks), so they only run versions you released and tested.
+- `staging` and `prod` pin a git tag in the [live repository](https://github.com/ConsciousML/eks-forge-live), so they only run versions you released and tested.
 
 This tag is separate from the catalog's version. An application change ships without a new catalog release, and a catalog change ships without touching the applications. The trade-off is that both versions must stay compatible: every `appParams` key the catalog sends must exist in the app of apps version it deploys.
